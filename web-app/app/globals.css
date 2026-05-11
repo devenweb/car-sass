@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-yellow: #fcc200;
+  --bg-primary: #F1EDE4;
+  --bg-dark: #1A1A1A;
+  --max-width: 80rem; 
+  --nav-height: 5rem;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--bg-dark)] font-sans antialiased overflow-x-hidden;
+  }
+}
+
+@layer components {
+  /* Unified Container for Design Parity */
+  .content-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
+  }
+
+  /* Universal Page Wrapper to prevent Nav overlap */
+  .page-layout {
+    @apply min-h-screen pt-[var(--nav-height)] flex flex-col;
+  }
+
+  /* Hero Section Standard - Premium Blurred Background */
+  .hero-standard {
+    @apply relative min-h-[50vh] flex items-center overflow-hidden bg-[#1A1A1A];
+  }
+
+  .hero-bg-image {
+    @apply absolute inset-0 w-full h-full object-cover opacity-30;
+  }
+
+  .hero-overlay {
+    @apply absolute inset-0 bg-gradient-to-b from-transparent via-[#1A1A1A] to-[#1A1A1A];
+  }
+
+  /* Section Spacing */
+  .section-padding {
+    @apply py-20 md:py-32;
+  }
+}

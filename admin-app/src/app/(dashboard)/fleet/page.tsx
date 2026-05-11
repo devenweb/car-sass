@@ -1,233 +1,325 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect, useRef } from "react";
 import { 
   Plus, Search, Filter, MoreVertical, Edit2, Trash2, Eye, Car as CarIcon, 
-  X, ChevronDown, ChevronRight, Settings, Calendar, Tool
+  X, ChevronDown, ChevronRight, Settings, Calendar, Wrench, AlertTriangle, CheckCircle2,
+  Trash, Upload, Save, Loader2, Info, History, Gauge
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-
-interface VehicleUnit {
-  id: string;
-  plate_number: string;
-  vin_number: string;
-  status: string;
-  availability_status: string;
-  mileage: number;
-  daily_price: number;
-}
-
-interface VehicleTemplate {
-  id: string;
-  brand: string;
-  model: string;
-  category: string;
-  transmission: string;
-  seats: number;
-  default_thumbnail: string;
-  units: VehicleUnit[];
-}
+import { supabase } from "@/lib/supabase";
 
 export default function FleetPage() {
-  const [templates, setTemplates] = useState<VehicleTemplate[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    fetchFleet();
-  }, []);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
+  const [editingUnit, setEditingUnit] = useState<any>(null);
+  const [isMaintModalOpen, setIsMaintModalOpen] = useState(false);
+  const [selectedUnitForMaint, setSelectedUnitForMaint] = useState<any>(null);
+  
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function fetchFleet() {
+  useEffect(() => { fetchFleet(); }, []);
+
+  const fetchFleet = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("vehicle_templates")
-      .select(`
-        *,
-        units:vehicle_units(*)
-      `)
-      .order("brand");
-
-    if (error) {
-      console.error("Error fetching fleet:", error);
-    } else {
+    try {
+      const { data, error } = await supabase
+        .from('vehicle_templates')
+        .select('*, units:vehicle_units(*)')
+        .order('brand', { ascending: true });
+      if (error) throw error;
       setTemplates(data || []);
-    }
-    setLoading(false);
-  }
+    } catch (error) { console.error(error); }
+    finally { setLoading(false); }
+  };
 
-  const toggleExpand = (id: string) => {
-    const next = new Set(expandedTemplates);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setExpandedTemplates(next);
+  const toggleRow = (id: string) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(id)) newExpanded.delete(id);
+    else newExpanded.add(id);
+    setExpandedRows(newExpanded);
+  };
+
+  const openEditModal = (template: any) => {
+    setEditingTemplate(template || {
+      brand: "", model: "", category: "Economy",
+      transmission: "Automatic", seats: 5, description: "",
+      published_status: "published"
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!editingTemplate.brand || !editingTemplate.model) return;
+    setUploading(true);
+    
+    // Clean the object before upserting
+    const { units, pricing, ...templateToSave } = editingTemplate;
+    
+    const { error } = await supabase.from('vehicle_templates').upsert(templateToSave);
+    if (error) {
+      console.error("Template save error:", error);
+      alert("Error saving template: " + error.message);
+    } else { 
+      setIsModalOpen(false); 
+      fetchFleet(); 
+    }
+    setUploading(false);
+  };
+
+  const handleDeleteTemplate = async (id: string) => {
+    if (!confirm("Are you sure?")) return;
+    const { error } = await supabase.from('vehicle_templates').delete().eq('id', id);
+    if (error) alert("Error deleting template");
+    else fetchFleet();
+  };
+
+  const openUnitModal = (unit: any, templateId?: string) => {
+    setEditingUnit(unit || {
+      vehicle_template_id: templateId, plate_number: "",
+      vin: "", color: "White", mileage: 0,
+      availability_status: "available", internal_reference: ""
+    });
+    setIsUnitModalOpen(true);
+  };
+
+  const handleSaveUnit = async () => {
+    if (!editingUnit.plate_number) return;
+    setUploading(true);
+    
+    // Clean the object before upserting
+    const { ...unitToSave } = editingUnit;
+    
+    const { error } = await supabase.from('vehicle_units').upsert(unitToSave);
+    if (error) {
+      console.error("Unit save error:", error);
+      alert("Error saving unit: " + error.message);
+    } else { 
+      setIsUnitModalOpen(false); 
+      fetchFleet(); 
+    }
+    setUploading(false);
+  };
+
+  const handleDeleteUnit = async (id: string) => {
+    if (!confirm("Remove unit?")) return;
+    const { error } = await supabase.from('vehicle_units').delete().eq('id', id);
+    if (error) alert("Error deleting unit");
+    else fetchFleet();
+  };
+
+  const openMaintenance = (unit: any) => {
+    setSelectedUnitForMaint(unit);
+    setIsMaintModalOpen(true);
+  };
+
+  const handleImageUpload = async (e: any) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingTemplate) return;
+    setUploading(true);
+    const fileName = `${Math.random()}.${file.name.split('.').pop()}`;
+    const { error: uploadError } = await supabase.storage.from('fleet').upload(`templates/${fileName}`, file);
+    if (uploadError) alert("Upload failed");
+    else {
+      const { data: { publicUrl } } = supabase.storage.from('fleet').getPublicUrl(`templates/${fileName}`);
+      setEditingTemplate({ ...editingTemplate, image_url: publicUrl, default_thumbnail: publicUrl });
+    }
+    setUploading(false);
   };
 
   const filteredTemplates = templates.filter(t => 
-    `${t.brand} ${t.model}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  return (
-    <div className="p-8 space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    `${t.brand} ${t.model}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );  return (
+    <div className="space-y-8 pb-20">
+      <div className="flex justify-between bg-white p-8 rounded-2xl border border-admin-border shadow-sm">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Fleet Inventory</h1>
-          <p className="text-slate-500 text-sm font-medium uppercase tracking-widest">Catalog & Unit Management</p>
+          <h1 className="text-3xl font-bold tracking-tight">Fleet Manager</h1>
+          <p className="text-slate-500">Manage models and units.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">
-            <Filter className="w-4 h-4" /> Filter
-          </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl">
-            <Plus className="w-4 h-4" /> Add Template
-          </button>
-        </div>
+        <button onClick={() => openEditModal(null)} className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+          <Plus size={20} /> Add New Model
+        </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Total Templates", value: templates.length, color: "blue" },
-          { label: "Total Units", value: templates.reduce((acc, t) => acc + (t.units?.length || 0), 0), color: "emerald" },
-          { label: "Available", value: templates.reduce((acc, t) => acc + (t.units?.filter(u => u.availability_status === 'available').length || 0), 0), color: "indigo" },
-          { label: "Maintenance", value: templates.reduce((acc, t) => acc + (t.units?.filter(u => u.availability_status === 'maintenance').length || 0), 0), color: "amber" },
+          { label: "Total Models", value: templates.length, color: "bg-blue-500" },
+          { label: "Total Units", value: templates.reduce((acc, t) => acc + (t.units?.length || 0), 0), color: "bg-indigo-500" },
+          { label: "Available", value: templates.reduce((acc, t) => acc + (t.units?.filter((u:any) => u.availability_status === 'available').length || 0), 0), color: "bg-emerald-500" },
+          { label: "Maintenance", value: templates.reduce((acc, t) => acc + (t.units?.filter((u:any) => u.availability_status === 'maintenance').length || 0), 0), color: "bg-amber-500" },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{stat.label}</p>
-            <p className="text-3xl font-black text-slate-900 tracking-tighter">{stat.value}</p>
+          <div key={i} className="bg-white p-6 rounded-2xl border border-admin-border shadow-sm flex items-center gap-4">
+            <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg", stat.color)}><CarIcon size={24} /></div>
+            <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+              <p className="text-2xl font-black text-admin-text">{stat.value}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-        <input 
-          type="text" 
-          placeholder="Search brand, model or category..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-white border border-slate-200 h-16 pl-16 pr-6 rounded-3xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition-all shadow-sm"
-        />
+      <div className="bg-white p-6 rounded-2xl border border-admin-border shadow-sm">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+          <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
+        </div>
       </div>
 
-      {/* Fleet List */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-admin-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-50 bg-slate-50/50">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Model</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Category</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-center">Units</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Avg Price</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Actions</th>
+              <tr className="bg-slate-50/50 border-b border-admin-border">
+                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Model Details</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Category</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Inventory</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Catalog</th>
+                <th className="px-8 py-5 text-right text-slate-400">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan={5} className="p-20 text-center font-black text-slate-300 uppercase tracking-widest">Loading Inventory...</td></tr>
-              ) : filteredTemplates.map((template) => (
-                <React.Fragment key={template.id}>
-                  <tr className="hover:bg-slate-50/50 transition-all group cursor-pointer" onClick={() => toggleExpand(template.id)}>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-10 relative bg-slate-100 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200">
-                          {template.default_thumbnail && (
-                            <Image src={template.default_thumbnail} fill className="object-cover mix-blend-multiply" alt={template.model} />
-                          )}
+                <tr><td colSpan={5} className="py-20 text-center text-slate-400">Loading...</td></tr>
+              ) : filteredTemplates.map((template) => {
+                const units = template.units || [];
+                return (
+                  <React.Fragment key={template.id}>
+                    <tr className={cn("group hover:bg-slate-50/50 cursor-pointer", expandedRows.has(template.id) && "bg-slate-50/80")} onClick={() => toggleRow(template.id)}>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          {expandedRows.has(template.id) ? <ChevronDown size={20}/> : <ChevronRight size={20}/>}
+                          <div className="w-20 h-12 relative rounded-lg overflow-hidden border bg-slate-100">
+                            <Image src={template.image_url || template.default_thumbnail || "/placeholder-car.png"} alt={template.brand} fill className="object-cover" />
+                          </div>
+                          <div><p className="text-lg font-bold">{template.brand} {template.model}</p></div>
                         </div>
-                        <div>
-                          <p className="font-black text-slate-900 uppercase tracking-tight">{template.brand} {template.model}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{template.transmission} • {template.seats} Seats</p>
+                      </td>
+                      <td className="px-8 py-6"><span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-black uppercase">{template.category}</span></td>
+                      <td className="px-8 py-6">
+                        <div className="flex gap-4">
+                          <div><p className="text-lg font-black">{units.length}</p><p className="text-[8px] uppercase text-slate-400 font-bold">Total</p></div>
+                          <div><p className="text-lg font-black text-emerald-500">{units.filter((u:any) => u.availability_status === 'available').length}</p><p className="text-[8px] uppercase text-slate-400 font-bold">Ready</p></div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[9px] font-black uppercase tracking-widest">
-                        {template.category}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <span className="font-black text-slate-900">{template.units?.length || 0}</span>
-                        {expandedTemplates.has(template.id) ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="font-black text-slate-900">Rs {Math.min(...(template.units?.map(u => u.daily_price) || [0]))}</span>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <button className="p-2 hover:bg-slate-200 rounded-xl transition-all">
-                        <Edit2 className="w-4 h-4 text-slate-400" />
-                      </button>
-                    </td>
-                  </tr>
-                  
-                  {/* Expanded Units View */}
-                  {expandedTemplates.has(template.id) && (
-                    <tr className="bg-slate-50/30">
-                      <td colSpan={5} className="px-12 py-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {template.units?.map(unit => (
-                            <div key={unit.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                              <div className="flex justify-between items-start mb-4">
-                                <div>
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Plate Number</p>
-                                  <p className="font-black text-slate-900 uppercase tracking-widest text-lg">{unit.plate_number}</p>
-                                </div>
-                                <span className={cn(
-                                  "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest",
-                                  unit.availability_status === 'available' ? "bg-emerald-100 text-emerald-700" :
-                                  unit.availability_status === 'rented' ? "bg-blue-100 text-blue-700" :
-                                  "bg-amber-100 text-amber-700"
-                                )}>
-                                  {unit.availability_status}
-                                </span>
-                              </div>
-                              
-                              <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-300">Mileage</p>
-                                  <p className="text-sm font-black text-slate-600">{unit.mileage.toLocaleString()} KM</p>
-                                </div>
-                                <div>
-                                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-300">Daily Price</p>
-                                  <p className="text-sm font-black text-slate-600">Rs {unit.daily_price}</p>
-                                </div>
-                              </div>
-                              
-                              <div className="flex gap-2 pt-4 border-t border-slate-50">
-                                <button title="Unit Settings" className="flex-1 flex items-center justify-center py-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all">
-                                  <Settings className="w-4 h-4" />
-                                </button>
-                                <button title="Maintenance" className="flex-1 flex items-center justify-center py-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all">
-                                  <Tool className="w-4 h-4" />
-                                </button>
-                                <button title="Bookings" className="flex-1 flex items-center justify-center py-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all">
-                                  <Calendar className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                          <button className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-slate-400 hover:text-slate-600 transition-all">
-                            <Plus className="w-6 h-6 mb-2" />
-                            <p className="text-[10px] font-black uppercase tracking-widest">Add Physical Unit</p>
-                          </button>
+                      </td>
+                      <td className="px-8 py-6"><span className="text-xs font-bold capitalize">{template.published_status}</span></td>
+                      <td className="px-8 py-6 text-right" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => openEditModal(template)} className="p-2 hover:bg-primary/10 rounded-xl"><Edit2 size={18}/></button>
+                          <button onClick={() => handleDeleteTemplate(template.id)} className="p-2 hover:bg-rose-500/10 rounded-xl"><Trash size={18}/></button>
                         </div>
                       </td>
                     </tr>
-                  )}
-                </React.Fragment>
-              ))}
+                    {expandedRows.has(template.id) && (
+                      <tr className="bg-slate-50/30">
+                        <td colSpan={5} className="px-20 py-6">
+                          <div className="flex justify-between border-b pb-2 mb-4">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Physical Units</h4>
+                            <button onClick={() => openUnitModal(null, template.id)} className="text-[9px] font-black text-primary uppercase">+ Add Unit</button>
+                          </div>
+                          <div className="grid gap-3">
+                            {units.map((unit: any) => (
+                              <div key={unit.id} className="bg-white p-4 rounded-xl border flex justify-between items-center group/unit">
+                                <div className="flex gap-6 items-center">
+                                  <div onClick={() => openUnitModal(unit)} className="px-3 py-1 bg-slate-900 text-white rounded font-mono text-sm cursor-pointer hover:bg-primary transition-colors">{unit.plate_number}</div>
+                                  <div className="flex gap-4 text-xs font-bold text-slate-500">
+                                    <span className="flex items-center gap-1"><Gauge size={14}/>{unit.mileage} KM</span>
+                                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full" style={{backgroundColor:unit.color}}/>{unit.color}</span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                  <span className={cn("px-3 py-1 rounded-full text-[9px] font-black uppercase", unit.availability_status === 'available' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600')}>{unit.availability_status}</span>
+                                  <div className="flex gap-1 opacity-0 group-hover/unit:opacity-100">
+                                    <button onClick={() => openMaintenance(unit)} className="p-1.5 hover:bg-primary/10 rounded"><Wrench size={14}/></button>
+                                    <button className="p-1.5 hover:bg-primary/10 rounded"><History size={14}/></button>
+                                    <button onClick={() => handleDeleteUnit(unit.id)} className="p-1.5 hover:bg-rose-500/10 rounded text-rose-500"><Trash2 size={14}/></button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      </div>
+      </div>      {isModalOpen && editingTemplate && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row">
+            <div className="w-full md:w-[40%] bg-slate-50 p-10 border-r">
+              <h3 className="text-xl font-black uppercase mb-6">Vehicle Image</h3>
+              <div className="aspect-[4/3] relative rounded-3xl overflow-hidden border-2 border-dashed bg-white flex items-center justify-center group shadow-inner">
+                {(editingTemplate.image_url || editingTemplate.default_thumbnail) ? (
+                  <><Image src={editingTemplate.image_url || editingTemplate.default_thumbnail} alt="Preview" fill className="object-cover" /><div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center"><button onClick={() => fileInputRef.current?.click()} className="p-3 bg-white rounded-full shadow-xl"><Upload size={20}/></button></div></>
+                ) : (
+                  <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-2 text-slate-400"><Upload size={24}/><span className="text-xs font-bold uppercase">Upload</span></button>
+                )}
+                {uploading && <div className="absolute inset-0 bg-white/80 flex items-center justify-center"><Loader2 className="animate-spin" /></div>}
+              </div>
+              <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
+            </div>
+            <div className="flex-1 p-12 space-y-6">
+              <h2 className="text-3xl font-black uppercase tracking-tighter">Model Config</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input type="text" value={editingTemplate.brand || ''} onChange={e => setEditingTemplate({...editingTemplate, brand: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Brand" />
+                <input type="text" value={editingTemplate.model || ''} onChange={e => setEditingTemplate({...editingTemplate, model: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Model" />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <select value={editingTemplate.category || ''} onChange={e => setEditingTemplate({...editingTemplate, category: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Economy</option><option>Sedan</option><option>SUV</option><option>MPV</option><option>Luxury</option></select>
+                <select value={editingTemplate.transmission || ''} onChange={e => setEditingTemplate({...editingTemplate, transmission: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Automatic</option><option>Manual</option></select>
+                <input type="number" value={editingTemplate.seats ?? 5} onChange={e => setEditingTemplate({...editingTemplate, seats: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Seats" />
+              </div>
+              <textarea value={editingTemplate.description || ""} onChange={e => setEditingTemplate({...editingTemplate, description: e.target.value})} className="w-full p-4 bg-slate-50 border rounded-xl min-h-[100px]" placeholder="Description" />
+              <div className="flex justify-between items-center pt-4">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 cursor-pointer"><input type="checkbox" checked={editingTemplate.published_status === 'published'} onChange={e => setEditingTemplate({...editingTemplate, published_status: e.target.checked ? 'published' : 'draft'})} /> Visible</label>
+                <button onClick={handleSaveTemplate} className="px-10 py-4 bg-primary text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-primary/20">Save Model</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isUnitModalOpen && editingUnit && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsUnitModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-xl rounded-[2rem] shadow-2xl p-10">
+            <h3 className="text-2xl font-black uppercase mb-6">Unit Configuration</h3>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <input type="text" value={editingUnit.plate_number || ''} onChange={e => setEditingUnit({...editingUnit, plate_number: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold uppercase" placeholder="Plate Number" />
+              <input type="text" value={editingUnit.vin || ""} onChange={e => setEditingUnit({...editingUnit, vin: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="VIN" />
+              <input type="text" value={editingUnit.color || ''} onChange={e => setEditingUnit({...editingUnit, color: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Color" />
+              <input type="number" value={editingUnit.mileage ?? 0} onChange={e => setEditingUnit({...editingUnit, mileage: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Mileage" />
+              <select value={editingUnit.availability_status || 'available'} onChange={e => setEditingUnit({...editingUnit, availability_status: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold col-span-2"><option value="available">Available</option><option value="maintenance">Maintenance</option><option value="rented">Rented</option></select>
+            </div>
+            <button onClick={handleSaveUnit} className="w-full py-4 bg-admin-text text-white rounded-xl font-black uppercase text-sm">Save Unit</button>
+          </div>
+        </div>
+      )}
+
+      {isMaintModalOpen && selectedUnitForMaint && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsMaintModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-10 text-center animate-in zoom-in-95">
+             <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6 shadow-sm"><Wrench size={32} /></div>
+             <h3 className="text-xl font-black uppercase mb-2">Record Maintenance</h3>
+             <p className="text-slate-500 text-sm mb-6 font-medium">Record entry for <span className="font-bold text-admin-text">{selectedUnitForMaint.plate_number}</span></p>
+             <input type="text" placeholder="Service (e.g. Oil Change)" className="w-full p-4 bg-slate-50 border rounded-xl font-bold text-sm mb-4" />
+             <button className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase text-xs">Log Service</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,23 +9,47 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { SmartImage, optimizeImage } from '@/lib/image';
+import { SmartImage } from '@/lib/image';
 import { useLocalization } from '@/lib/currency';
 
 export default function HomePage() {
-  const [featuredCars, setFeaturedCars] = useState([]);
+  const [featuredTemplates, setFeaturedTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const { formatPrice } = useLocalization();
 
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const { data, error } = await supabase
-          .from('cars')
+        // 1. Fetch Templates
+        const { data: templates, error: tError } = await supabase
+          .from('vehicle_templates')
           .select('*')
-          .limit(4); // Keep it tight
-        if (error) throw error;
-        setFeaturedCars(data || []);
+          .limit(4);
+        if (tError) throw tError;
+
+        // 2. Fetch Pricing
+        const { data: pricing, error: pError } = await supabase
+          .from('vehicle_pricing')
+          .select('vehicle_template_id, daily_price');
+
+        // 3. Fetch Units
+        const { data: units, error: uError } = await supabase
+          .from('vehicle_units')
+          .select('vehicle_template_id, availability_status');
+
+        const enriched = (templates || []).map(t => {
+          const carPricing = pricing?.filter(p => p.vehicle_template_id === t.id) || [];
+          const carUnits = units?.filter(u => u.vehicle_template_id === t.id) || [];
+          const availableCount = carUnits.filter(u => u.availability_status === "available").length;
+          
+          // Dynamic Pricing Logic
+          const dailyPrices = carPricing.map(p => p.daily_price);
+          const minPrice = dailyPrices.length > 0 ? Math.min(...dailyPrices) : (t.daily_price || 1500);
+          
+          return { ...t, available_count: availableCount, min_price: minPrice };
+        });
+
+        setFeaturedTemplates(enriched);
       } catch (err) {
         console.error('Error:', err);
       } finally {
@@ -90,7 +114,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 1. Experiences Section - FULL BLEED EDGE TOUCH */}
+      {/* 1. Experiences Section */}
       <section className="py-12 -mt-16 relative z-20">
         <div className="content-container">
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -98,45 +122,48 @@ export default function HomePage() {
                   <Link 
                     key={i} 
                     href={`/fleet?category=${exp.filter}`}
-                    className="group relative h-[320px] rounded-[3.5rem] overflow-hidden flex flex-col items-center justify-end border-[0px] shadow-2xl shadow-black/20 hover:-translate-y-3 transition-all duration-500 active:scale-95 bg-[var(--bg-primary)]"
+                    className="group relative h-[450px] rounded-[3.5rem] overflow-hidden flex flex-col items-center justify-end border-8 border-white shadow-2xl shadow-black/20 hover:-translate-y-3 transition-all duration-500 active:scale-95 bg-[var(--bg-primary)]"
                   >
-                    <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 z-0">
                        <img 
                          src={exp.image} 
-                         className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700" 
+                         className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-[1.5s]" 
                          alt={exp.label} 
                        />
-                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100"></div>
+                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                     
-                    <div className="relative z-10 p-8 space-y-2 text-center w-full">
-                       <h4 className="text-[14px] lg:text-[16px] font-black uppercase tracking-tight text-white leading-none">
+                    <div className="relative z-10 p-10 space-y-3 text-center">
+                       <h4 className="text-[20px] font-black uppercase tracking-tight text-white leading-none">
                           {exp.label}
                        </h4>
-                       <div className="h-1 w-10 bg-[var(--brand-yellow)] mx-auto rounded-full"></div>
-                       <p className="text-[8px] font-bold text-white/50 uppercase tracking-[0.2em] leading-relaxed">
+                       <p className="text-[10px] font-bold text-[var(--brand-yellow)] uppercase tracking-[0.3em]">
                           {exp.desc}
                        </p>
                     </div>
+
+                    <div className="absolute top-8 right-8 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:bg-[var(--brand-yellow)] group-hover:text-[var(--bg-dark)] transition-all">
+                       <ChevronRight className="w-6 h-6" />
+                    </div>
                   </Link>
                 ))}
-             </div>
+           </div>
         </div>
       </section>
 
-      {/* 2. Body Type Categories - FULL BLEED EDGE TOUCH */}
-      <section className="py-24 bg-white relative">
+      {/* 2. Categories Section */}
+      <section className="py-24 relative overflow-hidden bg-white">
         <div className="content-container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
-             <div className="space-y-3">
-                <h2 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
-                   Browse By <br />
-                   <span className="text-[var(--brand-yellow)]">Body Type.</span>
-                </h2>
-             </div>
-             <Link href="/fleet" className="group flex items-center gap-4 text-[var(--bg-dark)] font-black uppercase tracking-widest text-sm">
-                Full Collection
-                <div className="w-14 h-14 rounded-full border-2 border-black/10 flex items-center justify-center group-hover:bg-[var(--brand-yellow)] group-hover:border-[var(--brand-yellow)] transition-all">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-20">
+            <div className="space-y-4">
+              <h2 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
+                Browse By <br />
+                <span className="text-[var(--brand-yellow)]">Category.</span>
+              </h2>
+            </div>
+            <Link href="/fleet" className="group flex items-center gap-4 text-[var(--bg-dark)] font-black uppercase tracking-widest text-sm">
+                 Explore All
+                <div className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-[var(--bg-dark)] group-hover:text-white transition-all">
                    <ChevronRight className="w-6 h-6" />
                 </div>
              </Link>
@@ -152,7 +179,7 @@ export default function HomePage() {
                   <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
                      <img 
                        src={cat.image} 
-                       className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-700" 
+                       className="w-full h-full object-contain transform scale-100 group-hover:scale-110 transition-transform duration-700" 
                        alt={cat.label} 
                      />
                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100"></div>
@@ -173,7 +200,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Featured Fleet - FULL BLEED EDGE TOUCH */}
+      {/* 3. Featured Fleet */}
       <section className="py-24 relative bg-[var(--bg-primary)]">
         <div className="content-container">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
@@ -195,32 +222,29 @@ export default function HomePage() {
             {loading ? (
               [1, 2].map(i => <div key={i} className="aspect-[16/9] bg-white rounded-[3rem] animate-pulse" />)
             ) : (
-              featuredCars.map((car) => (
+              featuredTemplates.map((template) => (
                 <Link 
-                  key={car.id} 
-                  href={`/fleet/${car.id}`}
+                  key={template.id} 
+                  href={`/fleet/${template.id}`}
                   className="group bg-white rounded-[3.5rem] overflow-hidden border border-black/5 shadow-xl hover:shadow-3xl transition-all duration-700 hover:-translate-y-4 flex flex-col h-full"
                 >
-                  {/* Full Bleed Image - Edge Touch */}
-                  <div className="relative h-[360px] w-full bg-[var(--bg-primary)] overflow-hidden">
-                    <div className="absolute top-8 left-8 z-20">
+                  <div className="relative h-[320px] w-full bg-white overflow-hidden group-hover:bg-slate-50/50 transition-colors duration-700">
+                    <div className="absolute top-8 left-8 z-20 flex flex-col gap-2">
                        <span className="px-6 py-2 bg-white/95 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)] shadow-xl border border-black/5">
-                        {car.category} Verified
+                        {template.category} Verified
                        </span>
+                       {template.available_count > 0 && (
+                         <span className="px-4 py-1.5 bg-emerald-500 text-white rounded-full text-[8px] font-black uppercase tracking-[0.2em] shadow-xl w-fit">
+                           {template.available_count} Available
+                         </span>
+                       )}
                     </div>
-                    <div className="w-full h-full">
+                    <div className="w-full h-full p-8 flex items-center justify-center">
                        <SmartImage 
-                         src={car.image_url} 
-                         className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-[1s]" 
-                         alt={car.name} 
+                         src={template.default_thumbnail || template.image_url} 
+                         className="w-full h-full object-contain transform scale-100 group-hover:scale-110 transition-transform duration-[1s]" 
+                         alt={`${template.brand} ${template.model}`} 
                        />
-                    </div>
-                    <div className="absolute bottom-6 right-6 z-10">
-                      <div className="bg-[var(--bg-dark)] text-[var(--brand-yellow)] px-8 py-4 rounded-[1.5rem] shadow-xl border-2 border-white/20">
-                        <div className="text-2xl font-black tracking-tighter leading-none">
-                           {formatPrice(car.price_per_day).replace('Rs ', 'Rs')}
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -228,12 +252,8 @@ export default function HomePage() {
                     <div className="flex justify-between items-start">
                        <div className="space-y-2">
                           <h3 className="text-5xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-[0.8] group-hover:text-[var(--brand-yellow)] transition-colors duration-500">
-                             {car.name}
+                             {template.brand} {template.model}
                           </h3>
-                          <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                             <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Immediate Availability</span>
-                          </div>
                        </div>
                        <div className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-primary)] rounded-xl border border-black/5">
                           <Star className="w-4 h-4 fill-[var(--brand-yellow)] text-[var(--brand-yellow)]" />
@@ -246,26 +266,28 @@ export default function HomePage() {
                           <Users className="w-6 h-6 text-[var(--bg-dark)]/20" />
                           <div className="flex flex-col">
                              <span className="text-[9px] font-black text-[var(--bg-dark)]/40 uppercase tracking-[0.2em]">Capacity</span>
-                             <span className="text-sm font-black text-[var(--bg-dark)] uppercase">{car.seats} Adults</span>
+                             <span className="text-sm font-black text-[var(--bg-dark)] uppercase">{template.seats} Adults</span>
                           </div>
                        </div>
                        <div className="flex items-center gap-4 p-5 bg-[var(--bg-primary)]/50 rounded-2xl border border-black/5">
                           <Settings2 className="w-6 h-6 text-[var(--bg-dark)]/20" />
-                          <div className="flex flex-col">
+                          <div className="flex flex-col text-left">
                              <span className="text-[9px] font-black text-[var(--bg-dark)]/40 uppercase tracking-[0.2em]">Transmission</span>
-                             <span className="text-sm font-black text-[var(--bg-dark)] uppercase">{car.transmission}</span>
+                             <span className="text-sm font-black text-[var(--bg-dark)] uppercase">{template.transmission}</span>
                           </div>
                        </div>
                     </div>
 
-                    <div className="mt-auto pt-10 border-t border-black/5 flex items-center justify-between">
-                       <div className="flex items-center gap-3">
-                          <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                          <span className="text-[11px] font-black text-emerald-600 uppercase tracking-[0.2em]">Insured</span>
-                       </div>
-                       <div className="w-16 h-16 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-xl group-hover:scale-110 transition-all duration-500">
-                          <ArrowRight className="w-7 h-7" />
-                       </div>
+                    <div className="pt-5 border-t border-black/5 flex items-center justify-between mt-3">
+                      <div className="flex flex-col">
+                         <span className="text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.3em] leading-none mb-1">Starting At</span>
+                         <span className="text-[26px] font-black text-[var(--bg-dark)] tracking-tighter leading-none">
+                           {formatPrice(template.min_price)}
+                         </span>
+                      </div>
+                      <div className="w-14 h-14 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-lg group-hover:scale-110 transition-all duration-500">
+                         <ArrowRight className="w-7 h-7" />
+                      </div>
                     </div>
                   </div>
                 </Link>

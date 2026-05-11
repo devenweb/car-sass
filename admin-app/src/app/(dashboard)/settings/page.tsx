@@ -1,7 +1,9 @@
 "use client";
 
-import { Save, User, Bell, Shield, Database } from "lucide-react";
-import { useState } from "react";
+import { Save, User, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package } from "lucide-react";
+import { useState, useRef } from "react";
+import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
@@ -11,7 +13,117 @@ export default function SettingsPage() {
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Security", icon: Shield },
     { id: "database", label: "Database", icon: Database },
+    { id: "backups", label: "Backup & Restore", icon: History },
   ];
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [backupStatus, setBackupStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const TABLES_TO_BACKUP = [
+    'vehicle_templates',
+    'vehicle_units',
+    'vehicle_pricing',
+    'customers',
+    'rentals',
+    'contact_messages',
+    'newsletters',
+    'rental_inspections',
+    'vehicle_template_images'
+  ];
+
+  const handleCreateBackup = async () => {
+    setIsProcessing(true);
+    setBackupStatus(null);
+    try {
+      const backupData: Record<string, any> = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        tables: {}
+      };
+
+      for (const table of TABLES_TO_BACKUP) {
+        const { data, error } = await supabase.from(table).select('*');
+        if (error) throw new Error(`Failed to fetch ${table}: ${error.message}`);
+        backupData.tables[table] = data;
+      }
+
+      // Create and download file
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `royal-rental-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setBackupStatus({ type: 'success', message: 'Ecosystem backup created and downloaded successfully!' });
+    } catch (error: any) {
+      console.error(error);
+      setBackupStatus({ type: 'error', message: error.message || 'Failed to create backup' });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRestoreBackup = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!confirm("CRITICAL WARNING: Restoring a backup will attempt to merge data with your current database. It is highly recommended to have a manual SQL backup of your Supabase instance before proceeding. Continue?")) {
+      event.target.value = '';
+      return;
+    }
+
+    setIsProcessing(true);
+    setBackupStatus(null);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const backupData = JSON.parse(e.target?.result as string);
+          
+          if (!backupData.tables || typeof backupData.tables !== 'object') {
+            throw new Error('Invalid backup file format');
+          }
+
+          // Restore in specific order to satisfy foreign key constraints
+          const ORDERED_RESTORE = [
+            'vehicle_templates',
+            'vehicle_template_images',
+            'customers',
+            'newsletters',
+            'contact_messages',
+            'vehicle_units',
+            'vehicle_pricing',
+            'rentals',
+            'rental_inspections'
+          ];
+
+          for (const table of ORDERED_RESTORE) {
+            const data = backupData.tables[table];
+            if (data && data.length > 0) {
+              const { error } = await supabase.from(table).upsert(data);
+              if (error) throw new Error(`Restoring ${table} failed: ${error.message}`);
+            }
+          }
+
+          setBackupStatus({ type: 'success', message: 'Ecosystem restored successfully! Changes are now live.' });
+        } catch (err: any) {
+          setBackupStatus({ type: 'error', message: err.message || 'Failed to parse backup file' });
+        } finally {
+          setIsProcessing(false);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+      };
+      reader.readAsText(file);
+    } catch (error: any) {
+      setBackupStatus({ type: 'error', message: 'Failed to read file' });
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -67,23 +179,74 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {activeTab === "database" && (
-              <div className="space-y-4">
-                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-                  <strong>Warning:</strong> Database settings are critical. Changes may affect application stability.
+            {activeTab === "backups" && (
+              <div className="space-y-8">
+                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
+                    <Package size={32} />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h4 className="text-lg font-black text-admin-text uppercase">Full Ecosystem Snapshot</h4>
+                    <p className="text-sm text-admin-muted mt-1">Generate a comprehensive JSON backup of all tables, configurations, and system states.</p>
+                  </div>
+                  <button 
+                    onClick={handleCreateBackup}
+                    disabled={isProcessing}
+                    className="btn-primary whitespace-nowrap"
+                  >
+                    {isProcessing ? <RefreshCcw size={18} className="animate-spin" /> : <Download size={18} />}
+                    Create Backup
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">Supabase URL</label>
-                  <input type="text" readOnly value={process.env.NEXT_PUBLIC_SUPABASE_URL} className="input-field bg-slate-50 cursor-not-allowed" />
+
+                <div className="p-6 bg-white rounded-2xl border border-admin-border flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shrink-0 border border-amber-100">
+                    <Upload size={32} />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h4 className="text-lg font-black text-admin-text uppercase">Restore System State</h4>
+                    <p className="text-sm text-admin-muted mt-1">Upload a previous ecosystem snapshot to restore the database to its previous state.</p>
+                  </div>
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isProcessing}
+                    className="btn-secondary whitespace-nowrap border-slate-200"
+                  >
+                    {isProcessing ? <RefreshCcw size={18} className="animate-spin" /> : <FileJson size={18} />}
+                    Upload & Restore
+                  </button>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleRestoreBackup} 
+                    className="hidden" 
+                    accept=".json" 
+                  />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">Sync Interval (seconds)</label>
-                  <input type="number" defaultValue={30} className="input-field" />
+
+                {backupStatus && (
+                  <div className={cn(
+                    "p-4 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-2",
+                    backupStatus.type === 'success' ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
+                  )}>
+                    {backupStatus.type === 'success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
+                    <p className="text-sm font-bold">{backupStatus.message}</p>
+                  </div>
+                )}
+
+                <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100 flex items-start gap-4">
+                  <AlertTriangle className="text-rose-500 shrink-0 mt-0.5" size={20} />
+                  <div>
+                    <p className="text-sm font-black text-rose-900 uppercase tracking-tight">System Integrity Warning</p>
+                    <p className="text-xs text-rose-700 mt-2 leading-relaxed font-medium">
+                      The restore process uses **UPSERT** logic. It will overwrite existing records with the same IDs from the backup file but will **NOT** delete records created after the backup was taken. This tool is designed for ecosystem synchronization and emergency recovery.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
-            {activeTab !== "general" && activeTab !== "database" && (
+            {activeTab !== "general" && activeTab !== "database" && activeTab !== "backups" && (
               <div className="py-12 text-center text-slate-400 italic">
                 Settings for {activeTab} will be implemented in the next update.
               </div>

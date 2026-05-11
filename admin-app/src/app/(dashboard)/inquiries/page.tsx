@@ -8,7 +8,7 @@ import {
   User, 
   Phone, 
   Calendar,
-  MoreVertical,
+  Trash,
   CheckCircle,
   Clock
 } from "lucide-react";
@@ -46,6 +46,19 @@ export default function InquiriesPage() {
       setMessages(data || []);
     }
     setLoading(false);
+  }
+
+  async function updateStatus(id: string, newStatus: string) {
+    const { error } = await supabase.from("contact_messages").update({ status: newStatus }).eq("id", id);
+    if (error) alert("Error updating status");
+    else fetchMessages();
+  }
+
+  async function deleteMessage(id: string) {
+    if (!confirm("Delete this inquiry?")) return;
+    const { error } = await supabase.from("contact_messages").delete().eq("id", id);
+    if (error) alert("Error deleting message");
+    else fetchMessages();
   }
 
   const filteredMessages = messages.filter(msg => 
@@ -104,9 +117,13 @@ export default function InquiriesPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="btn-secondary text-xs h-8">Mark as Read</button>
-                    <button className="p-2 text-slate-400 hover:text-admin-text transition-colors">
-                      <MoreVertical size={18} />
+                    {msg.status === 'new' && (
+                      <button onClick={() => updateStatus(msg.id, 'read')} className="btn-secondary text-xs h-8">Mark as Read</button>
+                    )}
+                    <button 
+                      onClick={() => deleteMessage(msg.id)}
+                      className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Inquiry">
+                      <Trash size={18} />
                     </button>
                   </div>
                 </div>

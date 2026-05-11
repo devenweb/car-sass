@@ -22,6 +22,7 @@ const menuItems = [
   { icon: Users, label: "Customers", href: "/customers" },
   { icon: MessageSquare, label: "Inquiries", href: "/inquiries" },
   { icon: Mail, label: "Newsletter", href: "/newsletter" },
+  { icon: CalendarRange, label: "Pricing", href: "/pricing" },
 ];
 
 export default function Sidebar() {

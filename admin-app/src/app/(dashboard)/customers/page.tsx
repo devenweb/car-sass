@@ -9,7 +9,7 @@ import {
   Mail, 
   FileText,
   Calendar,
-  MoreVertical,
+  Trash,
   History
 } from "lucide-react";
 
@@ -26,6 +26,7 @@ export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -44,6 +45,13 @@ export default function CustomersPage() {
       setCustomers(data || []);
     }
     setLoading(false);
+  }
+
+  async function deleteCustomer(id: string) {
+    if (!confirm("Permanently remove customer record?")) return;
+    const { error } = await supabase.from("customers").delete().eq("id", id);
+    if (error) alert("Error deleting customer");
+    else fetchCustomers();
   }
 
   const filteredCustomers = customers.filter(c => 
@@ -120,11 +128,15 @@ export default function CustomersPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
+                        <button 
+                          onClick={() => setSelectedCustomer(customer)}
+                          className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
                           <History size={18} />
                         </button>
-                        <button className="p-2 text-slate-400 hover:text-admin-text hover:bg-slate-100 rounded-lg transition-all">
-                          <MoreVertical size={18} />
+                        <button 
+                          onClick={() => deleteCustomer(customer.id)}
+                          className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
+                          <Trash size={18} />
                         </button>
                       </div>
                     </td>

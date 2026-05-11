@@ -30,10 +30,10 @@ async function getDashboardData() {
       total_price,
       status,
       created_at,
-      cars (name),
+      vehicle_templates (brand, model),
       customers (name)
     `).order("created_at", { ascending: false }).limit(5),
-    supabase.from("cars").select("status"),
+    supabase.from("vehicle_units").select("availability_status"),
     supabase.from("rentals").select("total_price").gte("created_at", firstDayOfMonth)
   ]);
 
@@ -52,9 +52,9 @@ async function getDashboardData() {
   });
 
   // Calculate fleet status
-  const availableCount = allCars?.filter(c => c.status === 'available').length || 0;
-  const inUseCount = allCars?.filter(c => c.status === 'rented').length || 0;
-  const maintenanceCount = allCars?.filter(c => c.status === 'maintenance').length || 0;
+  const availableCount = allCars?.filter(c => c.availability_status === 'available').length || 0;
+  const inUseCount = allCars?.filter(c => (c as any).availability_status === 'rented').length || 0;
+  const maintenanceCount = allCars?.filter(c => (c as any).availability_status === 'maintenance').length || 0;
 
   const stats = [
     { 
@@ -132,13 +132,13 @@ export default async function Dashboard() {
           <div className="space-y-4">
             {recentRentals && recentRentals.length > 0 ? (
               recentRentals.map((rental: any) => (
-                <div key={rental.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
+                <Link key={rental.id} href={`/rentals/${rental.id}`} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center">
                       <Car size={20} className="text-slate-400" />
                     </div>
                     <div>
-                      <p className="font-semibold text-admin-text">{(rental.cars as any)?.name || 'Unknown Car'}</p>
+                      <p className="font-semibold text-admin-text">{(rental.vehicle_templates as any)?.brand} {(rental.vehicle_templates as any)?.model}</p>
                       <p className="text-xs text-admin-muted">Customer: {(rental.customers as any)?.name || 'Unknown Customer'}</p>
                     </div>
                   </div>
@@ -154,7 +154,7 @@ export default async function Dashboard() {
                       {rental.status}
                     </span>
                   </div>
-                </div>
+                </Link>
               ))
             ) : (
               <div className="text-center py-12 text-admin-muted">
@@ -168,7 +168,10 @@ export default async function Dashboard() {
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
-          <h3 className="text-lg font-bold text-admin-text mb-4">Fleet Status</h3>
+          <Link href="/fleet" className="group flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-admin-text">Fleet Status</h3>
+            <span className="text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">Manage Fleet →</span>
+          </Link>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-admin-muted">Available</span>

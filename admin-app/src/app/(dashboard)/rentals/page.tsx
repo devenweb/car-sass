@@ -23,7 +23,10 @@ interface Rental {
   total_price: number;
   status: string;
   customers: { name: string; email: string };
-  cars: { name: string };
+  vehicle_units: { 
+    plate_number: string;
+    vehicle_templates: { brand: string; model: string } 
+  };
 }
 
 const statusColors: Record<string, string> = {
@@ -51,7 +54,10 @@ export default function RentalsPage() {
       .select(`
         *,
         customers (name, email),
-        cars (name)
+        vehicle_units (
+          plate_number,
+          vehicle_templates (brand, model)
+        )
       `)
       .order("created_at", { ascending: false });
 

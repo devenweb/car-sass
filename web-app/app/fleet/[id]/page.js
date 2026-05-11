@@ -5,46 +5,66 @@ import {
   ArrowRight, Users, Settings2, Fuel, Star, 
   MapPin, CheckCircle2, ShieldCheck, Clock, 
   ChevronRight, Sparkles, MessageSquare, Phone, Car,
-  Shield // FIX: Explicitly import Shield
+  Shield, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { SmartImage, optimizeImage } from '@/lib/image';
+import { SmartImage } from '@/lib/image';
+import { useLocalization } from '@/lib/currency';
 
 function CarDetailContent() {
   const params = useParams();
   const id = params?.id;
-  const [car, setCar] = useState(null);
+  const [template, setTemplate] = useState(null);
+  const [units, setUnits] = useState([]);
+  const [minPrice, setMinPrice] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [relatedCars, setRelatedCars] = useState([]);
+  const { formatPrice } = useLocalization();
 
   useEffect(() => {
-    if (id) fetchCarData();
+    if (id) fetchTemplateData();
   }, [id]);
 
-  async function fetchCarData() {
+  async function fetchTemplateData() {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('cars')
+      // 1. Fetch Template
+      const { data: templateData, error: templateError } = await supabase
+        .from('vehicle_templates')
         .select('*')
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (templateError) throw templateError;
 
-      if (data) {
-        setCar(data);
-        const { data: related } = await supabase
-          .from('cars')
+      if (templateData) {
+        setTemplate(templateData);
+        
+        // 2. Fetch Units for this template
+        const { data: unitData, error: unitError } = await supabase
+          .from('vehicle_units')
           .select('*')
-          .eq('category', data.category)
-          .neq('id', id)
-          .limit(4);
-        setRelatedCars(related || []);
+          .eq('vehicle_template_id', id)
+          .eq('availability_status', 'available');
+        
+        if (unitError) throw unitError;
+        setUnits(unitData || []);
+
+        // 3. Fetch Pricing for this template
+        const { data: pricingData, error: pricingError } = await supabase
+          .from('vehicle_pricing')
+          .select('daily_price')
+          .eq('vehicle_template_id', id);
+
+        if (pricingError) throw pricingError;
+
+        // Determine starting price (dynamic > default)
+        const dailyPrices = pricingData?.map(p => p.daily_price) || [];
+        const dynamicMin = dailyPrices.length > 0 ? Math.min(...dailyPrices) : (templateData.daily_price || 1500);
+        setMinPrice(dynamicMin);
       }
     } catch (err) {
       console.error('Fetch error:', err);
@@ -59,16 +79,17 @@ function CarDetailContent() {
     </div>
   );
 
-  if (!car) return (
+  if (!template) return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center space-y-6">
-      <h2 className="text-4xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Vehicle Not Found</h2>
+      <h2 className="text-4xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Model Not Found</h2>
       <Link href="/fleet" className="bg-[var(--brand-yellow)] text-[var(--bg-dark)] px-8 py-4 rounded-xl font-black uppercase tracking-widest text-sm">
         Back to Fleet
       </Link>
     </div>
   );
 
-  const carImageUrl = optimizeImage(car.image_url);
+  const templateImageUrl = template.image_url;
+  const availableCount = units.filter(u => u.availability_status === 'available').length;
 
   return (
     <div className="page-layout bg-[var(--bg-primary)]">
@@ -76,25 +97,37 @@ function CarDetailContent() {
 
       <section className="hero-standard min-h-[60vh] flex items-center pt-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img src={carImageUrl} className="w-full h-full object-cover blur-[80px] opacity-30 scale-125" alt="" />
+          <SmartImage src={templateImageUrl} className="w-full h-full object-cover blur-[80px] opacity-30 scale-125" alt={`Rent ${template?.brand} ${template?.model} Mauritius`} />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--bg-dark)]/60 to-[var(--bg-dark)]"></div>
         </div>
         
         <div className="content-container relative z-10 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="space-y-10">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[var(--brand-yellow)] shadow-2xl">
-                <Sparkles className="w-4 h-4 mr-2" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">{car.category} COLLECTION</span>
+              <div className="flex flex-wrap gap-3">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[var(--brand-yellow)] shadow-2xl">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">{template.category} COLLECTION</span>
+                </div>
+                {availableCount > 0 ? (
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-500/10 backdrop-blur-md border border-emerald-500/20 text-emerald-400">
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">{availableCount} AVAILABLE NOW</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-400">
+                    <AlertTriangle className="w-4 h-4 mr-2" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">FULLY BOOKED</span>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-4">
                 <h1 className="text-6xl md:text-[100px] font-black text-white uppercase tracking-tighter leading-[0.8]">
-                  {car.name.split(' ').map((word, i) => (
-                    <span key={i} className={i === 1 ? 'text-[var(--brand-yellow)]' : ''}>{word} </span>
-                  ))}
+                  {template.brand} <br/>
+                  <span className="text-[var(--brand-yellow)]">{template.model}</span>
                 </h1>
-                <p className="text-white/40 font-bold uppercase tracking-[0.4em] text-sm">Verified Premium Edition</p>
+                <p className="text-white/40 font-bold uppercase tracking-[0.4em] text-sm">Verified Inventory • Mauritius Fleet</p>
               </div>
 
               <div className="flex flex-wrap gap-10 pt-4">
@@ -104,7 +137,7 @@ function CarDetailContent() {
                     </div>
                     <div className="flex flex-col">
                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] leading-none mb-1">Seating</span>
-                       <span className="text-xl font-black text-white uppercase tracking-tight">{car.seats} Adults</span>
+                       <span className="text-xl font-black text-white uppercase tracking-tight">{template.seats} Adults</span>
                     </div>
                  </div>
                  <div className="flex items-center gap-4">
@@ -113,7 +146,7 @@ function CarDetailContent() {
                     </div>
                     <div className="flex flex-col">
                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] leading-none mb-1">Gearbox</span>
-                       <span className="text-xl font-black text-white uppercase tracking-tight">{car.transmission}</span>
+                       <span className="text-xl font-black text-white uppercase tracking-tight">{template.transmission}</span>
                     </div>
                  </div>
               </div>
@@ -123,9 +156,9 @@ function CarDetailContent() {
                <div className="absolute inset-0 bg-[var(--brand-yellow)] blur-[150px] opacity-20 group-hover:opacity-30 transition-opacity"></div>
                <div className="relative z-10 transform group-hover:scale-110 group-hover:-rotate-2 transition-all duration-1000 origin-center drop-shadow-[0_50px_50px_rgba(0,0,0,0.5)]">
                  <img 
-                   src={carImageUrl} 
+                   src={templateImageUrl} 
                    className="w-full h-auto object-contain" 
-                   alt={car.name} 
+                   alt={`${template.brand} ${template.model}`} 
                  />
                </div>
             </div>
@@ -137,13 +170,13 @@ function CarDetailContent() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 items-start">
           <div className="lg:col-span-8 space-y-24">
             <div className="space-y-12">
-              <h2 className="text-5xl font-black uppercase tracking-tighter text-[var(--bg-dark)] border-l-8 border-[var(--brand-yellow)] pl-8">Full Specifications</h2>
+              <h2 className="text-5xl font-black uppercase tracking-tighter text-[var(--bg-dark)] border-l-8 border-[var(--brand-yellow)] pl-8">Vehicle Specifications</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {[
-                  { label: 'Body Type', value: car.category, icon: Car },
-                  { label: 'Transmission', value: car.transmission, icon: Settings2 },
-                  { label: 'Fuel Configuration', value: car.features?.engine || 'Hybrid/Petrol', icon: Fuel },
-                  { label: 'Interior Capacity', value: `${car.seats} Seater`, icon: Users },
+                  { label: 'Body Type', value: template.category, icon: Car },
+                  { label: 'Transmission', value: template.transmission, icon: Settings2 },
+                  { label: 'Fuel Configuration', value: 'Efficient Hybrid/Petrol', icon: Fuel },
+                  { label: 'Interior Capacity', value: `${template.seats} Seater`, icon: Users },
                   { label: 'Location Coverage', value: 'Mauritius Island-wide', icon: MapPin },
                   { label: 'Assistance Plan', value: 'Premium Roadside Support', icon: ShieldCheck }
                 ].map((spec, i) => (
@@ -152,8 +185,8 @@ function CarDetailContent() {
                       <spec.icon size={28} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.3em] mb-1">{spec.label}</span>
-                      <span className="text-xl font-black text-[var(--bg-dark)] uppercase tracking-tight">{spec.value}</span>
+                       <span className="text-[10px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.3em] mb-1">{spec.label}</span>
+                       <span className="text-xl font-black text-[var(--bg-dark)] uppercase tracking-tight">{spec.value}</span>
                     </div>
                   </div>
                 ))}
@@ -162,7 +195,7 @@ function CarDetailContent() {
 
             <div className="space-y-10 bg-white rounded-[4rem] p-16 border border-black/5 relative overflow-hidden shadow-2xl shadow-black/5">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--brand-yellow)] opacity-[0.03] blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-              <h3 className="text-3xl font-black uppercase tracking-tighter relative z-10">Standard Features</h3>
+              <h3 className="text-3xl font-black uppercase tracking-tighter relative z-10">Premium Features</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 relative z-10">
                 {['Premium Sound System', 'Touchscreen Infotainment', 'Reverse Park Assist', 'Multizone Climate Control', 'Safety Airbag Suite', 'Dynamic Stability Control'].map((feat, i) => (
                   <div key={i} className="flex items-center gap-5 text-[var(--bg-dark)]/70 font-bold group">
@@ -180,9 +213,9 @@ function CarDetailContent() {
             <div className="bg-[var(--bg-dark)] rounded-[3.5rem] p-12 text-white shadow-3xl shadow-[var(--brand-yellow)]/5 space-y-10 relative overflow-hidden border border-white/5">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-[var(--brand-yellow)] opacity-10 blur-3xl rounded-full"></div>
               <div className="space-y-3 relative z-10">
-                <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">DAILY RATE</span>
+                <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">STARTING FROM</span>
                 <div className="flex items-baseline gap-3">
-                  <span className="text-6xl font-black text-[var(--brand-yellow)] tracking-tighter">Rs {car.price_per_day?.toLocaleString()}</span>
+                  <span className="text-6xl font-black text-[var(--brand-yellow)] tracking-tighter">{formatPrice(minPrice)}</span>
                   <span className="text-lg font-bold text-white/20 uppercase">/ Day</span>
                 </div>
               </div>
@@ -199,7 +232,7 @@ function CarDetailContent() {
               </div>
 
               <Link 
-                href={`/contact?car=${car.id}`}
+                href={`/contact?template=${template.id}`}
                 className="w-full bg-[var(--brand-yellow)] text-[var(--bg-dark)] py-7 rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-2xl shadow-[var(--brand-yellow)]/20 relative z-10"
               >
                 Inquire Availability
@@ -215,28 +248,11 @@ function CarDetailContent() {
             <div className="bg-white rounded-[3.5rem] p-10 border border-black/5 space-y-10 shadow-sm">
               <h3 className="text-xl font-black uppercase tracking-tight text-[var(--bg-dark)] flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-[var(--brand-yellow)]"></div>
-                Need Support?
+                Assigned Asset
               </h3>
-              <div className="space-y-5">
-                 <a href="tel:+23059423033" className="flex items-center gap-6 p-6 rounded-[2rem] hover:bg-[var(--bg-primary)] transition-all group border border-transparent hover:border-black/5">
-                    <div className="w-14 h-14 bg-[var(--brand-yellow)]/10 rounded-2xl flex items-center justify-center text-[var(--brand-yellow)] group-hover:bg-[var(--brand-yellow)] group-hover:text-[var(--bg-dark)] transition-all shadow-lg shadow-transparent group-hover:shadow-[var(--brand-yellow)]/20">
-                       <Phone size={24} />
-                    </div>
-                    <div className="flex flex-col">
-                       <span className="text-[10px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none mb-1">Call Support</span>
-                       <span className="text-sm font-black uppercase tracking-tight">+230 5XXX XXXX</span>
-                    </div>
-                 </a>
-                 <a href="https://wa.me/23059423033" className="flex items-center gap-6 p-6 rounded-[2rem] hover:bg-emerald-50 transition-all group border border-transparent hover:border-emerald-100">
-                    <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-lg shadow-transparent group-hover:shadow-emerald-500/20">
-                       <MessageSquare size={24} />
-                    </div>
-                    <div className="flex flex-col">
-                       <span className="text-[10px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none mb-1">WhatsApp</span>
-                       <span className="text-sm font-black uppercase tracking-tight">Instant Chat</span>
-                    </div>
-                 </a>
-              </div>
+              <p className="text-[10px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-widest leading-relaxed">
+                Booking this model guarantees a vehicle of this exact specification. The physical unit (plate number) will be assigned at pickup.
+              </p>
             </div>
           </aside>
         </div>

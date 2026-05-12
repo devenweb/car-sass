@@ -113,7 +113,7 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                 isSelected 
                   ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)]' 
-                  : (isDark ? 'bg-white/5 text-white/20' : 'bg-[var(--bg-primary)] text-[var(--bg-dark)]/20')
+                  : (isDark ? 'bg-white/5 text-white/20' : 'bg-transparent border border-black/5 text-[var(--bg-dark)]/20')
               }`}>
                 {isSelected ? <Check size={16} strokeWidth={4} /> : <Icon size={16} />}
               </div>

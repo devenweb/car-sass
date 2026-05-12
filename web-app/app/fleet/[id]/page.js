@@ -252,7 +252,7 @@ function CarDetailContent() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
               {/* Left: Vehicle & Logistics */}
               <div className="md:col-span-7 space-y-8">
-                <div className="bg-slate-50 rounded-[3rem] p-10 border border-black/5 space-y-8">
+                <div className="bg-transparent rounded-[3rem] p-0 border border-black/5 space-y-8">
                   <div className="flex items-center gap-6">
                     <div className="w-32 h-24 bg-white rounded-3xl p-4 border border-black/5 flex items-center justify-center shadow-sm">
                       <SmartImage src={activeImage} className="w-full h-full object-contain" alt="Selected Car" />
@@ -300,7 +300,7 @@ function CarDetailContent() {
                   )}
                 </div>
 
-                <div className="p-8 bg-blue-50/50 rounded-[2rem] border border-blue-100 flex gap-6 items-start">
+                <div className="p-0 bg-transparent flex gap-6 items-start">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-500 shadow-sm shrink-0">
                     <Phone size={24} />
                   </div>
@@ -371,7 +371,7 @@ function CarDetailContent() {
     <div className="page-layout bg-white min-h-screen">
       <Navbar />
 
-      <main className="content-container pt-32 pb-24">
+      <main className="content-container pt-24 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           
           {/* Left Column: Vehicle Visuals & Details */}
@@ -379,7 +379,7 @@ function CarDetailContent() {
             <div className="space-y-8">
               {/* Main Image Gallery */}
               <div className="space-y-6">
-                <div className="relative group rounded-[3.5rem] bg-slate-50 p-8 md:p-12 border border-black/5 overflow-hidden shadow-sm">
+                <div className="relative group rounded-[3.5rem] bg-transparent p-0 border border-black/5 overflow-hidden">
                   <SmartImage 
                     src={activeImage} 
                     className="w-full h-[300px] md:h-[450px] object-contain drop-shadow-2xl transition-all duration-700 hover:scale-105" 
@@ -407,7 +407,7 @@ function CarDetailContent() {
 
               {/* Status & Badges */}
               <div className="flex flex-wrap items-center gap-3">
-                <span className="px-4 py-1.5 bg-slate-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{template.category}</span>
+                <span className="px-4 py-1.5 bg-transparent border border-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{template.category}</span>
                 {availableCount > 0 ? (
                   <span className="px-4 py-1.5 bg-emerald-50 rounded-lg text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -447,7 +447,7 @@ function CarDetailContent() {
                 { label: 'Rating', value: `${Number(template.rating || 5.0).toFixed(1)} / 5.0`, icon: Star }
               ].map((spec, i) => (
                 <div key={i} className="flex flex-col gap-4 p-8 bg-white rounded-[2.5rem] border border-black/5 shadow-sm hover:shadow-md transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[var(--brand-yellow)]">
+                  <div className="w-12 h-12 rounded-2xl bg-transparent border border-black/5 flex items-center justify-center text-[var(--brand-yellow)]">
                     <spec.icon size={24} />
                   </div>
                   <div>
@@ -459,7 +459,7 @@ function CarDetailContent() {
             </div>
 
             {/* Features List */}
-            <div className="p-10 bg-slate-50 rounded-[3rem] border border-black/5 space-y-8">
+            <div className="p-0 bg-transparent space-y-8">
               <div className="flex items-center gap-4">
                 <Sparkles className="text-[var(--brand-yellow)]" size={24} />
                 <h3 className="text-2xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Premium Standard Features</h3>
@@ -482,7 +482,7 @@ function CarDetailContent() {
 
           {/* Right Column: Booking Form (Sidebar) */}
           <aside className="lg:sticky lg:top-32">
-            <div className="bg-white rounded-[3.5rem] p-10 md:p-14 text-[var(--bg-dark)] shadow-xl relative overflow-hidden border border-black/5">
+            <div className="bg-white rounded-[3.5rem] p-8 md:p-10 text-[var(--bg-dark)] shadow-xl relative overflow-hidden border border-black/5">
               <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--brand-yellow)] opacity-[0.03] blur-[100px]"></div>
               
               {/* Header: Title & Base Price */}
@@ -501,7 +501,7 @@ function CarDetailContent() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Logistics: Pickup & Return Grouped */}
                 <div className="space-y-4">
-                  <div className="space-y-3 p-5 bg-slate-50 rounded-3xl border border-black/5">
+                  <div className="space-y-3 p-0 bg-transparent">
                     <div className="flex items-center gap-3 ml-2">
                       <Calendar size={14} className="text-[var(--brand-yellow)]" />
                       <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Pickup Date, Time & Address</label>
@@ -533,7 +533,7 @@ function CarDetailContent() {
                   </div>
 
                   {/* Return Section */}
-                  <div className="space-y-3 p-5 bg-slate-50 rounded-3xl border border-black/5">
+                  <div className="space-y-3 p-0 bg-transparent">
                     <div className="flex items-center gap-3 ml-2">
                       <Clock size={14} className="text-[var(--brand-yellow)]" />
                       <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Return Date, Time & Address</label>
@@ -576,7 +576,7 @@ function CarDetailContent() {
 
                 {/* Formal Invoice Table */}
                 {invoice.days > 0 && (
-                  <div className="bg-slate-50 rounded-[2.5rem] overflow-hidden border border-black/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <div className="bg-transparent rounded-2xl overflow-hidden border border-black/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-black/[0.02]">
@@ -620,7 +620,7 @@ function CarDetailContent() {
                    </div>
                    <textarea 
                      rows="2"
-                     className="w-full bg-slate-50 border border-black/5 rounded-3xl px-8 py-6 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all resize-none" 
+                     className="w-full bg-white border border-black/5 rounded-3xl px-8 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all resize-none" 
                      placeholder="Special requests..." 
                      value={formData.message}
                      onChange={(e) => setFormData({...formData, message: e.target.value})}
@@ -630,7 +630,7 @@ function CarDetailContent() {
                 {/* Final Confirmation */}
                 <div className="space-y-6 pt-2">
                   <div className="flex flex-col gap-6">
-                    <div className="flex items-center justify-between px-6 py-4 bg-slate-50 rounded-2xl border border-black/5">
+                    <div className="flex items-center justify-between px-6 py-4 bg-transparent rounded-2xl border border-black/5">
                       <span className="text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40">
                         {invoice.days > 0 ? 'Live Total' : 'Est. Daily Total'}
                       </span>
@@ -655,7 +655,7 @@ function CarDetailContent() {
 
                     <button 
                       disabled={isSubmitting}
-                      className="group w-full bg-[var(--bg-dark)] text-white py-7 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] hover:bg-[var(--brand-yellow)] hover:text-[var(--bg-dark)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
+                      className="group w-full bg-[var(--bg-dark)] text-white py-5 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] hover:bg-[var(--brand-yellow)] hover:text-[var(--bg-dark)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
                     >
                        {isSubmitting ? 'Processing...' : 'Confirm'}
                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />

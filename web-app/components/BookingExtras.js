@@ -83,7 +83,7 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
         </div>
       )}
 
-      <div className={`grid ${isDark ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {extras.map((extra) => {
           const Icon = ICON_MAP[extra.icon_name] || Info;
           const isSelected = selectedExtras.find(e => e.id === extra.id);
@@ -93,31 +93,31 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
               key={extra.id}
               type="button"
               onClick={() => toggleExtra(extra)}
-              className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 text-left ${
+              className={`group flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 text-left ${
                 isSelected 
                   ? (isDark ? 'bg-white/10 border-white/20' : 'bg-[var(--bg-dark)] border-[var(--bg-dark)] text-white shadow-lg') 
-                  : (isDark ? 'bg-white/5 border-white/5 hover:border-white/20' : 'bg-white border-black/5 hover:border-[var(--brand-yellow)] shadow-sm')
+                  : (isDark ? 'bg-white/5 border-white/5 hover:border-white/10' : 'bg-white border-black/5 hover:border-[var(--brand-yellow)] shadow-sm')
               }`}
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
                 isSelected 
                   ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)]' 
-                  : (isDark ? 'bg-white/10 text-white/40' : 'bg-[var(--bg-primary)] text-[var(--bg-dark)]/20')
+                  : (isDark ? 'bg-white/5 text-white/20' : 'bg-[var(--bg-primary)] text-[var(--bg-dark)]/20')
               }`}>
-                {isSelected ? <Check size={18} strokeWidth={3} /> : <Icon size={18} />}
+                {isSelected ? <Check size={14} strokeWidth={4} /> : <Icon size={14} />}
               </div>
 
               <div className="flex-grow min-w-0">
-                <div className="flex justify-between items-center">
-                  <h4 className={`text-[10px] font-black uppercase tracking-wider truncate ${
+                <div className="flex flex-col">
+                  <h4 className={`text-[9px] font-black uppercase tracking-tight truncate leading-tight ${
                     isSelected ? 'text-white' : (isDark ? 'text-white/80' : 'text-[var(--bg-dark)]')
                   }`}>
                     {extra.name}
                   </h4>
-                  <span className={`text-[10px] font-black shrink-0 ml-2 ${
-                    isSelected ? 'text-[var(--brand-yellow)]' : (isDark ? 'text-white/40' : 'text-[var(--bg-dark)]/60')
+                  <span className={`text-[8px] font-black uppercase tracking-widest leading-tight ${
+                    isSelected ? 'text-[var(--brand-yellow)]' : (isDark ? 'text-white/30' : 'text-[var(--bg-dark)]/40')
                   }`}>
-                    {mounted ? formatPrice(extra.price_per_day) : '...'}
+                    {mounted ? `+ ${formatPrice(extra.price_per_day)}` : '...'}
                   </span>
                 </div>
               </div>

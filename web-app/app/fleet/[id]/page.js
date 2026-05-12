@@ -372,10 +372,10 @@ function CarDetailContent() {
       <Navbar />
 
       <main className="content-container pt-32 pb-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           
           {/* Left Column: Vehicle Visuals & Details */}
-          <div className="lg:col-span-7 space-y-12">
+          <div className="space-y-12">
             <div className="space-y-8">
               {/* Main Image Gallery */}
               <div className="space-y-6">
@@ -481,44 +481,44 @@ function CarDetailContent() {
           </div>
 
           {/* Right Column: Booking Form (Sidebar) */}
-          <aside className="lg:col-span-5 lg:sticky lg:top-32">
-            <div className="bg-[var(--bg-dark)] rounded-[3.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden border border-white/5">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--brand-yellow)] opacity-5 blur-[100px]"></div>
+          <aside className="lg:sticky lg:top-32">
+            <div className="bg-white rounded-[3.5rem] p-10 md:p-14 text-[var(--bg-dark)] shadow-xl relative overflow-hidden border border-black/5">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--brand-yellow)] opacity-[0.03] blur-[100px]"></div>
               
               {/* Header: Title & Base Price */}
-              <div className="mb-12 space-y-4">
-                <h2 className="text-5xl font-black text-white uppercase tracking-tighter leading-none">
+              <div className="mb-10 space-y-4">
+                <h2 className="text-5xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
                   {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
                 </h2>
                 <div className="flex items-baseline gap-2 pt-2">
                   <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">
                     {mounted ? formatPrice(minPrice) : '...'}
                   </span>
-                  <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">/ Day</span>
+                  <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-[0.3em]">/ Day</span>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-10">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Logistics: Pickup & Return Grouped */}
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {/* Pickup Section */}
-                  <div className="space-y-5 p-6 bg-white/5 rounded-3xl border border-white/5">
+                  <div className="space-y-4 p-6 bg-slate-50 rounded-3xl border border-black/5">
                     <div className="flex items-center gap-3 ml-2">
                       <Calendar size={14} className="text-[var(--brand-yellow)]" />
-                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Pickup Date, Time & Address</label>
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Pickup Date, Time & Address</label>
                     </div>
                     <div className="flex gap-3">
                       <input 
                         required
                         type="date" 
-                        className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.startDate}
                         onChange={(e) => setFormData({...formData, startDate: e.target.value})}
                       />
                       <input 
                         required
                         type="time" 
-                        className="w-28 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="w-28 bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.startTime}
                         onChange={(e) => setFormData({...formData, startTime: e.target.value})}
                       />
@@ -526,7 +526,7 @@ function CarDetailContent() {
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder="Pickup Address (Airport, Hotel, Villa...)" 
                       value={formData.pickupAddress}
                       onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
@@ -534,23 +534,23 @@ function CarDetailContent() {
                   </div>
 
                   {/* Return Section */}
-                  <div className="space-y-5 p-6 bg-white/5 rounded-3xl border border-white/5">
+                  <div className="space-y-4 p-6 bg-slate-50 rounded-3xl border border-black/5">
                     <div className="flex items-center gap-3 ml-2">
                       <Clock size={14} className="text-[var(--brand-yellow)]" />
-                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Return Date, Time & Address</label>
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Return Date, Time & Address</label>
                     </div>
                     <div className="flex gap-3">
                       <input 
                         required
                         type="date" 
-                        className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.endDate}
                         onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       />
                       <input 
                         required
                         type="time" 
-                        className="w-28 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="w-28 bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.endTime}
                         onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                       />
@@ -558,7 +558,7 @@ function CarDetailContent() {
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder="Return Address" 
                       value={formData.returnAddress}
                       onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
@@ -570,42 +570,42 @@ function CarDetailContent() {
                 <div className="space-y-6 pt-2">
                    <div className="flex items-center gap-3 ml-4">
                      <Plus size={14} className="text-[var(--brand-yellow)]" />
-                     <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Resources / Extras</h4>
+                     <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
                    </div>
-                   <BookingExtras onSelectionChange={setSelectedExtras} isDark={true} />
+                   <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
                 </div>
 
-                {/* Formal Invoice Table (Aligning with competitor design) */}
+                {/* Formal Invoice Table */}
                 {invoice.days > 0 && (
-                  <div className="bg-white/5 rounded-[2.5rem] overflow-hidden border border-white/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <div className="bg-slate-50 rounded-[2.5rem] overflow-hidden border border-black/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-white/5">
-                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Description</th>
-                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-white/30 text-right">Amount</th>
+                        <tr className="bg-black/[0.02]">
+                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Description</th>
+                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30 text-right">Amount</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5">
+                      <tbody className="divide-y divide-black/5">
                         <tr>
-                          <td className="px-8 py-4 text-[11px] font-bold text-white/60">Rental ({invoice.days} Days)</td>
-                          <td className="px-8 py-4 text-[11px] font-black text-white text-right">{formatPrice(minPrice * invoice.days)}</td>
+                          <td className="px-8 py-4 text-[11px] font-bold text-[var(--bg-dark)]/60">Rental ({invoice.days} Days)</td>
+                          <td className="px-8 py-4 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(minPrice * invoice.days)}</td>
                         </tr>
                         {invoice.extrasTotal > 0 && (
                           <tr>
-                            <td className="px-8 py-4 text-[11px] font-bold text-white/60">Selected Extras</td>
-                            <td className="px-8 py-4 text-[11px] font-black text-white text-right">{formatPrice(invoice.extrasTotal)}</td>
+                            <td className="px-8 py-4 text-[11px] font-bold text-[var(--bg-dark)]/60">Selected Extras</td>
+                            <td className="px-8 py-4 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(invoice.extrasTotal)}</td>
                           </tr>
                         )}
                         <tr>
-                          <td className="px-8 py-4 text-[11px] font-bold text-white/40 italic">Total excluding tax</td>
-                          <td className="px-8 py-4 text-[11px] font-black text-white/60 text-right">{formatPrice(invoice.subtotal)}</td>
+                          <td className="px-8 py-4 text-[11px] font-bold text-[var(--bg-dark)]/30 italic">Total excluding tax</td>
+                          <td className="px-8 py-4 text-[11px] font-black text-[var(--bg-dark)]/40 text-right">{formatPrice(invoice.subtotal)}</td>
                         </tr>
                         <tr>
-                          <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)]/60 uppercase tracking-widest">TVA (15 %)</td>
+                          <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)] uppercase tracking-widest">TVA (15 %)</td>
                           <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)] text-right">{formatPrice(invoice.tax)}</td>
                         </tr>
                         <tr className="bg-[var(--brand-yellow)]/5">
-                          <td className="px-8 py-6 text-sm font-black uppercase tracking-widest text-white">Total TTC</td>
+                          <td className="px-8 py-6 text-sm font-black uppercase tracking-widest text-[var(--bg-dark)]">Total TTC</td>
                           <td className="px-8 py-6 text-2xl font-black text-[var(--brand-yellow)] tracking-tighter text-right">{formatPrice(invoice.total)}</td>
                         </tr>
                       </tbody>
@@ -617,26 +617,25 @@ function CarDetailContent() {
                 <div className="space-y-4">
                    <div className="flex items-center gap-3 ml-4">
                      <MessageSquare size={14} className="text-[var(--brand-yellow)]" />
-                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Comments / Special Requests</label>
+                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Comments</label>
                    </div>
                    <textarea 
-                     rows="3"
-                     className="w-full bg-white/5 border border-white/10 rounded-3xl px-8 py-6 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all resize-none" 
-                     placeholder="Add any specific requirements..." 
+                     rows="2"
+                     className="w-full bg-slate-50 border border-black/5 rounded-3xl px-8 py-6 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all resize-none" 
+                     placeholder="Special requests..." 
                      value={formData.message}
                      onChange={(e) => setFormData({...formData, message: e.target.value})}
                    ></textarea>
                 </div>
 
                 {/* Final Confirmation */}
-                <div className="space-y-8 pt-4">
+                <div className="space-y-6 pt-2">
                   <div className="flex flex-col gap-6">
-                    {/* Floating Total display for mobile or quick check */}
-                    <div className="flex items-center justify-between px-6 py-4 bg-white/5 rounded-2xl border border-white/10">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
+                    <div className="flex items-center justify-between px-6 py-4 bg-slate-50 rounded-2xl border border-black/5">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40">
                         {invoice.days > 0 ? 'Live Total' : 'Est. Daily Total'}
                       </span>
-                      <span className="text-xl font-black text-white tracking-tighter">
+                      <span className="text-xl font-black text-[var(--bg-dark)] tracking-tighter">
                         {formatPrice(invoice.total)}
                       </span>
                     </div>
@@ -646,20 +645,20 @@ function CarDetailContent() {
                         type="checkbox" 
                         required
                         id="terms"
-                        className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-white/5 text-[var(--brand-yellow)] focus:ring-[var(--brand-yellow)] transition-all cursor-pointer"
+                        className="mt-1 w-5 h-5 rounded-lg border-black/10 bg-slate-50 text-[var(--brand-yellow)] focus:ring-[var(--brand-yellow)] transition-all cursor-pointer"
                         checked={formData.agreedToTerms}
                         onChange={(e) => setFormData({...formData, agreedToTerms: e.target.checked})}
                       />
-                      <label htmlFor="terms" className="text-[10px] font-bold text-white/40 leading-relaxed cursor-pointer select-none">
-                        I have read and agree to the <Link href="/terms" className="text-[var(--brand-yellow)] underline hover:text-white transition-colors">Terms and Conditions of Sale</Link>.
+                      <label htmlFor="terms" className="text-[10px] font-bold text-[var(--bg-dark)]/40 leading-relaxed cursor-pointer select-none">
+                        I agree to the <Link href="/terms" className="text-[var(--brand-yellow)] underline hover:text-[var(--bg-dark)] transition-colors">Terms of Sale</Link>.
                       </label>
                     </div>
 
                     <button 
                       disabled={isSubmitting}
-                      className="group w-full bg-[var(--brand-yellow)] text-[var(--bg-dark)] py-7 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-2xl shadow-[var(--brand-yellow)]/10 disabled:opacity-50"
+                      className="group w-full bg-[var(--bg-dark)] text-white py-7 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] hover:bg-[var(--brand-yellow)] hover:text-[var(--bg-dark)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
                     >
-                       {isSubmitting ? 'Processing Request...' : 'Confirm Reservation'}
+                       {isSubmitting ? 'Processing...' : 'Confirm'}
                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>

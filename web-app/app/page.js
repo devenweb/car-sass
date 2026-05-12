@@ -234,7 +234,7 @@ export default function HomePage() {
                   href={`/fleet/${template.id}`}
                   className="group bg-white rounded-[2.5rem] overflow-hidden border border-black/5 shadow-xl hover:shadow-3xl transition-all duration-700 hover:-translate-y-4 flex flex-col h-full"
                 >
-                  <div className="relative h-[220px] w-full bg-white overflow-hidden group-hover:bg-slate-50/50 transition-colors duration-700">
+                  <div className="relative h-[220px] w-full bg-[var(--bg-primary)] overflow-hidden transition-colors duration-700">
                     <div className="absolute top-8 left-8 z-20 flex flex-col gap-2">
                        <span className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-[0.1em] text-[var(--bg-dark)] shadow-xl border border-black/5">
                         {template.category} Verified
@@ -245,12 +245,13 @@ export default function HomePage() {
                          </span>
                        )}
                     </div>
-                    <div className="w-full h-full p-8 flex items-center justify-center">
+                    <div className="w-full h-full p-8 flex items-center justify-center relative">
                        <SmartImage 
                          src={template.default_thumbnail || template.image_url} 
-                         className="w-full h-full object-contain transform scale-100 group-hover:scale-110 transition-transform duration-[1s]" 
+                         className="w-full h-full object-contain transform scale-100 group-hover:scale-110 transition-transform duration-[1s] z-10" 
                          alt={`${template.brand} ${template.model}`} 
                        />
+                       <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent opacity-100"></div>
                     </div>
                   </div>
 

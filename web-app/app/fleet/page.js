@@ -403,13 +403,14 @@ function FleetContent() {
                         href={`/fleet/${template.slug || template.id}`}
                         className="group relative bg-white rounded-[2.5rem] border border-black/5 shadow-lg hover:shadow-2xl transition-all duration-700 flex flex-col overflow-hidden cursor-pointer"
                       >
-                          <div className="relative aspect-[16/9.5] overflow-hidden shrink-0 bg-white group-hover:bg-slate-50/50 transition-colors duration-700 p-4">
+                          <div className="relative aspect-[16/9.5] overflow-hidden shrink-0 bg-[var(--bg-primary)] transition-colors duration-700 p-4">
                             <SmartImage 
                               src={template.default_thumbnail || template.image_url} 
-                              className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" 
+                              className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 relative z-10" 
                               alt={`${template.brand} ${template.model}`} 
                             />
-                            <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent opacity-100"></div>
+                            <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-20">
                               <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em]">{template.category}</span>
                               {mounted && (template.available_count > 0 ? (
                                  <span className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
@@ -500,13 +501,14 @@ function FleetContent() {
                         href={`/fleet/${template.slug || template.id}`}
                         className="group relative bg-white rounded-[3rem] border border-black/5 shadow-lg hover:shadow-2xl transition-all duration-700 flex flex-col md:flex-row overflow-hidden cursor-pointer"
                       >
-                         <div className="w-full md:w-96 relative overflow-hidden bg-white group-hover:bg-slate-50/50 transition-colors duration-700 p-8 flex items-center justify-center">
+                         <div className="w-full md:w-96 relative overflow-hidden bg-[var(--bg-primary)] transition-colors duration-700 p-8 flex items-center justify-center">
                             <SmartImage 
                               src={template.default_thumbnail || template.image_url} 
-                              className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-110" 
+                              className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-110 relative z-10" 
                               alt={`${template.brand} ${template.model}`} 
                             />
-                            <div className="absolute top-6 left-6 flex flex-col gap-1.5">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent opacity-100"></div>
+                            <div className="absolute top-6 left-6 flex flex-col gap-1.5 z-20">
                               <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">{template.category}</span>
                             </div>
                          </div>

@@ -10,6 +10,7 @@ export default function SettingsPage() {
   const [tenant, setTenant] = useState<any>(null);
   const [apiKeys, setApiKeys] = useState<any>({});
   const [notificationSettings, setNotificationSettings] = useState<any>({});
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const tabs = [
@@ -26,6 +27,7 @@ export default function SettingsPage() {
   }, []);
 
   async function fetchTenant() {
+    setLoading(true);
     const { data } = await supabase.from("tenants").select("*").single();
     if (data) {
       setTenant(data);
@@ -38,6 +40,7 @@ export default function SettingsPage() {
         rental_start_reminder: true
       });
     }
+    setLoading(false);
   }
 
   const handleApiKeyChange = (key: string, value: string) => {

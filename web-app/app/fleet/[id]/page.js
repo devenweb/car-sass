@@ -486,7 +486,7 @@ function CarDetailContent() {
               <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--brand-yellow)] opacity-[0.03] blur-[100px]"></div>
               
               {/* Header: Title & Base Price */}
-              <div className="mb-10 space-y-4">
+              <div className="mb-8 space-y-3">
                 <h2 className="text-5xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
                   {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
                 </h2>
@@ -498,11 +498,10 @@ function CarDetailContent() {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Logistics: Pickup & Return Grouped */}
-                <div className="space-y-6">
-                  {/* Pickup Section */}
-                  <div className="space-y-4 p-6 bg-slate-50 rounded-3xl border border-black/5">
+                <div className="space-y-4">
+                  <div className="space-y-3 p-5 bg-slate-50 rounded-3xl border border-black/5">
                     <div className="flex items-center gap-3 ml-2">
                       <Calendar size={14} className="text-[var(--brand-yellow)]" />
                       <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Pickup Date, Time & Address</label>
@@ -511,14 +510,14 @@ function CarDetailContent() {
                       <input 
                         required
                         type="date" 
-                        className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.startDate}
                         onChange={(e) => setFormData({...formData, startDate: e.target.value})}
                       />
                       <input 
                         required
                         type="time" 
-                        className="w-28 bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="w-28 bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.startTime}
                         onChange={(e) => setFormData({...formData, startTime: e.target.value})}
                       />
@@ -526,7 +525,7 @@ function CarDetailContent() {
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder="Pickup Address (Airport, Hotel, Villa...)" 
                       value={formData.pickupAddress}
                       onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
@@ -534,7 +533,7 @@ function CarDetailContent() {
                   </div>
 
                   {/* Return Section */}
-                  <div className="space-y-4 p-6 bg-slate-50 rounded-3xl border border-black/5">
+                  <div className="space-y-3 p-5 bg-slate-50 rounded-3xl border border-black/5">
                     <div className="flex items-center gap-3 ml-2">
                       <Clock size={14} className="text-[var(--brand-yellow)]" />
                       <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Return Date, Time & Address</label>
@@ -543,14 +542,14 @@ function CarDetailContent() {
                       <input 
                         required
                         type="date" 
-                        className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.endDate}
                         onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                       />
                       <input 
                         required
                         type="time" 
-                        className="w-28 bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        className="w-28 bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.endTime}
                         onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                       />
@@ -558,7 +557,7 @@ function CarDetailContent() {
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-4 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder="Return Address" 
                       value={formData.returnAddress}
                       onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
@@ -581,32 +580,32 @@ function CarDetailContent() {
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-black/[0.02]">
-                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Description</th>
-                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30 text-right">Amount</th>
+                          <th className="px-8 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Description</th>
+                          <th className="px-8 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30 text-right">Amount</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-black/5">
                         <tr>
-                          <td className="px-8 py-4 text-[11px] font-bold text-[var(--bg-dark)]/60">Rental ({invoice.days} Days)</td>
-                          <td className="px-8 py-4 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(minPrice * invoice.days)}</td>
+                          <td className="px-8 py-2.5 text-[11px] font-bold text-[var(--bg-dark)]/60">Rental ({invoice.days} Days)</td>
+                          <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(minPrice * invoice.days)}</td>
                         </tr>
                         {invoice.extrasTotal > 0 && (
                           <tr>
-                            <td className="px-8 py-4 text-[11px] font-bold text-[var(--bg-dark)]/60">Selected Extras</td>
-                            <td className="px-8 py-4 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(invoice.extrasTotal)}</td>
+                            <td className="px-8 py-2.5 text-[11px] font-bold text-[var(--bg-dark)]/60">Selected Extras</td>
+                            <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(invoice.extrasTotal)}</td>
                           </tr>
                         )}
                         <tr>
-                          <td className="px-8 py-4 text-[11px] font-bold text-[var(--bg-dark)]/30 italic">Total excluding tax</td>
-                          <td className="px-8 py-4 text-[11px] font-black text-[var(--bg-dark)]/40 text-right">{formatPrice(invoice.subtotal)}</td>
+                          <td className="px-8 py-2.5 text-[11px] font-bold text-[var(--bg-dark)]/30 italic">Total excluding tax</td>
+                          <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)]/40 text-right">{formatPrice(invoice.subtotal)}</td>
                         </tr>
                         <tr>
-                          <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)] uppercase tracking-widest">TVA (15 %)</td>
-                          <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)] text-right">{formatPrice(invoice.tax)}</td>
+                          <td className="px-8 py-2.5 text-[11px] font-black text-[var(--brand-yellow)] uppercase tracking-widest">TVA (15 %)</td>
+                          <td className="px-8 py-2.5 text-[11px] font-black text-[var(--brand-yellow)] text-right">{formatPrice(invoice.tax)}</td>
                         </tr>
                         <tr className="bg-[var(--brand-yellow)]/5">
-                          <td className="px-8 py-6 text-sm font-black uppercase tracking-widest text-[var(--bg-dark)]">Total TTC</td>
-                          <td className="px-8 py-6 text-2xl font-black text-[var(--brand-yellow)] tracking-tighter text-right">{formatPrice(invoice.total)}</td>
+                          <td className="px-8 py-4 text-sm font-black uppercase tracking-widest text-[var(--bg-dark)]">Total TTC</td>
+                          <td className="px-8 py-4 text-2xl font-black text-[var(--brand-yellow)] tracking-tighter text-right">{formatPrice(invoice.total)}</td>
                         </tr>
                       </tbody>
                     </table>

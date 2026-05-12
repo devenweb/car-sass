@@ -11,7 +11,10 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  Eye,
+  Edit2,
+  Trash2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import InspectionModal from "@/components/InspectionModal";
@@ -187,27 +190,33 @@ export default function RentalsPage() {
                       <p className="font-black text-admin-text text-xs leading-none">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
                     </td>
                     <td className="px-5 py-2.5 text-right">
-                      <div className="flex justify-end gap-2">
-                        {rental.status === "pending" && (
-                          <button 
-                            onClick={() => updateStatus(rental.id, "confirmed")}
-                            className="p-1.5 hover:bg-emerald-50 rounded-md text-emerald-600 border border-transparent hover:border-emerald-200"
-                            title="Confirm Booking"
-                          >
-                            <CheckCircle2 size={16} />
-                          </button>
-                        )}
-                        {(rental.status === "delivered" || rental.status === "collected") && (
-                          <button 
-                            onClick={() => setSelectedRentalId(rental.id)}
-                            className="p-1.5 hover:bg-blue-50 rounded-md text-blue-600 border border-transparent hover:border-blue-200"
-                            title="View Inspection"
-                          >
-                            <Search size={16} />
-                          </button>
-                        )}
-                        <button className="p-1 hover:bg-slate-100 rounded-md text-slate-400">
-                          <MoreHorizontal size={18} />
+                      <div className="flex justify-end gap-1">
+                        <button 
+                          onClick={() => setSelectedRentalId(rental.id)}
+                          className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" 
+                          title="View Inspection"
+                        >
+                          <Eye size={14} />
+                        </button>
+                        <button 
+                          onClick={() => alert("Edit Rental logic to be implemented - use status toggles for now.")}
+                          className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors"
+                          title="Edit"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            if (confirm("Delete rental record?")) {
+                              const { error } = await supabase.from("rentals").delete().eq("id", rental.id);
+                              if (error) alert("Error deleting rental");
+                              else fetchRentals();
+                            }
+                          }}
+                          className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>

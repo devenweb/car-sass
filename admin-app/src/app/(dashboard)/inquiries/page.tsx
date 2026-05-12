@@ -8,10 +8,12 @@ import {
   User, 
   Phone, 
   Calendar,
-  Trash,
+  Trash2,
   CheckCircle,
   Clock,
   Reply,
+  Eye,
+  Edit2,
   CheckSquare,
   Square,
   MessageSquare,
@@ -240,20 +242,21 @@ export default function InquiriesPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => alert("Message is already visible in view.")}
+                      className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View">
+                      <Eye size={14} />
+                    </button>
                     <button 
                       onClick={() => setReplyModal({ open: true, message: msg, bulk: false })}
-                      className="h-7 px-4 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center gap-1.5"
-                    >
-                      <Reply size={12} /> Reply
+                      className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Reply / Edit">
+                      <Edit2 size={14} />
                     </button>
-                    {msg.status === 'new' && (
-                      <button onClick={() => updateStatus(msg.id, 'read')} className="h-7 px-3 bg-white border border-slate-200 text-slate-400 rounded-lg text-[9px] font-black uppercase hover:bg-slate-50 transition-all">Mark Read</button>
-                    )}
                     <button 
                       onClick={() => deleteMessage(msg.id)}
-                      className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete">
-                      <Trash size={14} />
+                      className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>

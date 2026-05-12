@@ -4,7 +4,10 @@ import {
   Users, 
   TrendingUp,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Eye,
+  Edit2,
+  Trash2
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -139,8 +142,8 @@ export default async function Dashboard() {
           <div className="space-y-4">
             {recentRentals && recentRentals.length > 0 ? (
               recentRentals.map((rental: any) => (
-                <Link key={rental.id} href="/rentals" className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition-colors group">
-                  <div className="flex items-center gap-3">
+                <div key={rental.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition-colors group">
+                  <Link href="/rentals" className="flex items-center gap-3 flex-1">
                     <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
                       <Car size={16} className="text-slate-400" />
                     </div>
@@ -148,20 +151,36 @@ export default async function Dashboard() {
                       <p className="font-bold text-admin-text text-sm">{(rental.vehicle_templates as any)?.brand} {(rental.vehicle_templates as any)?.model}</p>
                       <p className="text-[10px] text-admin-muted font-bold uppercase tracking-tight">{(rental.customers as any)?.name || 'Guest'}</p>
                     </div>
+                  </Link>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="font-bold text-admin-text text-sm">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                        rental.status === 'collected' ? 'bg-emerald-100 text-emerald-700' : 
+                        rental.status === 'delivered' ? 'bg-teal-100 text-teal-700' : 
+                        rental.status === 'confirmed' ? 'bg-blue-100 text-blue-700' : 
+                        rental.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                        'bg-slate-100 text-slate-700'
+                      }`}>
+                        {rental.status}
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Link href="/rentals" className="p-1 text-slate-400 hover:text-primary transition-colors" title="View"><Eye size={14} /></Link>
+                      <Link href="/rentals" className="p-1 text-slate-400 hover:text-primary transition-colors" title="Edit"><Edit2 size={14} /></Link>
+                      <button 
+                        onClick={async () => {
+                          if (confirm("Delete rental record?")) {
+                            const { error } = await supabase.from("rentals").delete().eq("id", rental.id);
+                            if (error) alert("Error deleting rental");
+                            else window.location.reload();
+                          }
+                        }}
+                        className="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete"
+                      ><Trash2 size={14} /></button>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-admin-text text-sm">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                      rental.status === 'collected' ? 'bg-emerald-100 text-emerald-700' : 
-                      rental.status === 'delivered' ? 'bg-teal-100 text-teal-700' : 
-                      rental.status === 'confirmed' ? 'bg-blue-100 text-blue-700' : 
-                      rental.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                      'bg-slate-100 text-slate-700'
-                    }`}>
-                      {rental.status}
-                    </span>
-                  </div>
-                </Link>
+                </div>
               ))
             ) : (
               <div className="text-center py-12 text-admin-muted">

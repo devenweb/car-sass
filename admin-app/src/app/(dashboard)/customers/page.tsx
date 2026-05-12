@@ -9,7 +9,9 @@ import {
   Mail, 
   FileText,
   Calendar,
-  Trash,
+  Trash2,
+  Eye,
+  Edit2,
   History
 } from "lucide-react";
 
@@ -132,12 +134,17 @@ export default function CustomersPage() {
                         <button 
                           onClick={() => setSelectedCustomer(customer)}
                           className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
-                          <History size={14} />
+                          <Eye size={14} />
+                        </button>
+                        <button 
+                          onClick={() => alert("Edit Customer logic to be implemented.")}
+                          className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Edit">
+                          <Edit2 size={14} />
                         </button>
                         <button 
                           onClick={() => deleteCustomer(customer.id)}
                           className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
-                          <Trash size={14} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>

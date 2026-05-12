@@ -257,8 +257,9 @@ export default function FleetPage() {
                       </td>
                       <td className="px-6 py-3 text-right" onClick={e => e.stopPropagation()}>
                         <div className="flex justify-end gap-1">
-                          <button onClick={() => openEditModal(template)} className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors"><Edit2 size={14}/></button>
-                          <button onClick={() => handleDeleteTemplate(template.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"><Trash size={14}/></button>
+                          <Link href={`https://royalcarmuritius.vercel.app/fleet/${template.slug || template.id}`} target="_blank" className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" title="View Public"><Eye size={14}/></Link>
+                          <button onClick={() => openEditModal(template)} className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" title="Edit"><Edit2 size={14}/></button>
+                          <button onClick={() => handleDeleteTemplate(template.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete"><Trash2 size={14}/></button>
                         </div>
                       </td>
                     </tr>

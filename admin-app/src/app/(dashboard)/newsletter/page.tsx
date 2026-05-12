@@ -8,7 +8,9 @@ import {
   Download, 
   Trash2,
   CheckCircle2,
-  Clock
+  Clock,
+  Eye,
+  Edit2
 } from "lucide-react";
 
 interface Subscriber {
@@ -111,9 +113,26 @@ export default function NewsletterPage() {
                       {new Date(sub.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-2.5 text-right">
-                      <button className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all">
-                        <Trash2 size={14} />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View">
+                          <Eye size={14} />
+                        </button>
+                        <button className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Edit">
+                          <Edit2 size={14} />
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            if (confirm("Remove subscriber?")) {
+                              const { error } = await supabase.from("newsletters").delete().eq("id", sub.id);
+                              if (error) alert("Error deleting subscriber");
+                              else fetchSubscribers();
+                            }
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -9,6 +9,9 @@ import {
   TrendingUp, 
   AlertCircle,
   ChevronRight,
+  Eye,
+  Edit2,
+  Trash2,
   Car
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -232,9 +235,26 @@ export default function KMMonitoringPage() {
                       </div>
                     </td>
                     <td className="px-6 py-2.5 text-right">
-                      <button className="p-1 text-slate-300 hover:text-primary transition-colors">
-                        <ChevronRight size={14} />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
+                          <Eye size={14} />
+                        </button>
+                        <button className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Edit">
+                          <Edit2 size={14} />
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            if (confirm("Remove KM tracking record?")) {
+                              const { error } = await supabase.from("vehicle_units").delete().eq("id", record.id);
+                              if (error) alert("Error deleting record");
+                              else fetchKMData();
+                            }
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

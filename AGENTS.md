@@ -15,6 +15,11 @@
 - **Verification**: Conducted full build cycles for `web-app` and `admin-app`. Resolved two syntax regressions in the fleet marketplace discovered during the build process.
 - **Git**: Pushed all changes and fixes to main branch.
 
+- **Booking Page Overhaul**: Reworked the reservation interface to align with competitor standards. Added a high-fidelity image gallery with thumbnails, grouped Pickup/Return logistics (Date/Time/Address), and a formal Invoice table with transparent TTC (MUR) calculation.
+- **Data Alignment**: Created migration `20260512_add_missing_extras.sql` to include high-margin items (Airport Pickup/Dropoff, Meet & Greet) identified in the competitor study.
+- **UI UX**: Added a prominent "Member Rates" banner and a dedicated "Comment" area to the booking form, reducing friction and improving professional layout.
+- **Verification**: Full build check passed (`npm run build`). Pushed changes to production branch.
+
 ### Next Steps:
-- Implement user authentication enforcement for bookings.
+- Implement user authentication enforcement for bookings (currently Guest-friendly).
 - Expand "Extras" management in the admin dashboard.

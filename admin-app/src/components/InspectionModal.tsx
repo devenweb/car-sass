@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Image from "next/image";
 import { X, Fuel, Gauge, FileText, Image as ImageIcon, User, Calendar } from "lucide-react";
 
 interface InspectionModalProps {
@@ -102,11 +103,12 @@ export default function InspectionModal({ rentalId, onClose }: InspectionModalPr
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {inspection.photos && inspection.photos.map((photo: string, idx: number) => (
-                          <a key={idx} href={photo} target="_blank" rel="noreferrer" className="group relative">
-                            <img 
+                          <a key={idx} href={photo} target="_blank" rel="noreferrer" className="group relative w-20 h-20">
+                            <Image 
                               src={photo} 
                               alt={`Inspection photo ${idx + 1}`} 
-                              className="w-20 h-20 object-cover rounded-lg border border-slate-200 group-hover:opacity-75 transition-opacity"
+                              fill
+                              className="object-cover rounded-lg border border-slate-200 group-hover:opacity-75 transition-opacity"
                             />
                           </a>
                         ))}
@@ -119,11 +121,14 @@ export default function InspectionModal({ rentalId, onClose }: InspectionModalPr
                     {inspection.customer_signature && (
                       <div>
                         <p className="text-[10px] text-slate-400 uppercase font-bold mb-2">Customer Signature</p>
-                        <img 
-                          src={inspection.customer_signature} 
-                          alt="Customer Signature" 
-                          className="h-20 border border-slate-200 rounded bg-white"
-                        />
+                        <div className="relative h-20 w-40 border border-slate-200 rounded bg-white">
+                          <Image 
+                            src={inspection.customer_signature} 
+                            alt="Customer Signature" 
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>

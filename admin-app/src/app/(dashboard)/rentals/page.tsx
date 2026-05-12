@@ -190,17 +190,17 @@ export default function RentalsPage() {
                       <p className="font-black text-admin-text text-xs leading-none">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
                     </td>
                     <td className="px-5 py-2.5 text-right">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex justify-end gap-1.5">
                         <button 
                           onClick={() => setSelectedRentalId(rental.id)}
-                          className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" 
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" 
                           title="View Inspection"
                         >
                           <Eye size={14} />
                         </button>
                         <button 
                           onClick={() => alert("Edit Rental logic to be implemented - use status toggles for now.")}
-                          className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors"
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all"
                           title="Edit"
                         >
                           <Edit2 size={14} />
@@ -213,7 +213,7 @@ export default function RentalsPage() {
                               else fetchRentals();
                             }
                           }}
-                          className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all"
                           title="Delete"
                         >
                           <Trash2 size={14} />

@@ -235,11 +235,11 @@ export default function KMMonitoringPage() {
                       </div>
                     </td>
                     <td className="px-6 py-2.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View History">
                           <Eye size={14} />
                         </button>
-                        <button className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Edit">
+                        <button className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit">
                           <Edit2 size={14} />
                         </button>
                         <button 
@@ -250,7 +250,7 @@ export default function KMMonitoringPage() {
                               else fetchKMData();
                             }
                           }}
-                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete"
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all" title="Delete"
                         >
                           <Trash2 size={14} />
                         </button>

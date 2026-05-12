@@ -153,6 +153,25 @@ function CarDetailContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 1. Block Rs 0 bookings
+    if (invoice.total <= 0) {
+      alert('Invalid booking total. Please check your selected dates and extras.');
+      return;
+    }
+
+    // 2. Require Customer Name
+    if (!formData.name?.trim()) {
+      alert('Please provide your Full Name.');
+      return;
+    }
+
+    // 3. Require Email OR Phone
+    if (!formData.email?.trim() && !formData.phone?.trim()) {
+      alert('Please provide either an Email Address or a Phone Number so we can contact you.');
+      return;
+    }
+
     if (!formData.agreedToTerms) {
       alert('Please agree to the Terms and Conditions.');
       return;

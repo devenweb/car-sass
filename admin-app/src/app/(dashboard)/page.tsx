@@ -63,28 +63,32 @@ async function getDashboardData() {
       value: carCount?.toString() || "0", 
       icon: Car, 
       change: "+0", 
-      trend: "up" 
+      trend: "up",
+      href: "/fleet"
     },
     { 
       label: "Active Rentals", 
       value: rentalCount?.toString() || "0", 
       icon: CalendarCheck, 
       change: "+0", 
-      trend: "up" 
+      trend: "up",
+      href: "/rentals"
     },
     { 
       label: "Total Customers", 
       value: customerCount?.toString() || "0", 
       icon: Users, 
       change: "+0", 
-      trend: "up" 
+      trend: "up",
+      href: "/customers"
     },
     { 
       label: "Revenue (MTD)", 
       value: `Rs ${mtdRevenue.toLocaleString()}`, 
       icon: TrendingUp, 
       change: "+0%", 
-      trend: "up" 
+      trend: "up",
+      href: "/rentals"
     },
   ];
 
@@ -107,9 +111,9 @@ export default async function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <div key={stat.label} className="card-stat">
+          <Link key={stat.label} href={stat.href} className="card-stat hover:border-primary/50 transition-all group">
             <div className="flex items-start justify-between">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary">
+              <div className="p-2 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 <stat.icon size={24} />
               </div>
               <div className={`flex items-center gap-1 text-xs font-medium ${
@@ -123,7 +127,7 @@ export default async function Dashboard() {
               <h3 className="text-admin-muted text-sm font-medium">{stat.label}</h3>
               <p className="text-2xl font-bold text-admin-text mt-1">{stat.value}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -133,7 +137,7 @@ export default async function Dashboard() {
           <div className="space-y-4">
             {recentRentals && recentRentals.length > 0 ? (
               recentRentals.map((rental: any) => (
-                <Link key={rental.id} href={`/rentals/${rental.id}`} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
+                <Link key={rental.id} href="/rentals" className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors group">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center">
                       <Car size={20} className="text-slate-400" />
@@ -173,39 +177,45 @@ export default async function Dashboard() {
             <h3 className="text-lg font-bold text-admin-text">Fleet Status</h3>
             <span className="text-xs font-bold text-primary transition-opacity">Manage Fleet →</span>
           </Link>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-admin-muted">Available</span>
-              <span className="text-sm font-bold text-emerald-600">{availableCount}</span>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-emerald-500 h-full transition-all duration-500" 
-                style={{ width: `${availablePercent}%` }}
-              ></div>
-            </div>
+          <div className="space-y-6">
+            <Link href="/fleet" className="block group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-admin-muted group-hover:text-primary transition-colors">Available</span>
+                <span className="text-sm font-bold text-emerald-600">{availableCount}</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200 shadow-inner">
+                <div 
+                  className="bg-emerald-500 h-full transition-all duration-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" 
+                  style={{ width: `${availablePercent}%` }}
+                ></div>
+              </div>
+            </Link>
             
-            <div className="flex items-center justify-between pt-4">
-              <span className="text-sm text-admin-muted">In Use</span>
-              <span className="text-sm font-bold text-primary">{inUseCount}</span>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-primary h-full transition-all duration-500" 
-                style={{ width: `${inUsePercent}%` }}
-              ></div>
-            </div>
+            <Link href="/fleet" className="block group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-admin-muted group-hover:text-primary transition-colors">In Use</span>
+                <span className="text-sm font-bold text-primary">{inUseCount}</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200 shadow-inner">
+                <div 
+                  className="bg-primary h-full transition-all duration-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]" 
+                  style={{ width: `${inUsePercent}%` }}
+                ></div>
+              </div>
+            </Link>
 
-            <div className="flex items-center justify-between pt-4">
-              <span className="text-sm text-admin-muted">Maintenance</span>
-              <span className="text-sm font-bold text-amber-500">{maintenanceCount}</span>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-amber-500 h-full transition-all duration-500" 
-                style={{ width: `${maintenancePercent}%` }}
-              ></div>
-            </div>
+            <Link href="/fleet" className="block group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-admin-muted group-hover:text-primary transition-colors">Maintenance</span>
+                <span className="text-sm font-bold text-amber-500">{maintenanceCount}</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200 shadow-inner">
+                <div 
+                  className="bg-amber-500 h-full transition-all duration-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" 
+                  style={{ width: `${maintenancePercent}%` }}
+                ></div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

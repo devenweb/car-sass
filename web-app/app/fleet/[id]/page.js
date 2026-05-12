@@ -60,30 +60,31 @@ function CarDetailContent() {
   });
 
   useEffect(() => {
+    let diffDays = 0;
     if (formData.startDate && formData.endDate) {
       const start = new Date(`${formData.startDate}T${formData.startTime}`);
       const end = new Date(`${formData.endDate}T${formData.endTime}`);
       
       if (end > start) {
         const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        const extrasTotal = selectedExtras.reduce((acc, curr) => acc + (curr.price_per_day * diffDays), 0);
-        const subtotal = (minPrice * diffDays) + extrasTotal;
-        const tax = subtotal * 0.15;
-        const total = subtotal + tax;
-
-        setInvoice({
-          days: diffDays,
-          subtotal,
-          tax,
-          total,
-          extrasTotal
-        });
-      } else {
-        setInvoice({ days: 0, subtotal: 0, tax: 0, total: 0, extrasTotal: 0 });
+        diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       }
     }
+
+    // Always calculate preview based on at least 1 day for the "Live Total"
+    const effectiveDays = diffDays || 1;
+    const extrasTotal = selectedExtras.reduce((acc, curr) => acc + (Number(curr.price_per_day) * effectiveDays), 0);
+    const subtotal = (minPrice * effectiveDays) + extrasTotal;
+    const tax = subtotal * 0.15;
+    const total = subtotal + tax;
+
+    setInvoice({
+      days: diffDays, // Store actual days for the invoice table visibility
+      subtotal,
+      tax,
+      total,
+      extrasTotal
+    });
   }, [formData.startDate, formData.startTime, formData.endDate, formData.endTime, selectedExtras, minPrice]);
 
   useEffect(() => {
@@ -122,13 +123,13 @@ function CarDetailContent() {
           .order('sort_order', { ascending: true });
         
         const gallery = imageData?.map(img => img.image_url) || [];
-        // Ensure default image is in gallery if not already
         const defaultImg = templateData.default_thumbnail || templateData.image_url;
         if (defaultImg && !gallery.includes(defaultImg)) {
           gallery.unshift(defaultImg);
         }
         setGalleryImages(gallery);
 
+        // Fetch Units and Prices
         const { data: unitData, error: unitError } = await supabase
           .from('vehicle_units')
           .select('*')
@@ -138,14 +139,9 @@ function CarDetailContent() {
         if (unitError) throw unitError;
         setUnits(unitData || []);
 
-        const { data: pricingData, error: pricingError } = await supabase
-          .from('vehicle_pricing')
-          .select('daily_price')
-          .eq('vehicle_template_id', templateId);
-
-        if (pricingError) throw pricingError;
-        const dailyPrices = pricingData?.map(p => p.daily_price) || [];
-        const dynamicMin = dailyPrices.length > 0 ? Math.min(...dailyPrices) : (templateData.daily_price || 1500);
+        // Get minimum daily price from available units
+        const unitPrices = unitData?.map(u => u.daily_price) || [];
+        const dynamicMin = unitPrices.length > 0 ? Math.min(...unitPrices) : 1500;
         setMinPrice(dynamicMin);
       }
     } catch (err) {
@@ -522,9 +518,11 @@ function CarDetailContent() {
                   <div className="flex flex-col gap-6">
                     {/* Floating Total display for mobile or quick check */}
                     <div className="flex items-center justify-between px-6 py-4 bg-white/5 rounded-2xl border border-white/10">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Live Total</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">
+                        {invoice.days > 0 ? 'Live Total' : 'Est. Daily Total'}
+                      </span>
                       <span className="text-xl font-black text-white tracking-tighter">
-                        {invoice.total > 0 ? formatPrice(invoice.total) : formatPrice(minPrice)}
+                        {formatPrice(invoice.total)}
                       </span>
                     </div>
 

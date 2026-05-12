@@ -6,16 +6,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SmartImage } from '@/lib/image';
 import { useLocalization } from '@/lib/currency';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
 
 function FleetContent() {
   const router = useRouter();

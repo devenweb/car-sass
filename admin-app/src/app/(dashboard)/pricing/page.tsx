@@ -6,6 +6,7 @@ import {
   Save, Sparkles, AlertCircle, Ban, CheckCircle2, Loader2, ArrowRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { 
   format, 
@@ -160,7 +161,7 @@ export default function PricingPage() {
                   )}
                 >
                   <div className="w-10 h-7 relative rounded bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
-                    <img src={t.default_thumbnail || ""} alt="" className="object-cover w-full h-full" />
+                    <Image src={t.default_thumbnail || "/placeholder-car.png"} alt="" fill className="object-cover" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">

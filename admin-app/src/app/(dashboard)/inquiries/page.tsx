@@ -193,7 +193,7 @@ export default function InquiriesPage() {
                 onClick={handleBulkDelete}
                 className="h-7 px-3 bg-white border border-rose-100 text-rose-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-50 transition-all flex items-center gap-1.5"
               >
-                <Trash size={12} /> Delete
+                <Trash2 size={12} /> Delete
               </button>
             </div>
           )}

@@ -403,7 +403,7 @@ function FleetContent() {
                         href={`/fleet/${template.slug || template.id}`}
                         className="group relative bg-white rounded-[2.5rem] border border-black/5 shadow-lg hover:shadow-2xl transition-all duration-700 flex flex-col overflow-hidden cursor-pointer"
                       >
-                          <div className="relative aspect-[16/9.5] overflow-hidden shrink-0 bg-[var(--bg-primary)] transition-colors duration-700 p-4">
+                          <div className="relative aspect-[16/11] overflow-hidden shrink-0 bg-[var(--bg-primary)] transition-colors duration-700 p-2">
                             <SmartImage 
                               src={template.default_thumbnail || template.image_url} 
                               className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 relative z-10" 
@@ -501,7 +501,7 @@ function FleetContent() {
                         href={`/fleet/${template.slug || template.id}`}
                         className="group relative bg-white rounded-[3rem] border border-black/5 shadow-lg hover:shadow-2xl transition-all duration-700 flex flex-col md:flex-row overflow-hidden cursor-pointer"
                       >
-                         <div className="w-full md:w-96 relative overflow-hidden bg-[var(--bg-primary)] transition-colors duration-700 p-8 flex items-center justify-center">
+                         <div className="w-full md:w-[460px] relative overflow-hidden bg-[var(--bg-primary)] transition-colors duration-700 p-4 flex items-center justify-center">
                             <SmartImage 
                               src={template.default_thumbnail || template.image_url} 
                               className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-110 relative z-10" 

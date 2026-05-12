@@ -252,10 +252,6 @@ function CarDetailContent() {
                   <span className="px-3 py-1 bg-red-50 rounded-lg text-[9px] font-black uppercase tracking-widest text-red-600">On Waitlist</span>
                 )}
               </div>
-              <h1 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
-                  <span className="px-4 py-1.5 bg-red-50 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-600">On Waitlist</span>
-                )}
-              </div>
               <h1 className="text-6xl md:text-8xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
                 {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
               </h1>

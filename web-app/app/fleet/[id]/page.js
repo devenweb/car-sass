@@ -5,7 +5,7 @@ import {
   ArrowRight, Users, Settings2, Fuel, Star, 
   MapPin, CheckCircle2, ShieldCheck, Clock, 
   ChevronRight, Sparkles, MessageSquare, Phone, Car,
-  Shield, AlertTriangle, Music
+  Shield, AlertTriangle, Music, Calendar, Plus, UserPlus
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -19,6 +19,13 @@ import BookingExtras from '@/components/BookingExtras';
 function CarDetailContent() {
   const params = useParams();
   const id = params?.id;
+  const [template, setTemplate] = useState(null);
+  const [units, setUnits] = useState([]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const { formatPrice } = useLocalization();
+
   // Image Gallery state
   const [galleryImages, setGalleryImages] = useState([]);
   const [activeImage, setActiveImage] = useState(null);

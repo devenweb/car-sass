@@ -1,6 +1,6 @@
 "use client";
 
-import { Save, User, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package, Key, Smartphone, Mail } from "lucide-react";
+import { Save, User, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package, Key, Smartphone, Mail, Server } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -250,6 +250,65 @@ export default function SettingsPage() {
                       onChange={(e) => handleApiKeyChange("resend_api_key", e.target.value)}
                       placeholder="re_xxxxxxxxxxxxxx"
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
+                    <Server size={18} />
+                    <h4 className="text-sm font-bold uppercase tracking-wider">SMTP (Direct Mail Server)</h4>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP Host</label>
+                      <input 
+                        type="text" 
+                        className="input-field" 
+                        value={apiKeys.smtp_host || ""} 
+                        onChange={(e) => handleApiKeyChange("smtp_host", e.target.value)}
+                        placeholder="smtp.example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP Port</label>
+                      <input 
+                        type="text" 
+                        className="input-field" 
+                        value={apiKeys.smtp_port || ""} 
+                        onChange={(e) => handleApiKeyChange("smtp_port", e.target.value)}
+                        placeholder="587"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP User</label>
+                      <input 
+                        type="text" 
+                        className="input-field" 
+                        value={apiKeys.smtp_user || ""} 
+                        onChange={(e) => handleApiKeyChange("smtp_user", e.target.value)}
+                        placeholder="user@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP Password</label>
+                      <input 
+                        type="password" 
+                        className="input-field" 
+                        value={apiKeys.smtp_pass || ""} 
+                        onChange={(e) => handleApiKeyChange("smtp_pass", e.target.value)}
+                        placeholder="••••••••••••"
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Sender Email Address</label>
+                      <input 
+                        type="email" 
+                        className="input-field" 
+                        value={apiKeys.smtp_from_email || ""} 
+                        onChange={(e) => handleApiKeyChange("smtp_from_email", e.target.value)}
+                        placeholder="noreply@royalrentals.com"
+                      />
+                    </div>
                   </div>
                 </div>
 

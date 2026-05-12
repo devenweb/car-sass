@@ -47,7 +47,7 @@ export const SmartImage = ({ src, alt, className = "", ...props }) => {
   const optimizedSrc = optimizeImage(src);
 
   return (
-    <div className={`relative overflow-hidden bg-[#F1EDE4] ${className}`} style={{ aspectRatio: ASPECT_RATIO }}>
+    <div className={`relative overflow-hidden bg-transparent ${className}`} style={{ aspectRatio: ASPECT_RATIO }}>
       <img
         src={optimizedSrc}
         alt={alt}
@@ -61,7 +61,6 @@ export const SmartImage = ({ src, alt, className = "", ...props }) => {
         }}
         {...props}
       />
-      <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-black/5 rounded-[inherit]" />
     </div>
   );
 };

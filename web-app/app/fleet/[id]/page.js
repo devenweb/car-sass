@@ -233,20 +233,135 @@ function CarDetailContent() {
 
   if (submitted) {
     return (
-      <div className="page-layout bg-white min-h-screen flex flex-col">
+      <div className="page-layout bg-white min-h-screen">
         <Navbar />
-        <div className="flex-grow flex items-center justify-center py-20 px-6">
-          <div className="max-w-xl w-full text-center space-y-8">
-             <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mx-auto">
-                <CheckCircle2 size={40} />
-             </div>
-             <h2 className="text-4xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Booking Received.</h2>
-             <p className="text-[10px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-[0.2em] leading-relaxed">
-               Our concierge team will review your requirements for the {template.brand} {template.model} and contact you shortly.
-             </p>
-             <Link href="/fleet" className="inline-block bg-[var(--bg-dark)] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px]">Return to Fleet</Link>
+        <main className="content-container pt-32 pb-24">
+          <div className="max-w-4xl mx-auto space-y-12">
+            {/* Header Status */}
+            <div className="text-center space-y-6">
+              <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-sm border border-emerald-100">
+                <CheckCircle2 size={48} strokeWidth={2.5} />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-5xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Booking Received.</h1>
+                <p className="text-[11px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.4em]">Reservation ID: #{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
+              </div>
+            </div>
+
+            {/* Receipt Summary Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+              {/* Left: Vehicle & Logistics */}
+              <div className="md:col-span-7 space-y-8">
+                <div className="bg-slate-50 rounded-[3rem] p-10 border border-black/5 space-y-8">
+                  <div className="flex items-center gap-6">
+                    <div className="w-32 h-24 bg-white rounded-3xl p-4 border border-black/5 flex items-center justify-center shadow-sm">
+                      <SmartImage src={activeImage} className="w-full h-full object-contain" alt="Selected Car" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">{template.brand} {template.model}</h3>
+                      <span className="px-3 py-1 bg-[var(--brand-yellow)] text-[var(--bg-dark)] rounded-lg text-[8px] font-black uppercase tracking-widest">{template.category}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8 border-t border-black/5">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Calendar size={14} className="text-[var(--brand-yellow)]" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Pickup Logistics</span>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-black text-[var(--bg-dark)] uppercase">{formData.startDate} • {formData.startTime}</p>
+                        <p className="text-[10px] font-bold text-[var(--bg-dark)]/60 uppercase leading-relaxed">{formData.pickupAddress}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Clock size={14} className="text-[var(--brand-yellow)]" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Return Logistics</span>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-black text-[var(--bg-dark)] uppercase">{formData.endDate} • {formData.endTime}</p>
+                        <p className="text-[10px] font-bold text-[var(--bg-dark)]/60 uppercase leading-relaxed">{formData.returnAddress}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {selectedExtras.length > 0 && (
+                    <div className="pt-8 border-t border-black/5 space-y-4">
+                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40 ml-1">Selected Services</span>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedExtras.map(ex => (
+                          <span key={ex.id} className="px-4 py-2 bg-white border border-black/5 rounded-xl text-[9px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">
+                            {ex.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-8 bg-blue-50/50 rounded-[2rem] border border-blue-100 flex gap-6 items-start">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-500 shadow-sm shrink-0">
+                    <Phone size={24} />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-black uppercase tracking-tight text-[var(--bg-dark)]">Concierge Review</h4>
+                    <p className="text-[10px] font-bold text-[var(--bg-dark)]/50 uppercase leading-relaxed">
+                      Our team is currently verifying vehicle availability and your specific delivery requirements. You will receive a confirmation call or email within 30 minutes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Financial Summary */}
+              <div className="md:col-span-5">
+                <div className="bg-[var(--bg-dark)] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden border border-white/5">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--brand-yellow)] opacity-5 blur-3xl"></div>
+                  
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 border-b border-white/5 pb-4">Payment Summary</h4>
+                  
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[11px] font-bold text-white/50">Rental ({invoice.days} Days)</span>
+                      <span className="text-[11px] font-black text-white">{formatPrice(minPrice * invoice.days)}</span>
+                    </div>
+                    {invoice.extrasTotal > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-[11px] font-bold text-white/50">Add-ons & Extras</span>
+                        <span className="text-[11px] font-black text-white">{formatPrice(invoice.extrasTotal)}</span>
+                      </div>
+                    )}
+                    <div className="pt-6 border-t border-white/5 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[11px] font-bold text-white/30 italic">Subtotal</span>
+                        <span className="text-[11px] font-black text-white/60">{formatPrice(invoice.subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[11px] font-black text-[var(--brand-yellow)]/60 uppercase tracking-widest">TVA (15 %)</span>
+                        <span className="text-[11px] font-black text-[var(--brand-yellow)]">{formatPrice(invoice.tax)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-10 border-t border-white/10 flex justify-between items-end">
+                      <div>
+                        <span className="block text-[8px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">Final Total</span>
+                        <span className="text-sm font-black uppercase tracking-widest text-white">Total TTC</span>
+                      </div>
+                      <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">{formatPrice(invoice.total)}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-12 space-y-4">
+                    <Link href="/fleet" className="flex items-center justify-center gap-3 w-full bg-white text-[var(--bg-dark)] py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[var(--brand-yellow)] transition-all">
+                      Return to Fleet
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </main>
         <Footer />
       </div>
     );

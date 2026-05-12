@@ -48,7 +48,9 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
         'BOOSTER SEAT (4-12 YRS)',
         'APPLE CARPLAY / ANDROID AUTO',
         'GPS NAVIGATION',
-        'CHILD CAR SEAT'
+        'CHILD CAR SEAT',
+        'ADDITIONAL DRIVER',
+        'ADDITIONAL DRIVERS'
       ];
       const filtered = (data || []).filter(item => !excludedNames.includes(item.name.toUpperCase()));
       setExtras(filtered);
@@ -92,7 +94,7 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {extras.map((extra) => {
           const Icon = ICON_MAP[extra.icon_name] || Info;
           const isSelected = selectedExtras.find(e => e.id === extra.id);
@@ -102,28 +104,28 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
               key={extra.id}
               type="button"
               onClick={() => toggleExtra(extra)}
-              className={`group flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 text-left ${
+              className={`group flex items-center gap-3.5 p-3 rounded-2xl border transition-all duration-300 text-left ${
                 isSelected 
-                  ? (isDark ? 'bg-white/10 border-white/20' : 'bg-[var(--bg-dark)] border-[var(--bg-dark)] text-white shadow-lg') 
-                  : (isDark ? 'bg-white/5 border-white/5 hover:border-white/10' : 'bg-white border-black/5 hover:border-[var(--brand-yellow)] shadow-sm')
+                  ? (isDark ? 'bg-white/10 border-white/20' : 'bg-[var(--bg-dark)] border-[var(--bg-dark)] text-white shadow-xl scale-[1.01]') 
+                  : (isDark ? 'bg-white/5 border-white/5 hover:border-white/10' : 'bg-white border-black/5 hover:border-[var(--brand-yellow)] shadow-sm hover:shadow-md')
               }`}
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                 isSelected 
                   ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)]' 
                   : (isDark ? 'bg-white/5 text-white/20' : 'bg-[var(--bg-primary)] text-[var(--bg-dark)]/20')
               }`}>
-                {isSelected ? <Check size={14} strokeWidth={4} /> : <Icon size={14} />}
+                {isSelected ? <Check size={16} strokeWidth={4} /> : <Icon size={16} />}
               </div>
 
               <div className="flex-grow min-w-0">
                 <div className="flex flex-col">
-                  <h4 className={`text-[9px] font-black uppercase tracking-tight truncate leading-tight ${
+                  <h4 className={`text-[11px] font-black uppercase tracking-tight truncate leading-tight ${
                     isSelected ? 'text-white' : (isDark ? 'text-white/80' : 'text-[var(--bg-dark)]')
                   }`}>
                     {extra.name}
                   </h4>
-                  <span className={`text-[8px] font-black uppercase tracking-widest leading-tight ${
+                  <span className={`text-[10px] font-black uppercase tracking-widest leading-tight ${
                     isSelected ? 'text-[var(--brand-yellow)]' : (isDark ? 'text-white/30' : 'text-[var(--bg-dark)]/40')
                   }`}>
                     {mounted ? `+ ${formatPrice(extra.price_per_day)}` : '...'}

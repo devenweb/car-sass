@@ -27,6 +27,7 @@ async function getDashboardData() {
     supabase.from("customers").select("*", { count: "exact" }).limit(1),
     supabase.from("rentals").select(`
       id,
+      total_amount,
       total_price,
       status,
       created_at,
@@ -34,14 +35,14 @@ async function getDashboardData() {
       customers (name)
     `).order("created_at", { ascending: false }).limit(5),
     supabase.from("vehicle_units").select("availability_status"),
-    supabase.from("rentals").select("total_price").gte("created_at", firstDayOfMonth)
+    supabase.from("rentals").select("total_amount, total_price").gte("created_at", firstDayOfMonth)
   ]);
 
   if (revenueData?.[0]) {
     console.log('Revenue Data Sample:', revenueData[0]);
   }
 
-  const mtdRevenue = revenueData?.reduce((acc, curr) => acc + (curr.total_price || 0), 0) || 0;
+  const mtdRevenue = revenueData?.reduce((acc, curr) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
 
   console.log('Dashboard Data Debug:', {
     carCount,
@@ -143,7 +144,7 @@ export default async function Dashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-admin-text text-sm">Rs {rental.total_price?.toLocaleString() || '0'}</p>
+                    <p className="font-bold text-admin-text text-sm">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
                       rental.status === 'collected' ? 'bg-emerald-100 text-emerald-700' : 
                       rental.status === 'delivered' ? 'bg-teal-100 text-teal-700' : 

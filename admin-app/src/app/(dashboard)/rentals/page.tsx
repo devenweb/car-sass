@@ -18,9 +18,10 @@ import InspectionModal from "@/components/InspectionModal";
 
 interface Rental {
   id: string;
-  start_date: string;
-  end_date: string;
-  total_price: number;
+  pickup_datetime: string;
+  return_datetime: string;
+  total_amount: number;
+  total_price: number; // Keep for legacy compatibility
   status: string;
   customers: { name: string; email: string };
   vehicle_units: { 
@@ -167,8 +168,12 @@ export default function RentalsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col text-[11px] text-admin-muted">
-                        <span className="flex items-center gap-1"><Clock size={10} /> {rental.start_date}</span>
-                        <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-emerald-500" /> {rental.end_date}</span>
+                        <span className="flex items-center gap-1 font-bold">
+                          <Clock size={10} /> {rental.pickup_datetime ? new Date(rental.pickup_datetime).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 size={10} className="text-emerald-500" /> {rental.return_datetime ? new Date(rental.return_datetime).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -180,7 +185,7 @@ export default function RentalsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-bold text-admin-text text-sm">Rs {rental.total_price?.toLocaleString()}</p>
+                      <p className="font-bold text-admin-text text-sm">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">

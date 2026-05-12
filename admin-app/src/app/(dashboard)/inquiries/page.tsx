@@ -335,6 +335,5 @@ export default function InquiriesPage() {
         </div>
       )}
     </div>
-    </div>
   );
 }

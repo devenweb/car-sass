@@ -78,7 +78,16 @@ export default function RentalsPage() {
   async function handleSaveRental() {
     if (!editingRental) return;
     setSaving(true);
-    const { customers, vehicle_units, ...updateData } = editingRental;
+    const updateData = {
+      status: editingRental.status,
+      total_amount: editingRental.total_amount,
+      total_price: editingRental.total_price,
+      pickup_datetime: editingRental.pickup_datetime,
+      return_datetime: editingRental.return_datetime,
+      pickup_location: editingRental.pickup_location,
+      return_location: editingRental.return_location,
+      notes: editingRental.notes
+    };
     
     const { error } = await supabase
       .from("rentals")

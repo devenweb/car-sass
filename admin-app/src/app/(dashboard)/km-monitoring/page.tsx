@@ -268,8 +268,13 @@ export default function KMMonitoringPage() {
                             e.stopPropagation();
                             if (confirm("Remove KM tracking record?")) {
                               const { error } = await supabase.from("vehicle_units").delete().eq("id", record.id);
-                              if (error) alert("Error deleting record");
-                              else fetchKMData();
+                              if (error) {
+                                if (error.code === '23503') {
+                                  alert("CANNOT DELETE: This unit has active or past rental history. Please change its status to 'Inactive' in the Fleet Manager instead.");
+                                } else {
+                                  alert("Error deleting record: " + error.message);
+                                }
+                              } else fetchKMData();
                             }
                           }}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all" title="Delete"

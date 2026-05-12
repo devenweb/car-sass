@@ -65,8 +65,26 @@ export default function FleetPage() {
     if (!editingTemplate.brand || !editingTemplate.model) return;
     setUploading(true);
     
-    // Clean the object before upserting
-    const { units, pricing, ...templateToSave } = editingTemplate;
+    const templateToSave = {
+      id: editingTemplate.id,
+      brand: editingTemplate.brand,
+      model: editingTemplate.model,
+      category: editingTemplate.category,
+      transmission: editingTemplate.transmission,
+      seats: editingTemplate.seats,
+      description: editingTemplate.description,
+      image_url: editingTemplate.image_url,
+      default_thumbnail: editingTemplate.default_thumbnail,
+      published_status: editingTemplate.published_status,
+      rating: editingTemplate.rating,
+      air_conditioning: editingTemplate.air_conditioning,
+      has_hifi: editingTemplate.has_hifi,
+      has_bluetooth: editingTemplate.has_bluetooth,
+      has_apple_carplay: editingTemplate.has_apple_carplay,
+      has_android_auto: editingTemplate.has_android_auto,
+      airbag_count: editingTemplate.airbag_count,
+      tags: editingTemplate.tags
+    };
     
     const { error } = await supabase.from('vehicle_templates').upsert(templateToSave);
     if (error) {
@@ -121,8 +139,16 @@ export default function FleetPage() {
     if (!editingUnit.plate_number) return;
     setUploading(true);
     
-    // Clean the object before upserting
-    const { ...unitToSave } = editingUnit;
+    const unitToSave = {
+      id: editingUnit.id,
+      vehicle_template_id: editingUnit.vehicle_template_id,
+      plate_number: editingUnit.plate_number,
+      vin: editingUnit.vin,
+      color: editingUnit.color,
+      mileage: editingUnit.mileage,
+      availability_status: editingUnit.availability_status,
+      internal_reference: editingUnit.internal_reference
+    };
     
     const { error } = await supabase.from('vehicle_units').upsert(unitToSave);
     if (error) {

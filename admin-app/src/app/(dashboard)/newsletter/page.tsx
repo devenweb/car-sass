@@ -169,8 +169,11 @@ export default function NewsletterPage() {
                             e.stopPropagation();
                             if (confirm("Remove subscriber?")) {
                               const { error } = await supabase.from("newsletters").delete().eq("id", sub.id);
-                              if (error) alert("Error deleting subscriber");
-                              else fetchSubscribers();
+                              if (error) {
+                                alert("Error deleting subscriber: " + error.message);
+                              } else {
+                                fetchSubscribers();
+                              }
                             }
                           }}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all" title="Delete"

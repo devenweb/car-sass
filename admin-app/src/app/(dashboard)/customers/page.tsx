@@ -75,10 +75,15 @@ export default function CustomersPage() {
   }
 
   async function deleteCustomer(id: string) {
-    if (!confirm("Permanently remove customer record?")) return;
+    if (!confirm("Permanently remove customer record? This cannot be undone.")) return;
     const { error } = await supabase.from("customers").delete().eq("id", id);
-    if (error) alert("Error deleting customer");
-    else fetchCustomers();
+    if (error) {
+      if (error.code === '23503') {
+        alert("CANNOT DELETE: This customer has active or past rental records. Please keep their record for auditing or contact support to archive.");
+      } else {
+        alert("Error deleting customer: " + error.message);
+      }
+    } else fetchCustomers();
   }
 
   const filteredCustomers = customers.filter(c => 

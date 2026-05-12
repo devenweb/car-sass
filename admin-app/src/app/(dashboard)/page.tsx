@@ -171,7 +171,7 @@ export default async function Dashboard() {
         <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
           <Link href="/fleet" className="group flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-admin-text">Fleet Status</h3>
-            <span className="text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">Manage Fleet →</span>
+            <span className="text-xs font-bold text-primary transition-opacity">Manage Fleet →</span>
           </Link>
           <div className="space-y-4">
             <div className="flex items-center justify-between">

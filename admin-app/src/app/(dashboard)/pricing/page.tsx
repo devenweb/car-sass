@@ -286,8 +286,8 @@ export default function PricingPage() {
                               setPricingData(newData);
                             }}
                             className={cn(
-                              "p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100",
-                              dayData.stopSale ? "bg-rose-500 text-white opacity-100" : "bg-slate-200 text-slate-400 hover:bg-rose-500 hover:text-white"
+                              "p-1.5 rounded-md transition-all",
+                              dayData.stopSale ? "bg-rose-500 text-white" : "bg-slate-100 text-slate-400 hover:bg-rose-500 hover:text-white"
                             )}
                           >
                             <Ban size={12} />

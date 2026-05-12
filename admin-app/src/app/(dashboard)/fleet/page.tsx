@@ -265,10 +265,10 @@ export default function FleetPage() {
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <span className={cn("px-3 py-1 rounded-full text-[9px] font-black uppercase", unit.availability_status === 'available' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600')}>{unit.availability_status}</span>
-                                  <div className="flex gap-1 opacity-0 group-hover/unit:opacity-100">
-                                    <button onClick={() => openMaintenance(unit)} className="p-1.5 hover:bg-primary/10 rounded"><Wrench size={14}/></button>
-                                    <button className="p-1.5 hover:bg-primary/10 rounded"><History size={14}/></button>
-                                    <button onClick={() => handleDeleteUnit(unit.id)} className="p-1.5 hover:bg-rose-500/10 rounded text-rose-500"><Trash2 size={14}/></button>
+                                  <div className="flex gap-1">
+                                    <button onClick={() => openMaintenance(unit)} className="p-1.5 hover:bg-primary/10 rounded text-slate-400 hover:text-primary transition-colors"><Wrench size={14}/></button>
+                                    <button className="p-1.5 hover:bg-primary/10 rounded text-slate-400 hover:text-primary transition-colors"><History size={14}/></button>
+                                    <button onClick={() => handleDeleteUnit(unit.id)} className="p-1.5 hover:bg-rose-500/10 rounded text-rose-500 transition-colors"><Trash2 size={14}/></button>
                                   </div>
                                 </div>
                               </div>
@@ -291,7 +291,14 @@ export default function FleetPage() {
               <h3 className="text-xl font-black uppercase mb-6">Vehicle Image</h3>
               <div className="aspect-[4/3] relative rounded-3xl overflow-hidden border-2 border-dashed bg-white flex items-center justify-center group shadow-inner">
                 {(editingTemplate.image_url || editingTemplate.default_thumbnail) ? (
-                  <><Image src={editingTemplate.image_url || editingTemplate.default_thumbnail} alt="Preview" fill className="object-cover" /><div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center"><button onClick={() => fileInputRef.current?.click()} className="p-3 bg-white rounded-full shadow-xl"><Upload size={20}/></button></div></>
+                  <>
+                    <Image src={editingTemplate.image_url || editingTemplate.default_thumbnail} alt="Preview" fill className="object-cover" />
+                    <div className="absolute top-4 right-4 flex items-center justify-center">
+                      <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white transition-all text-primary border border-primary/10">
+                        <Upload size={20}/>
+                      </button>
+                    </div>
+                  </>
                 ) : (
                   <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-2 text-slate-400"><Upload size={24}/><span className="text-xs font-bold uppercase">Upload</span></button>
                 )}

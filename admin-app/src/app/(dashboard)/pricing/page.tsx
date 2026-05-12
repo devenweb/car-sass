@@ -163,9 +163,14 @@ export default function PricingPage() {
                     <img src={t.default_thumbnail || ""} alt="" className="object-cover w-full h-full" />
                   </div>
                   <div>
-                    <p className={cn("text-sm font-bold truncate", selectedTemplate?.id === t.id ? "text-primary" : "text-admin-text")}>
-                      {t.brand} {t.model}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className={cn("text-sm font-bold truncate", selectedTemplate?.id === t.id ? "text-primary" : "text-admin-text")}>
+                        {t.brand} {t.model}
+                      </p>
+                      {t.published_status !== 'published' && (
+                        <span className="px-1.5 py-0.5 bg-rose-50 text-rose-500 rounded text-[7px] font-black uppercase border border-rose-100 shrink-0">Inactive</span>
+                      )}
+                    </div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.category}</p>
                   </div>
                 </button>

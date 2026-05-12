@@ -12,7 +12,8 @@ import {
   Eye,
   Edit2,
   Trash2,
-  Car
+  Car,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,9 @@ export default function KMMonitoringPage() {
   const [records, setRecords] = useState<KMRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRecord, setSelectedRecord] = useState<KMRecord | null>(null);
+  const [editingRecord, setEditingRecord] = useState<KMRecord | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchKMData();
@@ -48,7 +52,6 @@ export default function KMMonitoringPage() {
 
   async function fetchKMData() {
     setLoading(true);
-    // Fetch vehicle units with their templates and inspections (via rentals)
     const { data, error } = await supabase
       .from("vehicle_units")
       .select(`
@@ -72,7 +75,6 @@ export default function KMMonitoringPage() {
     if (error) {
       console.error("Error fetching KM data:", error);
     } else {
-      // Flatten the data for easier display
       const formattedRecords = data?.map((unit: any) => {
         const inspections = unit.rentals?.flatMap((r: any) => 
           r.rental_inspections?.map((ins: any) => ({
@@ -93,6 +95,23 @@ export default function KMMonitoringPage() {
       setRecords(formattedRecords);
     }
     setLoading(false);
+  }
+
+  async function handleUpdateMileage() {
+    if (!editingRecord) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("vehicle_units")
+      .update({ mileage: editingRecord.mileage })
+      .eq("id", editingRecord.id);
+
+    if (error) {
+      alert("Error updating mileage: " + error.message);
+    } else {
+      setEditingRecord(null);
+      fetchKMData();
+    }
+    setSaving(false);
   }
 
   const filteredRecords = records.filter(record => 
@@ -162,8 +181,6 @@ export default function KMMonitoringPage() {
           </div>
         </div>
       </div>
-
-      {/* Integrated search into header */}
 
       <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -237,12 +254,12 @@ export default function KMMonitoringPage() {
                     <td className="px-6 py-2.5 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button 
-                          onClick={(e) => { e.stopPropagation(); alert("KM history view placeholder."); }}
+                          onClick={(e) => { e.stopPropagation(); setSelectedRecord(record); }}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View History">
                           <Eye size={14} />
                         </button>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); alert("KM record edit placeholder."); }}
+                          onClick={(e) => { e.stopPropagation(); setEditingRecord(record); }}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit">
                           <Edit2 size={14} />
                         </button>
@@ -274,6 +291,92 @@ export default function KMMonitoringPage() {
           </table>
         </div>
       </div>
+
+      {/* History Modal */}
+      {selectedRecord && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div>
+                <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight leading-none">{selectedRecord.plate_number} History</h2>
+                <p className="text-[10px] text-admin-muted font-bold tracking-tight uppercase mt-1">{selectedRecord.vehicle_templates.brand} {selectedRecord.vehicle_templates.model}</p>
+              </div>
+              <button onClick={() => setSelectedRecord(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={20} className="text-slate-400" /></button>
+            </div>
+            <div className="p-6 max-h-[400px] overflow-y-auto">
+              <div className="space-y-4">
+                {selectedRecord.inspections.length > 0 ? (
+                  selectedRecord.inspections.map((ins, idx) => (
+                    <div key={ins.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-2 h-2 rounded-full",
+                          ins.type === 'delivery' ? 'bg-teal-400' : 'bg-amber-400'
+                        )} />
+                        <div>
+                          <p className="text-xs font-black text-slate-900 uppercase leading-none">{ins.type}</p>
+                          <p className="text-[9px] text-admin-muted font-bold mt-1">{(ins as any).customer_name || "Internal"}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-primary leading-none">{ins.mileage.toLocaleString()} KM</p>
+                        <p className="text-[9px] text-slate-400 font-bold mt-1">{new Date(ins.created_at).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-admin-muted italic text-xs">No historical recordings found for this unit.</div>
+                )}
+              </div>
+            </div>
+            <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+              <button onClick={() => setSelectedRecord(null)} className="px-6 py-2 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm">Close History</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Mileage Modal */}
+      {editingRecord && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Update Mileage</h2>
+              <button onClick={() => setEditingRecord(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={20} className="text-slate-400" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Plate Number</label>
+                <div className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs font-black text-slate-500">{editingRecord.plate_number}</div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Current Mileage (KM)</label>
+                <input 
+                  type="number"
+                  value={editingRecord.mileage}
+                  onChange={(e) => setEditingRecord({...editingRecord, mileage: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button 
+                  onClick={() => setEditingRecord(null)}
+                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleUpdateMileage}
+                  disabled={saving}
+                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-white bg-primary rounded-lg hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Update KM"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

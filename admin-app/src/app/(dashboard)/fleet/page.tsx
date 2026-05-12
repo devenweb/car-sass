@@ -23,6 +23,7 @@ export default function FleetPage() {
   const [editingUnit, setEditingUnit] = useState<any>(null);
   const [isMaintModalOpen, setIsMaintModalOpen] = useState(false);
   const [selectedUnitForMaint, setSelectedUnitForMaint] = useState<any>(null);
+  const [selectedUnitHistory, setSelectedUnitHistory] = useState<any>(null);
   
   const [uploading, setUploading] = useState(false);
   const [maintDescription, setMaintDescription] = useState("");
@@ -79,15 +80,29 @@ export default function FleetPage() {
   };
 
   const handleDeleteTemplate = async (id: string) => {
-    if (!confirm("Are you sure? This will delete the template and all associated vehicle units. Rental records may block this deletion.")) return;
+    if (!confirm("Are you sure? This will delete the template and all associated vehicle units. If there are existing rentals for these vehicles, deletion will be blocked.")) return;
     
-    // Try to delete associated units first (soft cascade)
-    await supabase.from('vehicle_units').delete().eq('vehicle_template_id', id);
+    // Try to delete associated units first (soft cascade attempt)
+    const { error: unitError } = await supabase.from('vehicle_units').delete().eq('vehicle_template_id', id);
+    
+    if (unitError) {
+      if (unitError.code === '23503') {
+        alert("CANNOT DELETE: This model has units linked to existing rental records. Please set the model to 'Inactive' instead to remove it from the public catalog.");
+        return;
+      }
+      console.error("Unit delete error:", unitError);
+      alert("Error deleting units: " + unitError.message);
+      return;
+    }
 
     const { error } = await supabase.from('vehicle_templates').delete().eq('id', id);
     if (error) {
-      console.error("Delete error:", error);
-      alert("Error deleting template: " + error.message);
+      if (error.code === '23503') {
+        alert("CANNOT DELETE: This model is referenced by other records (rentals or logs). Set to 'Inactive' to hide it.");
+      } else {
+        console.error("Delete error:", error);
+        alert("Error deleting template: " + error.message);
+      }
     } else {
       fetchFleet();
     }
@@ -121,10 +136,15 @@ export default function FleetPage() {
   };
 
   const handleDeleteUnit = async (id: string) => {
-    if (!confirm("Remove unit?")) return;
+    if (!confirm("Remove unit? This cannot be undone.")) return;
     const { error } = await supabase.from('vehicle_units').delete().eq('id', id);
-    if (error) alert("Error deleting unit");
-    else fetchFleet();
+    if (error) {
+      if (error.code === '23503') {
+        alert("CANNOT DELETE: This unit is linked to rental history. Change its status to 'Maintenance' or 'Inactive' instead.");
+      } else {
+        alert("Error deleting unit: " + error.message);
+      }
+    } else fetchFleet();
   };
 
   const openMaintenance = (unit: any) => {
@@ -292,9 +312,35 @@ export default function FleetPage() {
                                 <div className="flex items-center gap-4">
                                   <span className={cn("px-3 py-1 rounded-full text-[9px] font-black uppercase", unit.availability_status === 'available' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600')}>{unit.availability_status}</span>
                                   <div className="flex gap-1">
-                                    <button onClick={() => openMaintenance(unit)} className="p-1.5 hover:bg-primary/10 rounded text-slate-400 hover:text-primary transition-colors"><Wrench size={14}/></button>
-                                    <button className="p-1.5 hover:bg-primary/10 rounded text-slate-400 hover:text-primary transition-colors"><History size={14}/></button>
-                                    <button onClick={() => handleDeleteUnit(unit.id)} className="p-1.5 hover:bg-rose-500/10 rounded text-rose-500 transition-colors"><Trash2 size={14}/></button>
+                                    <button onClick={() => openMaintenance(unit)} className="p-1.5 hover:bg-primary/10 rounded text-slate-400 hover:text-primary transition-colors" title="Log Maintenance"><Wrench size={14}/></button>
+                                    <button 
+                                      onClick={async () => {
+                                        const { data } = await supabase
+                                          .from('rental_inspections')
+                                          .select(`
+                                            *,
+                                            rentals (
+                                              customers (name)
+                                            )
+                                          `)
+                                          .eq('vehicle_unit_id', unit.id)
+                                          .order('created_at', { ascending: false });
+                                        
+                                        if (data && data.length > 0) {
+                                          setSelectedUnitHistory({
+                                            unit,
+                                            history: data
+                                          });
+                                        } else {
+                                          alert("No history records found for this unit.");
+                                        }
+                                      }}
+                                      className="p-1.5 hover:bg-primary/10 rounded text-slate-400 hover:text-primary transition-colors" 
+                                      title="Mileage History"
+                                    >
+                                      <History size={14}/>
+                                    </button>
+                                    <button onClick={() => handleDeleteUnit(unit.id)} className="p-1.5 hover:bg-rose-500/10 rounded text-rose-500 transition-colors" title="Delete Unit"><Trash2 size={14}/></button>
                                   </div>
                                 </div>
                               </div>
@@ -462,6 +508,45 @@ export default function FleetPage() {
              >
                {isSavingMaint ? <Loader2 className="animate-spin" size={16} /> : "Log Service"}
              </button>
+          </div>
+        </div>
+      )}
+      {selectedUnitHistory && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedUnitHistory(null)}></div>
+          <div className="relative bg-white w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div>
+                <h3 className="text-xl font-black uppercase leading-none">{selectedUnitHistory.unit.plate_number} History</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">Operational Audit Trail</p>
+              </div>
+              <button onClick={() => setSelectedUnitHistory(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={20} className="text-slate-400" /></button>
+            </div>
+            <div className="p-8 max-h-[400px] overflow-y-auto">
+              <div className="space-y-4">
+                {selectedUnitHistory.history.map((record: any) => (
+                  <div key={record.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-primary/20 transition-all">
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        "w-2.5 h-2.5 rounded-full",
+                        record.type === 'delivery' ? 'bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.5)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]'
+                      )} />
+                      <div>
+                        <p className="text-xs font-black text-slate-900 uppercase leading-none">{record.type}</p>
+                        <p className="text-[9px] text-slate-400 font-bold mt-1.5">{record.rentals?.customers?.name || "Internal Record"}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-primary leading-none">{record.mileage?.toLocaleString()} KM</p>
+                      <p className="text-[9px] text-slate-400 font-bold mt-1.5">{new Date(record.created_at).toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-center">
+              <button onClick={() => setSelectedUnitHistory(null)} className="px-8 py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">Dismiss</button>
+            </div>
           </div>
         </div>
       )}

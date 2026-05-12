@@ -12,7 +12,8 @@ import {
   Trash2,
   Eye,
   Edit2,
-  History
+  History,
+  X
 } from "lucide-react";
 
 interface Customer {
@@ -29,6 +30,8 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchCustomers();
@@ -47,6 +50,28 @@ export default function CustomersPage() {
       setCustomers(data || []);
     }
     setLoading(false);
+  }
+
+  async function handleSaveCustomer() {
+    if (!editingCustomer) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("customers")
+      .update({
+        name: editingCustomer.name,
+        email: editingCustomer.email,
+        phone: editingCustomer.phone,
+        license_number: editingCustomer.license_number
+      })
+      .eq("id", editingCustomer.id);
+
+    if (error) {
+      alert("Error saving customer: " + error.message);
+    } else {
+      setEditingCustomer(null);
+      fetchCustomers();
+    }
+    setSaving(false);
   }
 
   async function deleteCustomer(id: string) {
@@ -137,7 +162,7 @@ export default function CustomersPage() {
                           <Eye size={14} />
                         </button>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); alert("Edit Customer logic to be implemented."); }}
+                          onClick={(e) => { e.stopPropagation(); setEditingCustomer(customer); }}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit">
                           <Edit2 size={14} />
                         </button>
@@ -161,6 +186,76 @@ export default function CustomersPage() {
           </table>
         </div>
       </div>
+
+      {/* Edit Customer Modal */}
+      {editingCustomer && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Edit Customer</h2>
+              <button onClick={() => setEditingCustomer(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={20} className="text-slate-400" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Full Name</label>
+                <input 
+                  type="text"
+                  value={editingCustomer.name}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, name: e.target.value})}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Email Address</label>
+                <input 
+                  type="email"
+                  value={editingCustomer.email}
+                  onChange={(e) => setEditingCustomer({...editingCustomer, email: e.target.value})}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone</label>
+                  <input 
+                    type="text"
+                    value={editingCustomer.phone || ""}
+                    onChange={(e) => setEditingCustomer({...editingCustomer, phone: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">License Number</label>
+                  <input 
+                    type="text"
+                    value={editingCustomer.license_number || ""}
+                    onChange={(e) => setEditingCustomer({...editingCustomer, license_number: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  onClick={() => setEditingCustomer(null)}
+                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSaveCustomer}
+                  disabled={saving}
+                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-white bg-primary rounded-lg hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

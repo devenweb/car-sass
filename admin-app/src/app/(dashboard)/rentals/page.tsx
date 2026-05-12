@@ -46,6 +46,8 @@ export default function RentalsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRentalId, setSelectedRentalId] = useState<string | null>(null);
+  const [editingRental, setEditingRental] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchRentals();
@@ -73,18 +75,23 @@ export default function RentalsPage() {
     setLoading(false);
   }
 
-  async function updateStatus(id: string, newStatus: string) {
+  async function handleSaveRental() {
+    if (!editingRental) return;
+    setSaving(true);
+    const { customers, vehicle_units, ...updateData } = editingRental;
+    
     const { error } = await supabase
       .from("rentals")
-      .update({ status: newStatus })
-      .eq("id", id);
+      .update(updateData)
+      .eq("id", editingRental.id);
 
     if (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status");
+      alert("Error saving rental: " + error.message);
     } else {
+      setEditingRental(null);
       fetchRentals();
     }
+    setSaving(false);
   }
 
   const filteredRentals = rentals.filter(rental => {
@@ -199,7 +206,7 @@ export default function RentalsPage() {
                           <Eye size={14} />
                         </button>
                         <button 
-                          onClick={() => alert("Edit Rental logic to be implemented - use status toggles for now.")}
+                          onClick={() => setEditingRental(rental)}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all"
                           title="Edit"
                         >
@@ -237,6 +244,79 @@ export default function RentalsPage() {
           </table>
         </div>
       </div>
+
+      {/* Edit Rental Modal */}
+      {editingRental && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Edit Reservation</h2>
+              <button onClick={() => setEditingRental(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><XCircle size={20} className="text-slate-400" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Status</label>
+                  <select 
+                    value={editingRental.status}
+                    onChange={(e) => setEditingRental({...editingRental, status: e.target.value})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    {Object.keys(statusColors).map(status => (
+                      <option key={status} value={status}>{status.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Total Amount (Rs)</label>
+                  <input 
+                    type="number"
+                    value={editingRental.total_amount || editingRental.total_price || 0}
+                    onChange={(e) => setEditingRental({...editingRental, total_amount: parseFloat(e.target.value)})}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Pickup Date & Time</label>
+                <input 
+                  type="datetime-local"
+                  value={editingRental.pickup_datetime ? new Date(editingRental.pickup_datetime).toISOString().slice(0, 16) : ""}
+                  onChange={(e) => setEditingRental({...editingRental, pickup_datetime: e.target.value})}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Return Date & Time</label>
+                <input 
+                  type="datetime-local"
+                  value={editingRental.return_datetime ? new Date(editingRental.return_datetime).toISOString().slice(0, 16) : ""}
+                  onChange={(e) => setEditingRental({...editingRental, return_datetime: e.target.value})}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  onClick={() => setEditingRental(null)}
+                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSaveRental}
+                  disabled={saving}
+                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-white bg-primary rounded-lg hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedRentalId && (
         <InspectionModal 

@@ -1,3 +1,4 @@
+/*
 # ANTIGRAVITY ENFORCEMENT RULES
 
 This document contains the absolute mandates for the Antigravity AI. You MUST read this document before every single response and implementation.

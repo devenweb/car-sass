@@ -19,6 +19,8 @@ function ContactContent() {
     phone: '',
     startDate: '',
     endDate: '',
+    deliveryLocation: 'airport',
+    hotelName: '',
     message: ''
   });
   const [selectedExtras, setSelectedExtras] = useState([]);
@@ -57,7 +59,7 @@ function ContactContent() {
     setIsSubmitting(true);
     
     try {
-      // 1. Create or Get Customer
+      // Handle customer record creation or retrieval
       let customerId;
       const { data: existingCustomer } = await supabase
         .from('customers')
@@ -82,7 +84,7 @@ function ContactContent() {
         customerId = newCustomer.id;
       }
 
-      // 2. Create Rental Record if template is selected
+      // Create the rental record for the selected vehicle template
       if (templateId && customerId) {
         const { error: rentalError } = await supabase
           .from('rentals')
@@ -97,14 +99,14 @@ function ContactContent() {
         if (rentalError) throw rentalError;
       }
 
-      // 3. Create Contact Message (for history)
+      // Store contact message for historical tracking
       const { error } = await supabase
         .from('contact_messages')
         .insert([{
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          message: `Vehicle: ${template ? `${template.brand} ${template.model}` : 'General Inquiry'}\nDates: ${formData.startDate} to ${formData.endDate}\nExtras: ${selectedExtras.map(e => e.name).join(', ')}\n\nMessage: ${formData.message}`,
+          message: `Vehicle: ${template ? `${template.brand} ${template.model}` : 'General Inquiry'}\nDates: ${formData.startDate} to ${formData.endDate}\nDelivery: ${formData.deliveryLocation}${formData.deliveryLocation === 'hotel' ? ` (${formData.hotelName})` : ''}\nExtras: ${selectedExtras.map(e => e.name).join(', ')}\n\nMessage: ${formData.message}`,
           status: 'new'
         }]);
 
@@ -205,7 +207,7 @@ function ContactContent() {
             <div className="grid grid-cols-1 gap-6">
               {[
                 { icon: Phone, title: 'Concierge', value: '+230 5XXX XXXX' },
-                { icon: Mail, title: 'Email', value: 'bookings@drive.mu' }
+                { icon: Mail, title: 'Email', value: 'devenpawaray@gmail.com' }
               ].map((item, i) => (
                 <div key={i} className="bg-white rounded-3xl p-8 border border-black/5 flex items-center gap-6">
                   <div className="w-12 h-12 rounded-xl bg-[var(--bg-primary)] flex items-center justify-center text-[var(--brand-yellow)]">
@@ -284,6 +286,51 @@ function ContactContent() {
                        />
                     </div>
                   </div>
+                </div>
+
+                <div className="space-y-10 pt-10 border-t border-black/5">
+                   <div className="space-y-4">
+                     <h2 className="text-4xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
+                        Delivery <span className="text-[var(--brand-yellow)]">Location.</span>
+                     </h2>
+                     <p className="text-[11px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-[0.2em]">Where should we meet you?</p>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {[
+                        { id: 'airport', label: 'SSR Airport', icon: MapPin },
+                        { id: 'hotel', label: 'Hotel / Villa', icon: MapPin },
+                        { id: 'agency', label: 'Agency Office', icon: MapPin }
+                      ].map((loc) => (
+                        <button
+                          key={loc.id}
+                          type="button"
+                          onClick={() => setFormData({...formData, deliveryLocation: loc.id})}
+                          className={`p-8 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 ${
+                            formData.deliveryLocation === loc.id 
+                              ? 'bg-[var(--bg-dark)] border-[var(--bg-dark)] text-white' 
+                              : 'bg-white border-black/5 text-[var(--bg-dark)]/40 hover:border-[var(--brand-yellow)]'
+                          }`}
+                        >
+                           <loc.icon size={24} className={formData.deliveryLocation === loc.id ? 'text-[var(--brand-yellow)]' : ''} />
+                           <span className="text-[10px] font-black uppercase tracking-widest">{loc.label}</span>
+                        </button>
+                      ))}
+                   </div>
+
+                   {formData.deliveryLocation === 'hotel' && (
+                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-4">Hotel or Villa Name</label>
+                        <input 
+                          required
+                          type="text" 
+                          className="form-input-premium" 
+                          placeholder="e.g. Royal Palm Beachcomber" 
+                          value={formData.hotelName}
+                          onChange={(e) => setFormData({...formData, hotelName: e.target.value})}
+                        />
+                     </div>
+                   )}
                 </div>
 
                 <div className="space-y-3">

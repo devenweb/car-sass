@@ -71,7 +71,7 @@ export default function FloatingActions() {
 
         {/* Email */}
         <a 
-          href="mailto:info@royalrentals.mu" 
+          href="mailto:devenpawaray@gmail.com" 
           className="w-12 h-12 bg-[#4F46E5] text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-[4px] border-[#2C3344]"
         >
           <Mail className="w-6 h-6" />

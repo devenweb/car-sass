@@ -33,6 +33,8 @@ function CarDetailContent() {
     phone: '',
     startDate: '',
     endDate: '',
+    deliveryLocation: 'airport',
+    hotelName: '',
     message: ''
   });
   const [selectedExtras, setSelectedExtras] = useState([]);
@@ -129,7 +131,7 @@ function CarDetailContent() {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        message: `Vehicle: ${template.brand} ${template.model}\nDates: ${formData.startDate} to ${formData.endDate}\nExtras: ${selectedExtras.map(ex => ex.name).join(', ')}\n\nNotes: ${formData.message}`,
+        message: `Vehicle: ${template.brand} ${template.model}\nDates: ${formData.startDate} to ${formData.endDate}\nDelivery: ${formData.deliveryLocation}${formData.deliveryLocation === 'hotel' ? ` (${formData.hotelName})` : ''}\nExtras: ${selectedExtras.map(ex => ex.name).join(', ')}\n\nNotes: ${formData.message}`,
         status: 'new'
       }]);
 
@@ -311,10 +313,48 @@ function CarDetailContent() {
                   </div>
                 </div>
 
-{/* <div className="space-y-4">
-                   <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-2">Premium Extras</h4>
+                {/* Delivery Options */}
+                <div className="space-y-4 pt-4 border-t border-white/10">
+                  <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Delivery Location</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { id: 'airport', label: 'Airport' },
+                      { id: 'hotel', label: 'Hotel' },
+                      { id: 'agency', label: 'Agency' }
+                    ].map((loc) => (
+                      <button
+                        key={loc.id}
+                        type="button"
+                        onClick={() => setFormData({...formData, deliveryLocation: loc.id})}
+                        className={`py-3 rounded-xl border text-[8px] font-black uppercase tracking-widest transition-all ${
+                          formData.deliveryLocation === loc.id 
+                            ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)]' 
+                            : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
+                        }`}
+                      >
+                        {loc.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {formData.deliveryLocation === 'hotel' && (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-top-1">
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-xs focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        placeholder="Hotel / Villa Name" 
+                        value={formData.hotelName}
+                        onChange={(e) => setFormData({...formData, hotelName: e.target.value})}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-white/10">
+                   <h4 className="text-[8px] font-black text-white/40 uppercase tracking-widest ml-4">Premium Extras</h4>
                    <BookingExtras onSelectionChange={setSelectedExtras} isDark={true} />
-                </div> */}
+                </div>
 
                 <button 
                   disabled={isSubmitting}

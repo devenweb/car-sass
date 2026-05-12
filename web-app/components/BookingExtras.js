@@ -5,7 +5,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { useLocalization } from '@/lib/currency';
 import { 
   Plus, Check, Info, ShieldCheck, 
-  MapPin, Baby, UserPlus, Package 
+  MapPin, Baby, UserPlus, Package, 
+  Music, Flower, Smartphone, Wifi
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -13,7 +14,11 @@ const ICON_MAP = {
   Baby: Baby,
   UserPlus: UserPlus,
   ShieldCheck: ShieldCheck,
-  Package: Package
+  Package: Package,
+  Music: Music,
+  Flower: Flower,
+  Smartphone: Smartphone,
+  Wifi: Wifi
 };
 
 export default function BookingExtras({ onSelectionChange, isDark = false }) {

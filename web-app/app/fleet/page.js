@@ -403,78 +403,78 @@ function FleetContent() {
                         href={`/fleet/${template.slug || template.id}`}
                         className="group relative bg-white rounded-[2.5rem] border border-black/5 shadow-lg hover:shadow-2xl transition-all duration-700 flex flex-col overflow-hidden cursor-pointer"
                       >
-                          <div className="relative aspect-[16/8.5] overflow-hidden shrink-0 bg-white group-hover:bg-slate-50/50 transition-colors duration-700 p-4">
+                          <div className="relative aspect-[16/9.5] overflow-hidden shrink-0 bg-white group-hover:bg-slate-50/50 transition-colors duration-700 p-4">
                             <SmartImage 
                               src={template.default_thumbnail || template.image_url} 
                               className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" 
                               alt={`${template.brand} ${template.model}`} 
                             />
-                            <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                              <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-3 py-0.5 rounded-full text-[7px] font-black uppercase tracking-[0.2em]">{template.category}</span>
+                            <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                              <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em]">{template.category}</span>
                               {mounted && (template.available_count > 0 ? (
-                                 <span className="px-2.5 py-0.5 bg-emerald-500 text-white rounded-lg text-[7px] font-black uppercase tracking-widest shadow-sm">
+                                 <span className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
                                    {template.available_count} Available
                                  </span>
                                ) : (
-                                 <span className="px-2.5 py-0.5 bg-red-500 text-white rounded-lg text-[7px] font-black uppercase tracking-widest shadow-sm">
+                                 <span className="px-3 py-1 bg-red-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
                                    Sold Out
                                  </span>
                                ))}
                             </div>
-                            <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-lg shadow-sm flex items-center gap-1">
-                              <Star className="w-2.5 h-2.5 text-[var(--brand-yellow)] fill-[var(--brand-yellow)]" />
-                              <span className="text-[9px] font-black text-[var(--bg-dark)]">{Number(template.rating || 5.0).toFixed(1)}</span>
+                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg shadow-sm flex items-center gap-1.5">
+                              <Star className="w-3.5 h-3.5 text-[var(--brand-yellow)] fill-[var(--brand-yellow)]" />
+                              <span className="text-[11px] font-black text-[var(--bg-dark)]">{Number(template.rating || 5.0).toFixed(1)}</span>
                             </div>
                           </div>
                           
-                          <div className="p-5 flex flex-col flex-1">
-                            <h3 className="text-[var(--bg-dark)] text-lg font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-0.5 tracking-tighter leading-tight">{template.brand} {template.model}</h3>
-                            <div className="flex items-center gap-2 mb-3">
-                               <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-                               <span className="text-[7px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Verified Fleet</span>
+                          <div className="p-7 flex flex-col flex-1">
+                            <h3 className="text-[var(--bg-dark)] text-xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 tracking-tighter leading-tight">{template.brand} {template.model}</h3>
+                            <div className="flex items-center gap-2 mb-4">
+                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Verified Fleet</span>
                             </div>
                             
-                            <div className="grid grid-cols-2 gap-x-3 gap-y-2 py-3 border-y border-black/5 mb-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
-                                  <Users className="w-3.5 h-3.5 text-[var(--brand-yellow)]" />
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-4 border-y border-black/5 mb-5">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
+                                  <Users className="w-4 h-4 text-[var(--brand-yellow)]" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                   <span className="text-[6px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Seats</span>
-                                   <span className="text-[9px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                                   <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Seats</span>
+                                   <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
                                      {mounted ? `${template.seats}` : '...'}
                                    </span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
-                                  <Briefcase className="w-3.5 h-3.5 text-[var(--brand-yellow)]" />
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
+                                  <Briefcase className="w-4 h-4 text-[var(--brand-yellow)]" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                   <span className="text-[6px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Luggage</span>
-                                   <span className="text-[9px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                                   <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Luggage</span>
+                                   <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
                                      {mounted ? `${template.luggage_large || 2} Large` : '...'}
                                    </span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
-                                  <Fuel className="w-3.5 h-3.5 text-[var(--brand-yellow)]" />
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
+                                  <Fuel className="w-4 h-4 text-[var(--brand-yellow)]" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                   <span className="text-[6px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Fuel</span>
-                                   <span className="text-[9px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                                   <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Fuel</span>
+                                   <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
                                      {mounted ? (template.fuel_type || 'Gasoline') : '...'}
                                    </span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
-                                  <Smartphone className="w-3.5 h-3.5 text-[var(--brand-yellow)]" />
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
+                                  <Smartphone className="w-4 h-4 text-[var(--brand-yellow)]" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                   <span className="text-[6px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Tech</span>
-                                   <span className="text-[9px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                                   <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none">Tech</span>
+                                   <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
                                      {mounted ? (template.has_apple_carplay ? 'CarPlay' : 'BT Audio') : '...'}
                                    </span>
                                 </div>
@@ -483,13 +483,13 @@ function FleetContent() {
                             
                             <div className="mt-auto flex items-center justify-between">
                               <div className="flex flex-col">
-                                <span className="text-[7px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em] mb-0.5 leading-none">Starting At</span>
-                                <span className="text-xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
+                                <span className="text-[8px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em] mb-0.5 leading-none">Starting At</span>
+                                <span className="text-2xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
                                   {mounted ? formatPrice(template.min_price) : '...'}
                                 </span>
                               </div>
-                              <div className="w-10 h-10 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-md group-hover:scale-110 transition-transform">
-                                <ArrowRight className="w-5 h-5" />
+                              <div className="w-12 h-12 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-md group-hover:scale-110 transition-transform">
+                                <ArrowRight className="w-6 h-6" />
                               </div>
                             </div>
                           </div>
@@ -500,46 +500,46 @@ function FleetContent() {
                         href={`/fleet/${template.slug || template.id}`}
                         className="group relative bg-white rounded-[3rem] border border-black/5 shadow-lg hover:shadow-2xl transition-all duration-700 flex flex-col md:flex-row overflow-hidden cursor-pointer"
                       >
-                         <div className="w-full md:w-80 relative overflow-hidden bg-white group-hover:bg-slate-50/50 transition-colors duration-700 p-6 flex items-center justify-center">
+                         <div className="w-full md:w-96 relative overflow-hidden bg-white group-hover:bg-slate-50/50 transition-colors duration-700 p-8 flex items-center justify-center">
                             <SmartImage 
                               src={template.default_thumbnail || template.image_url} 
                               className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-110" 
                               alt={`${template.brand} ${template.model}`} 
                             />
-                            <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                              <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em]">{template.category}</span>
+                            <div className="absolute top-6 left-6 flex flex-col gap-1.5">
+                              <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">{template.category}</span>
                             </div>
                          </div>
 
-                         <div className="flex-grow p-8 flex flex-col border-t md:border-t-0 md:border-l border-black/5">
-                            <div className="flex justify-between items-start mb-4">
+                         <div className="flex-grow p-10 flex flex-col border-t md:border-t-0 md:border-l border-black/5">
+                            <div className="flex justify-between items-start mb-6">
                                <div>
-                                  <h3 className="text-[var(--bg-dark)] text-2xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 tracking-tighter">{template.brand} {template.model}</h3>
-                                  <div className="flex items-center gap-2">
-                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                     <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Immediate Confirmation • Premium Quality</span>
+                                  <h3 className="text-[var(--bg-dark)] text-3xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1.5 tracking-tighter">{template.brand} {template.model}</h3>
+                                  <div className="flex items-center gap-3">
+                                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Immediate Confirmation • Premium Quality</span>
                                   </div>
                                </div>
-                               <div className="bg-white/90 border border-black/5 px-3 py-1 rounded-xl shadow-sm flex items-center gap-1.5">
-                                  <Star className="w-3.5 h-3.5 text-[var(--brand-yellow)] fill-[var(--brand-yellow)]" />
-                                  <span className="text-xs font-black text-[var(--bg-dark)]">{Number(template.rating || 5.0).toFixed(1)}</span>
+                               <div className="bg-white/90 border border-black/5 px-4 py-1.5 rounded-xl shadow-sm flex items-center gap-2">
+                                  <Star className="w-4 h-4 text-[var(--brand-yellow)] fill-[var(--brand-yellow)]" />
+                                  <span className="text-sm font-black text-[var(--bg-dark)]">{Number(template.rating || 5.0).toFixed(1)}</span>
                                </div>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-y border-black/5 mb-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-y border-black/5 mb-8">
                                {[
                                  { icon: Users, label: 'Seats', value: template.seats },
                                  { icon: Briefcase, label: 'Luggage', value: `${template.luggage_large || 2} Large` },
                                  { icon: Fuel, label: 'Fuel', value: template.fuel_type || 'Gasoline' },
                                  { icon: Smartphone, label: 'Tech', value: template.has_apple_carplay ? 'CarPlay' : 'BT' }
                                ].map((item, idx) => (
-                                 <div key={idx} className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
-                                      <item.icon className="w-4 h-4 text-[var(--brand-yellow)]" />
+                                 <div key={idx} className="flex items-center gap-4">
+                                    <div className="w-11 h-11 rounded-xl bg-slate-50 border border-black/5 flex items-center justify-center shrink-0">
+                                      <item.icon className="w-5 h-5 text-[var(--brand-yellow)]" />
                                     </div>
                                     <div className="flex flex-col">
-                                       <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest">{item.label}</span>
-                                       <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight">{mounted ? item.value : '...'}</span>
+                                       <span className="text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest">{item.label}</span>
+                                       <span className="text-[11px] font-black text-[var(--bg-dark)] uppercase tracking-tight">{mounted ? item.value : '...'}</span>
                                     </div>
                                  </div>
                                ))}
@@ -553,21 +553,21 @@ function FleetContent() {
                                ))}
                             </div>
 
-                            <div className="mt-auto flex items-center justify-between pt-4 border-t border-black/5">
+                            <div className="mt-auto flex items-center justify-between pt-6 border-t border-black/5">
                                <div className="flex items-baseline gap-2">
-                                  <span className="text-[10px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em]">Starting At</span>
-                                  <span className="text-3xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
+                                  <span className="text-[11px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em]">Starting At</span>
+                                  <span className="text-4xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
                                     {mounted ? formatPrice(template.min_price) : '...'}
                                   </span>
-                                  <span className="text-[8px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-widest">/ Per Day</span>
-                               </div>
-                               <div className="flex items-center gap-4">
+                                  <span className="text-[9px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-widest">/ Per Day</span>
+                                </div>
+                               <div className="flex items-center gap-6">
                                   {mounted && template.available_count > 0 && (
-                                    <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">{template.available_count} Cars Left</span>
+                                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{template.available_count} Cars Left</span>
                                   )}
-                                  <div className="h-14 px-8 rounded-2xl bg-[var(--brand-yellow)] flex items-center justify-center gap-3 text-[var(--bg-dark)] font-black uppercase tracking-widest text-[10px] shadow-lg group-hover:scale-[1.02] transition-all">
+                                  <div className="h-16 px-10 rounded-2xl bg-[var(--brand-yellow)] flex items-center justify-center gap-3 text-[var(--bg-dark)] font-black uppercase tracking-widest text-[11px] shadow-lg group-hover:scale-[1.02] transition-all">
                                     View Details
-                                    <ArrowRight size={18} />
+                                    <ArrowRight size={20} />
                                   </div>
                                </div>
                             </div>

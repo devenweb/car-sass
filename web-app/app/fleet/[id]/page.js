@@ -253,15 +253,19 @@ function CarDetailContent() {
                 )}
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
+                  <span className="px-4 py-1.5 bg-red-50 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-600">On Waitlist</span>
+                )}
+              </div>
+              <h1 className="text-6xl md:text-8xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
                 {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
               </h1>
-              <p className="text-[10px] font-bold text-[var(--bg-dark)]/30 uppercase tracking-[0.4em]">Verified Inventory • Mauritius Fleet</p>
+              <p className="text-[11px] font-bold text-[var(--bg-dark)]/30 uppercase tracking-[0.4em]">Verified Inventory • Mauritius Fleet</p>
             </div>
 
-            <div className="relative group rounded-[3rem] bg-slate-50 p-10 border border-black/5 overflow-hidden">
+            <div className="relative group rounded-[3.3rem] bg-slate-50 p-11 border border-black/5 overflow-hidden">
                <SmartImage 
                  src={templateImageUrl} 
-                 className="w-full h-auto object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-105" 
+                 className="w-full h-auto object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-110" 
                  alt={`${template.brand} ${template.model}`} 
                />
             </div>
@@ -275,28 +279,28 @@ function CarDetailContent() {
                 { label: 'Safety', value: `${template.airbag_count || 2} Bags`, icon: Shield },
                 { label: 'Rating', value: Number(template.rating || 5.0).toFixed(1), icon: Star }
               ].map((spec, i) => (
-                <div key={i} className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-black/5 shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-[var(--brand-yellow)]">
-                    <spec.icon size={20} />
+                <div key={i} className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-black/5 shadow-sm">
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-[var(--brand-yellow)]">
+                    <spec.icon size={24} />
                   </div>
                   <div className="flex flex-col min-w-0">
-                     <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none mb-1">{spec.label}</span>
-                     <span className="text-xs font-black text-[var(--bg-dark)] uppercase truncate">{spec.value}</span>
+                     <span className="text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none mb-1">{spec.label}</span>
+                     <span className="text-sm font-black text-[var(--bg-dark)] uppercase truncate">{spec.value}</span>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-xl font-black uppercase tracking-tight text-[var(--bg-dark)]">Premium Features</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tight text-[var(--bg-dark)]">Premium Features</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {(Array.isArray(template.features_json) && template.features_json.length > 0 
                   ? template.features_json 
                   : ['Climate Control', 'Reverse Sensors', 'Multimedia System', 'Cruise Control']
                 ).map((feat, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <CheckCircle2 size={14} className="text-emerald-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{feat}</span>
+                    <CheckCircle2 size={16} className="text-emerald-500" />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{feat}</span>
                   </div>
                 ))}
               </div>
@@ -305,77 +309,77 @@ function CarDetailContent() {
 
           {/* Right Column: Booking Form */}
           <aside className="lg:col-span-5 lg:sticky lg:top-32">
-            <div className="bg-[var(--bg-dark)] rounded-[3rem] p-10 md:p-12 text-white shadow-2xl relative overflow-hidden border border-white/5">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--brand-yellow)] opacity-10 blur-3xl"></div>
+            <div className="bg-[var(--bg-dark)] rounded-[3.3rem] p-11 md:p-14 text-white shadow-2xl relative overflow-hidden border border-white/5">
+              <div className="absolute top-0 right-0 w-36 h-36 bg-[var(--brand-yellow)] opacity-10 blur-3xl"></div>
               
-              <div className="mb-10 space-y-4">
-                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em]">Reservation Inquiry</span>
+              <div className="mb-12 space-y-4">
+                <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em]">Reservation Inquiry</span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black text-[var(--brand-yellow)] tracking-tighter">
+                  <span className="text-6xl font-black text-[var(--brand-yellow)] tracking-tighter">
                     {mounted ? formatPrice(minPrice) : '...'}
                   </span>
-                  <span className="text-xs font-bold text-white/20 uppercase tracking-widest">/ Day</span>
+                  <span className="text-sm font-bold text-white/20 uppercase tracking-widest">/ Day</span>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Full Name</label>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Full Name</label>
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-xs focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder="Your Name" 
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Email Address</label>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Email Address</label>
                     <input 
                       required
                       type="email" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-xs focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder="your@email.com" 
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Pickup Date & Time</label>
-                      <div className="flex gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Pickup Date & Time</label>
+                      <div className="flex gap-3">
                         <input 
                           required
                           type="date" 
-                          className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white font-bold text-[10px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                          className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                           value={formData.startDate}
                           onChange={(e) => setFormData({...formData, startDate: e.target.value})}
                         />
                         <input 
                           required
                           type="time" 
-                          className="w-24 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white font-bold text-[10px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                          className="w-28 bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                           value={formData.startTime}
                           onChange={(e) => setFormData({...formData, startTime: e.target.value})}
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Return Date & Time</label>
-                      <div className="flex gap-2">
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Return Date & Time</label>
+                      <div className="flex gap-3">
                         <input 
                           required
                           type="date" 
-                          className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white font-bold text-[10px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                          className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                           value={formData.endDate}
                           onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                         />
                         <input 
                           required
                           type="time" 
-                          className="w-24 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white font-bold text-[10px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                          className="w-28 bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                           value={formData.endTime}
                           onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                         />
@@ -385,16 +389,16 @@ function CarDetailContent() {
                 </div>
 
                 {/* Delivery Options */}
-                <div className="space-y-6 pt-4 border-t border-white/10">
-                  <div className="space-y-4">
-                    <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Pickup Location & Address</label>
-                    <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-8 pt-6 border-t border-white/10">
+                  <div className="space-y-5">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Pickup Location & Address</label>
+                    <div className="grid grid-cols-3 gap-3">
                       {['airport', 'hotel', 'agency'].map((loc) => (
                         <button
                           key={loc}
                           type="button"
                           onClick={() => setFormData({...formData, pickupLocation: loc})}
-                          className={`py-3 rounded-xl border text-[7px] font-black uppercase tracking-widest transition-all ${
+                          className={`py-4 rounded-xl border text-[8px] font-black uppercase tracking-widest transition-all ${
                             formData.pickupLocation === loc 
                               ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)]' 
                               : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
@@ -407,22 +411,22 @@ function CarDetailContent() {
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-xs focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder={formData.pickupLocation === 'hotel' ? "Hotel / Villa Name" : "Specific Address / Flight No"} 
                       value={formData.pickupAddress}
                       onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
                     />
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-white/5">
-                    <label className="text-[8px] font-black uppercase tracking-widest text-white/40 ml-4">Return Location & Address</label>
-                    <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-5 pt-6 border-t border-white/5">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Return Location & Address</label>
+                    <div className="grid grid-cols-3 gap-3">
                       {['airport', 'hotel', 'agency'].map((loc) => (
                         <button
                           key={loc}
                           type="button"
                           onClick={() => setFormData({...formData, returnLocation: loc})}
-                          className={`py-3 rounded-xl border text-[7px] font-black uppercase tracking-widest transition-all ${
+                          className={`py-4 rounded-xl border text-[8px] font-black uppercase tracking-widest transition-all ${
                             formData.returnLocation === loc 
                               ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)]' 
                               : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
@@ -435,7 +439,7 @@ function CarDetailContent() {
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-xs focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                       placeholder={formData.returnLocation === 'hotel' ? "Hotel / Villa Name" : "Specific Address / Flight No"} 
                       value={formData.returnAddress}
                       onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
@@ -443,47 +447,47 @@ function CarDetailContent() {
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-white/10">
-                   <h4 className="text-[8px] font-black text-white/40 uppercase tracking-widest ml-4">Premium Extras</h4>
+                <div className="space-y-5 pt-6 border-t border-white/10">
+                   <h4 className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-4">Premium Extras</h4>
                    <BookingExtras onSelectionChange={setSelectedExtras} isDark={true} />
                 </div>
 
                 {/* Live Invoice Breakdown */}
                 {invoice.days > 0 && (
-                  <div className="bg-white/5 rounded-[2rem] p-6 space-y-4 border border-white/5 animate-in fade-in zoom-in-95 duration-500">
-                    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5 pb-2">
+                  <div className="bg-white/5 rounded-[2.5rem] p-8 space-y-6 border border-white/5 animate-in fade-in zoom-in-95 duration-500">
+                    <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5 pb-4">
                       <span>Description</span>
                       <span>Amount</span>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-white/60">Rental ({invoice.days} Days)</span>
-                        <span className="text-[10px] font-black text-white">{formatPrice(minPrice * invoice.days)}</span>
+                        <span className="text-[11px] font-bold text-white/60">Rental ({invoice.days} Days)</span>
+                        <span className="text-[11px] font-black text-white">{formatPrice(minPrice * invoice.days)}</span>
                       </div>
                       {invoice.extrasTotal > 0 && (
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-white/60">Selected Extras</span>
-                          <span className="text-[10px] font-black text-white">{formatPrice(invoice.extrasTotal)}</span>
+                          <span className="text-[11px] font-bold text-white/60">Selected Extras</span>
+                          <span className="text-[11px] font-black text-white">{formatPrice(invoice.extrasTotal)}</span>
                         </div>
                       )}
-                      <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                        <span className="text-[10px] font-bold text-white/40 italic">Subtotal</span>
-                        <span className="text-[10px] font-black text-white/60">{formatPrice(invoice.subtotal)}</span>
+                      <div className="flex justify-between items-center pt-3 border-t border-white/5">
+                        <span className="text-[11px] font-bold text-white/40 italic">Subtotal</span>
+                        <span className="text-[11px] font-black text-white/60">{formatPrice(invoice.subtotal)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-[var(--brand-yellow)]/60">TVA (15%)</span>
-                        <span className="text-[10px] font-black text-[var(--brand-yellow)]">{formatPrice(invoice.tax)}</span>
+                        <span className="text-[11px] font-bold text-[var(--brand-yellow)]/60">TVA (15%)</span>
+                        <span className="text-[11px] font-black text-[var(--brand-yellow)]">{formatPrice(invoice.tax)}</span>
                       </div>
                     </div>
-                    <div className="flex justify-between items-center pt-4 border-t border-white/10">
-                       <span className="text-xs font-black uppercase tracking-widest text-white">Total TTC</span>
-                       <span className="text-2xl font-black text-[var(--brand-yellow)] tracking-tighter">{formatPrice(invoice.total)}</span>
+                    <div className="flex justify-between items-center pt-6 border-t border-white/10">
+                       <span className="text-sm font-black uppercase tracking-widest text-white">Total TTC</span>
+                       <span className="text-3xl font-black text-[var(--brand-yellow)] tracking-tighter">{formatPrice(invoice.total)}</span>
                     </div>
                   </div>
                 )}
 
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-start gap-3 px-4">
+                <div className="flex flex-col gap-6">
+                  <div className="flex items-start gap-4 px-4">
                     <input 
                       type="checkbox" 
                       required

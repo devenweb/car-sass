@@ -139,31 +139,31 @@ export default function InquiriesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-admin-text">Customer Inquiries</h1>
-        <p className="text-admin-muted">Manage messages and contact requests from the website.</p>
+    <div className="space-y-4">
+      <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm">
+        <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Customer Inquiries</h1>
+        <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Website Correspondence & Lead Management</p>
       </div>
 
       <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden relative">
-        <div className="p-4 border-b border-admin-border bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="p-3 border-b border-admin-border bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
             <button 
               onClick={toggleSelectAll}
-              className="p-2 text-slate-400 hover:text-primary transition-colors"
+              className="p-1.5 text-slate-300 hover:text-primary transition-colors"
             >
               {selectedIds.size > 0 && selectedIds.size === filteredMessages.length ? (
-                <CheckSquare size={20} className="text-primary" />
+                <CheckSquare size={16} className="text-primary" />
               ) : (
-                <Square size={20} />
+                <Square size={16} />
               )}
             </button>
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <div className="relative w-full md:w-64 h-8">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               <input 
                 type="text" 
                 placeholder="Search messages..." 
-                className="input-field pl-10"
+                className="w-full h-full pl-9 pr-4 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-[10px]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -171,27 +171,27 @@ export default function InquiriesPage() {
           </div>
 
           {selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
-              <span className="text-xs font-bold text-primary px-3 py-1 bg-primary/10 rounded-lg">
+            <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-4">
+              <span className="text-[9px] font-black text-primary px-2 py-0.5 bg-primary/10 rounded border border-primary/20 uppercase tracking-tight">
                 {selectedIds.size} Selected
               </span>
               <button 
                 onClick={() => setReplyModal({ open: true, message: null, bulk: true })}
-                className="btn-secondary text-xs h-9 flex items-center gap-2"
+                className="h-7 px-3 bg-white border border-admin-border text-slate-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-1.5"
               >
-                <Reply size={14} /> Bulk Reply
+                <Reply size={12} /> Bulk Reply
               </button>
               <button 
                 onClick={handleBulkMarkRead}
-                className="btn-secondary text-xs h-9 flex items-center gap-2"
+                className="h-7 px-3 bg-white border border-admin-border text-slate-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center gap-1.5"
               >
-                <CheckCircle size={14} /> Mark Read
+                <CheckCircle size={12} /> Read
               </button>
               <button 
                 onClick={handleBulkDelete}
-                className="btn-secondary text-xs h-9 flex items-center gap-2 text-rose-500 hover:bg-rose-50 border-rose-100"
+                className="h-7 px-3 bg-white border border-rose-100 text-rose-500 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-rose-50 transition-all flex items-center gap-1.5"
               >
-                <Trash size={14} /> Delete
+                <Trash size={12} /> Delete
               </button>
             </div>
           )}
@@ -203,29 +203,29 @@ export default function InquiriesPage() {
           ) : filteredMessages.length > 0 ? (
             filteredMessages.map((msg) => (
               <div key={msg.id} className={cn(
-                "p-6 hover:bg-slate-50 transition-colors group relative border-l-4",
+                "p-4 hover:bg-slate-50 transition-colors group relative border-l-2",
                 selectedIds.has(msg.id) ? "bg-primary/5 border-primary" : "border-transparent"
               )}>
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                   <div className="flex gap-4">
                     <button 
                       onClick={() => toggleSelect(msg.id)}
-                      className="mt-1 p-1 text-slate-300 hover:text-primary transition-colors shrink-0"
+                      className="mt-0.5 p-1 text-slate-200 hover:text-primary transition-colors shrink-0"
                     >
                       {selectedIds.has(msg.id) ? (
-                        <CheckSquare size={18} className="text-primary" />
+                        <CheckSquare size={14} className="text-primary" />
                       ) : (
-                        <Square size={18} />
+                        <Square size={14} />
                       )}
                     </button>
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <User size={20} />
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
+                      <User size={16} />
                     </div>
                     <div>
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-bold text-admin-text">{msg.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-admin-text text-sm leading-none uppercase tracking-tight">{msg.name}</h3>
                         <span className={cn(
-                          "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase border",
+                          "text-[8px] px-1.5 py-0.5 rounded font-black uppercase border leading-none",
                           msg.status === 'new' ? 'bg-amber-100 text-amber-700 border-amber-200' : 
                           msg.status === 'replied' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
                           'bg-slate-100 text-slate-600 border-slate-200'
@@ -233,32 +233,32 @@ export default function InquiriesPage() {
                           {msg.status}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-xs text-admin-muted">
-                        <span className="flex items-center gap-1 font-medium"><Mail size={12} className="text-primary/60" /> {msg.email}</span>
-                        {msg.phone && <span className="flex items-center gap-1 font-medium"><Phone size={12} className="text-primary/60" /> {msg.phone}</span>}
-                        <span className="flex items-center gap-1 font-medium"><Clock size={12} className="text-primary/60" /> {new Date(msg.created_at).toLocaleString()}</span>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[9px] text-admin-muted uppercase tracking-tight font-bold">
+                        <span className="flex items-center gap-1"><Mail size={10} className="text-primary/60" /> {msg.email}</span>
+                        {msg.phone && <span className="flex items-center gap-1"><Phone size={10} className="text-primary/60" /> {msg.phone}</span>}
+                        <span className="flex items-center gap-1"><Clock size={10} className="text-primary/60" /> {new Date(msg.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setReplyModal({ open: true, message: msg, bulk: false })}
-                      className="btn-secondary text-xs h-8 flex items-center gap-2"
+                      className="h-7 px-4 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center gap-1.5"
                     >
-                      <Reply size={14} /> Reply
+                      <Reply size={12} /> Reply
                     </button>
                     {msg.status === 'new' && (
-                      <button onClick={() => updateStatus(msg.id, 'read')} className="btn-secondary text-xs h-8">Mark as Read</button>
+                      <button onClick={() => updateStatus(msg.id, 'read')} className="h-7 px-3 bg-white border border-slate-200 text-slate-400 rounded-lg text-[9px] font-black uppercase hover:bg-slate-50 transition-all">Mark Read</button>
                     )}
                     <button 
                       onClick={() => deleteMessage(msg.id)}
-                      className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Inquiry">
-                      <Trash size={18} />
+                      className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Delete">
+                      <Trash size={14} />
                     </button>
                   </div>
                 </div>
-                <div className="mt-4 pl-20">
-                  <p className="text-sm text-slate-600 leading-relaxed bg-white p-5 rounded-2xl border border-slate-100 shadow-sm whitespace-pre-wrap">
+                <div className="mt-3 pl-12">
+                  <p className="text-[11px] text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100 shadow-sm whitespace-pre-wrap font-medium">
                     {msg.message}
                   </p>
                 </div>
@@ -280,18 +280,18 @@ export default function InquiriesPage() {
       {replyModal.open && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setReplyModal({ open: false, message: null, bulk: false })}></div>
-          <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-10 animate-in zoom-in-95">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                  <Reply size={24} />
+          <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 animate-in zoom-in-95">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                  <Reply size={20} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black uppercase tracking-tighter">
-                    {replyModal.bulk ? `Bulk Reply to ${selectedIds.size} Items` : `Reply to ${replyModal.message?.name}`}
+                  <h3 className="text-sm font-black uppercase tracking-tight">
+                    {replyModal.bulk ? `Bulk Reply (${selectedIds.size})` : `Reply to ${replyModal.message?.name}`}
                   </h3>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                    {replyModal.bulk ? "Individual messages will be sent to all selected emails" : `Sending to: ${replyModal.message?.email}`}
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                    {replyModal.bulk ? "Broadcast to selected" : `Recipient: ${replyModal.message?.email}`}
                   </p>
                 </div>
               </div>
@@ -303,31 +303,31 @@ export default function InquiriesPage() {
               </button>
             </div>
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Your Response</label>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Your Response</label>
                 <textarea 
-                  rows={6}
-                  className="w-full p-6 bg-slate-50 border border-slate-100 rounded-3xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-sm resize-none"
-                  placeholder="Type your message here..."
+                  rows={5}
+                  className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-xs resize-none"
+                  placeholder="Type your message..."
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex justify-end gap-2 pt-2">
                 <button 
                   onClick={() => setReplyModal({ open: false, message: null, bulk: false })}
-                  className="btn-secondary h-12 px-8"
+                  className="h-9 px-6 text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleSendReply}
                   disabled={!replyText.trim() || loading}
-                  className="btn-primary h-12 px-10 flex items-center gap-2 disabled:opacity-50"
+                  className="btn-primary h-9 px-8 flex items-center gap-2 text-[10px] font-black uppercase disabled:opacity-50"
                 >
-                  <Send size={16} /> Send Reply
+                  <Send size={14} /> Send
                 </button>
               </div>
             </div>

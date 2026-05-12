@@ -99,79 +99,79 @@ export default function KMMonitoringPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-admin-text flex items-center gap-2">
-          <Gauge className="text-primary" size={28} />
-          KM Monitoring & Management
-        </h1>
-        <p className="text-admin-muted">Automated mileage tracking from agent inspections.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-              <Car size={20} />
-            </div>
-            <span className="text-xs font-bold text-slate-400 uppercase">Total Fleet</span>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-admin-border shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+            <Gauge size={16} />
           </div>
-          <p className="text-3xl font-bold text-admin-text">{records.length}</p>
-          <p className="text-xs text-admin-muted mt-1">Active vehicle units</p>
+          <div>
+            <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">KM Monitoring</h1>
+            <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Automated Mileage Intelligence</p>
+          </div>
         </div>
-
-        <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-              <TrendingUp size={20} />
-            </div>
-            <span className="text-xs font-bold text-slate-400 uppercase">KM Tracked Today</span>
-          </div>
-          <p className="text-3xl font-bold text-admin-text">
-            {records.reduce((acc, curr) => acc + (curr.inspections.filter(i => 
-              new Date(i.created_at).toDateString() === new Date().toDateString()
-            ).length), 0)}
-          </p>
-          <p className="text-xs text-admin-muted mt-1">Updates in the last 24h</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
-              <AlertCircle size={20} />
-            </div>
-            <span className="text-xs font-bold text-slate-400 uppercase">Service Alerts</span>
-          </div>
-          <p className="text-3xl font-bold text-admin-text">
-            {records.filter(r => (r.mileage || 0) > 100000).length}
-          </p>
-          <p className="text-xs text-admin-muted mt-1">Vehicles over 100k KM</p>
+        <div className="relative w-64 h-8">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+          <input 
+            type="text" 
+            placeholder="Filter by plate or model..." 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+            className="w-full h-full pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-[10px]" 
+          />
         </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex items-center gap-3">
+          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+            <Car size={16} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Total Fleet</p>
+            <p className="text-lg font-black text-admin-text leading-tight mt-1">{records.length}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex items-center gap-3">
+          <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg shrink-0">
+            <TrendingUp size={16} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Tracked Today</p>
+            <p className="text-lg font-black text-admin-text leading-tight mt-1">
+              {records.reduce((acc, curr) => acc + (curr.inspections.filter(i => 
+                new Date(i.created_at).toDateString() === new Date().toDateString()
+              ).length), 0)}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex items-center gap-3">
+          <div className="p-2 bg-amber-50 text-amber-600 rounded-lg shrink-0">
+            <AlertCircle size={16} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Service Alerts</p>
+            <p className="text-lg font-black text-admin-text leading-tight mt-1">
+              {records.filter(r => (r.mileage || 0) > 100000).length}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Integrated search into header */}
 
       <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-admin-border bg-slate-50/50">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search by plate, brand or model..." 
-              className="input-field pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-wider font-black border-b border-slate-100">
-                <th className="px-6 py-4">Vehicle Unit</th>
-                <th className="px-6 py-4">Current Mileage</th>
-                <th className="px-6 py-4">Last recorded</th>
-                <th className="px-6 py-4">Recent History</th>
-                <th className="px-6 py-4 text-right">Action</th>
+              <tr className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-widest font-black border-b border-slate-100">
+                <th className="px-6 py-3">Vehicle Unit</th>
+                <th className="px-6 py-3">Mileage</th>
+                <th className="px-6 py-3">Last Recorded</th>
+                <th className="px-6 py-3">History</th>
+                <th className="px-6 py-3 text-right"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -185,63 +185,55 @@ export default function KMMonitoringPage() {
                 ))
               ) : filteredRecords.length > 0 ? (
                 filteredRecords.map((record) => (
-                  <tr key={record.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-6 py-4">
+                  <tr key={record.id} className="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+                    <td className="px-6 py-2.5">
                       <div className="flex items-center gap-3">
-                        <div className="bg-slate-900 text-white px-2 py-1 rounded text-[10px] font-black tracking-widest border border-slate-700">
+                        <div className="bg-slate-900 text-white px-1.5 py-0.5 rounded text-[9px] font-black tracking-widest border border-slate-700 leading-none">
                           {record.plate_number}
                         </div>
-                        <div>
-                          <p className="font-bold text-slate-900 text-sm">
-                            {record.vehicle_templates?.brand} {record.vehicle_templates?.model}
-                          </p>
-                        </div>
+                        <p className="font-bold text-slate-900 text-xs leading-none">
+                          {record.vehicle_templates?.brand} {record.vehicle_templates?.model}
+                        </p>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-primary font-black">
-                        <Gauge size={14} />
-                        <span className="text-lg">{record.mileage?.toLocaleString()}</span>
-                        <span className="text-[10px] text-slate-400 uppercase">KM</span>
+                    <td className="px-6 py-2.5">
+                      <div className="flex items-center gap-1.5 text-primary font-black leading-none">
+                        <Gauge size={12} />
+                        <span className="text-sm">{record.mileage?.toLocaleString()}</span>
+                        <span className="text-[8px] text-slate-400 uppercase tracking-tighter">KM</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-2.5">
                       {record.inspections[0] ? (
-                        <div>
-                          <p className="text-sm font-bold text-slate-700">
+                        <div className="leading-tight">
+                          <p className="text-xs font-black text-slate-700 leading-none">
                             {record.inspections[0].mileage?.toLocaleString()} KM
                           </p>
-                          <p className="text-[10px] text-slate-400 uppercase flex items-center gap-1">
-                            <History size={10} />
-                            {new Date(record.inspections[0].created_at).toLocaleDateString()} via {record.inspections[0].type}
+                          <p className="text-[8px] text-slate-400 uppercase font-bold tracking-tight mt-0.5">
+                            {new Date(record.inspections[0].created_at).toLocaleDateString()}
                           </p>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-400 italic">No recordings yet</span>
+                        <span className="text-[10px] text-slate-300 italic">No Recordings</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-1">
-                        {record.inspections.slice(0, 3).map((ins, idx) => (
+                    <td className="px-6 py-2.5">
+                      <div className="flex gap-0.5">
+                        {record.inspections.slice(0, 5).map((ins, idx) => (
                           <div 
                             key={ins.id} 
                             className={cn(
-                              "w-2 h-8 rounded-full",
-                              ins.type === 'delivery' ? 'bg-teal-100' : 'bg-amber-100'
+                              "w-1.5 h-6 rounded-full",
+                              ins.type === 'delivery' ? 'bg-teal-200' : 'bg-amber-200'
                             )}
-                            title={`${ins.type}: ${ins.mileage} KM on ${new Date(ins.created_at).toLocaleDateString()}`}
+                            title={`${ins.type}: ${ins.mileage} KM`}
                           />
                         ))}
-                        {record.inspections.length > 3 && (
-                          <div className="w-2 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-400">
-                            +
-                          </div>
-                        )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-primary transition-all border border-transparent hover:border-slate-200">
-                        <ChevronRight size={18} />
+                    <td className="px-6 py-2.5 text-right">
+                      <button className="p-1 text-slate-300 hover:text-primary transition-colors">
+                        <ChevronRight size={14} />
                       </button>
                     </td>
                   </tr>

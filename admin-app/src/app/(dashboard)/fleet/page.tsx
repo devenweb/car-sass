@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Plus, Search, Filter, MoreVertical, Edit2, Trash2, Eye, Car as CarIcon, 
   X, ChevronDown, ChevronRight, Settings, Calendar, Wrench, AlertTriangle, CheckCircle2,
@@ -250,9 +250,9 @@ export default function FleetPage() {
                       <td className="px-6 py-3">
                         <span className={cn(
                           "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border",
-                          template.published_status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+                          template.published_status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-500 border-rose-100'
                         )}>
-                          {template.published_status}
+                          {template.published_status === 'published' ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="px-6 py-3 text-right" onClick={e => e.stopPropagation()}>
@@ -458,5 +458,3 @@ export default function FleetPage() {
     </div>
   );
 }
-
-import React from "react";

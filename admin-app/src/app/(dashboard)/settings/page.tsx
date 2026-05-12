@@ -161,73 +161,73 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-admin-text">Settings</h1>
-        <p className="text-admin-muted">Manage your application configuration and preferences.</p>
+    <div className="space-y-4">
+      <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm">
+        <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">System Settings</h1>
+        <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Application Configuration & Preferences</p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-4">
         {/* Sidebar Tabs */}
-        <div className="w-full md:w-64 space-y-1">
+        <div className="w-full md:w-56 space-y-0.5">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left ${
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-left ${
                 activeTab === tab.id
                   ? "bg-primary text-white shadow-md shadow-primary/20"
                   : "text-slate-600 hover:bg-slate-100"
               }`}
             >
-              <tab.icon size={20} />
-              <span className="font-medium">{tab.label}</span>
+              <tab.icon size={16} />
+              <span className="text-xs font-bold uppercase tracking-tight">{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Content Area */}
         <div className="flex-1 bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-admin-border">
-            <h3 className="text-lg font-bold text-admin-text uppercase tracking-tight">
+          <div className="p-4 border-b border-admin-border bg-slate-50/50">
+            <h3 className="text-sm font-black text-admin-text uppercase tracking-tight">
               {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Settings
             </h3>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-4 space-y-4">
             {activeTab === "api" && (
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
-                    <Smartphone size={18} />
-                    <h4 className="text-sm font-bold uppercase tracking-wider">Twilio (WhatsApp Business)</h4>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-1.5">
+                    <Smartphone size={16} />
+                    <h4 className="text-[10px] font-black uppercase tracking-widest">Twilio (WhatsApp Business)</h4>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Account SID</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Account SID</label>
                       <input 
                         type="password" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.twilio_sid || ""} 
                         onChange={(e) => handleApiKeyChange("twilio_sid", e.target.value)}
                         placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxx"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Auth Token</label>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Auth Token</label>
                       <input 
                         type="password" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.twilio_auth_token || ""} 
                         onChange={(e) => handleApiKeyChange("twilio_auth_token", e.target.value)}
                         placeholder="••••••••••••••••••••••••"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">WhatsApp Sender Number</label>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">WhatsApp Sender</label>
                       <input 
                         type="text" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.twilio_whatsapp_number || ""} 
                         onChange={(e) => handleApiKeyChange("twilio_whatsapp_number", e.target.value)}
                         placeholder="+14155238886"
@@ -236,16 +236,16 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
-                    <Mail size={18} />
-                    <h4 className="text-sm font-bold uppercase tracking-wider">Resend (Email Service)</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-1.5">
+                    <Mail size={16} />
+                    <h4 className="text-[10px] font-black uppercase tracking-widest">Resend (Email Service)</h4>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">API Key</label>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">API Key</label>
                     <input 
                       type="password" 
-                      className="input-field" 
+                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                       value={apiKeys.resend_api_key || ""} 
                       onChange={(e) => handleApiKeyChange("resend_api_key", e.target.value)}
                       placeholder="re_xxxxxxxxxxxxxx"
@@ -253,57 +253,57 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
-                    <Server size={18} />
-                    <h4 className="text-sm font-bold uppercase tracking-wider">SMTP (Direct Mail Server)</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-1.5">
+                    <Server size={16} />
+                    <h4 className="text-[10px] font-black uppercase tracking-widest">SMTP (Direct Mail Server)</h4>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP Host</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">SMTP Host</label>
                       <input 
                         type="text" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.smtp_host || ""} 
                         onChange={(e) => handleApiKeyChange("smtp_host", e.target.value)}
                         placeholder="smtp.example.com"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP Port</label>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">SMTP Port</label>
                       <input 
                         type="text" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.smtp_port || ""} 
                         onChange={(e) => handleApiKeyChange("smtp_port", e.target.value)}
                         placeholder="587"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP User</label>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">SMTP User</label>
                       <input 
                         type="text" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.smtp_user || ""} 
                         onChange={(e) => handleApiKeyChange("smtp_user", e.target.value)}
                         placeholder="user@example.com"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">SMTP Password</label>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">SMTP Password</label>
                       <input 
                         type="password" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.smtp_pass || ""} 
                         onChange={(e) => handleApiKeyChange("smtp_pass", e.target.value)}
                         placeholder="••••••••••••"
                       />
                     </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Sender Email Address</label>
+                    <div className="space-y-1 md:col-span-2">
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Sender Email</label>
                       <input 
                         type="email" 
-                        className="input-field" 
+                        className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" 
                         value={apiKeys.smtp_from_email || ""} 
                         onChange={(e) => handleApiKeyChange("smtp_from_email", e.target.value)}
                         placeholder="noreply@royalrentals.com"
@@ -422,16 +422,16 @@ export default function SettingsPage() {
               </div>
             )}
 
-            <div className="pt-6 flex justify-end">
+            <div className="pt-4 flex justify-end">
               <button 
-                className="btn-primary flex items-center gap-2"
+                className="btn-primary h-8 px-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider"
                 disabled={saving}
                 onClick={activeTab === "api" ? handleSaveApiKeys : undefined}
               >
                 {saving ? (
-                  <RefreshCcw size={18} className="animate-spin" />
+                  <RefreshCcw size={14} className="animate-spin" />
                 ) : (
-                  <Save size={18} />
+                  <Save size={14} />
                 )}
                 {saving ? "Saving..." : "Save Changes"}
               </button>

@@ -116,26 +116,26 @@ export default function PricingPage() {
   }, [currentMonth]);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="bg-white p-8 rounded-2xl border border-admin-border shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+      <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-admin-text tracking-tight">Pricing Manager</h1>
-          <p className="text-slate-500 mt-1">Set date-specific daily rates and manage stop-sales for each model.</p>
+          <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Pricing Manager</h1>
+          <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Dynamic Rate & Inventory Control</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button 
             onClick={handleSave}
             disabled={!selectedTemplate || saving}
-            className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+            className="btn-primary h-8 px-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider disabled:opacity-50"
           >
-            {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={20} />}
-            Save Changes
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={14} />}
+            Save Pricing
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
         {/* Sidebar: Vehicle Selection */}
         <aside className="xl:col-span-1 space-y-4">
           <div className="bg-white rounded-2xl border border-admin-border shadow-sm overflow-hidden">
@@ -149,17 +149,17 @@ export default function PricingPage() {
                 />
               </div>
             </div>
-            <div className="divide-y divide-slate-50 max-h-[600px] overflow-y-auto">
+            <div className="divide-y divide-slate-50 max-h-[500px] overflow-y-auto">
               {templates.map(t => (
                 <button
                   key={t.id}
                   onClick={() => setSelectedTemplate(t)}
                   className={cn(
-                    "w-full p-4 text-left flex items-center gap-4 transition-all hover:bg-slate-50",
-                    selectedTemplate?.id === t.id ? "bg-primary/5 border-l-4 border-primary" : "border-l-4 border-transparent"
+                    "w-full p-2.5 text-left flex items-center gap-3 transition-all hover:bg-slate-50",
+                    selectedTemplate?.id === t.id ? "bg-primary/5 border-l-2 border-primary" : "border-l-2 border-transparent"
                   )}
                 >
-                  <div className="w-12 h-8 relative rounded bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
+                  <div className="w-10 h-7 relative rounded bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
                     <img src={t.default_thumbnail || ""} alt="" className="object-cover w-full h-full" />
                   </div>
                   <div>
@@ -180,7 +180,7 @@ export default function PricingPage() {
         </aside>
 
         {/* Main Content: Pricing Calendar */}
-        <div className="xl:col-span-3 space-y-6">
+        <div className="xl:col-span-3 space-y-4">
           {!selectedTemplate ? (
             <div className="bg-white rounded-3xl border-2 border-dashed border-slate-200 p-20 text-center flex flex-col items-center justify-center space-y-6">
               <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-300">
@@ -194,48 +194,48 @@ export default function PricingPage() {
           ) : (
             <>
               {/* Bulk Updater */}
-              <div className="bg-white p-6 rounded-2xl border border-admin-border shadow-sm flex flex-col md:flex-row items-end gap-6">
-                <div className="flex-1 space-y-2 w-full">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Monthly Bulk Update (Price)</label>
+              <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex flex-col md:flex-row items-end gap-4">
+                <div className="flex-1 space-y-1.5 w-full">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Monthly Bulk Update (Price)</label>
                   <input 
                     type="number" 
                     placeholder="e.g. 2500"
                     value={bulkPrice}
                     onChange={(e) => setBulkPrice(e.target.value)}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold"
+                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-xs"
                   />
                 </div>
-                <div className="flex-1 space-y-2 w-full">
-                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Stop Sale Status</label>
+                <div className="flex-1 space-y-1.5 w-full">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Stop Sale Status</label>
                    <button 
                     onClick={() => setBulkStopSale(!bulkStopSale)}
                     className={cn(
-                      "w-full p-3 rounded-xl border font-bold flex items-center justify-center gap-2 transition-all",
+                      "w-full h-8 px-3 rounded-lg border font-bold flex items-center justify-center gap-2 transition-all text-[10px] uppercase",
                       bulkStopSale ? "bg-rose-50 border-rose-200 text-rose-600" : "bg-slate-50 border-slate-200 text-slate-600"
                     )}
                    >
-                     {bulkStopSale ? <Ban size={18} /> : <CheckCircle2 size={18} />}
-                     {bulkStopSale ? "Enable Stop Sale" : "No Stop Sale"}
+                     {bulkStopSale ? <Ban size={14} /> : <CheckCircle2 size={14} />}
+                     {bulkStopSale ? "Stop Sale ON" : "No Stop Sale"}
                    </button>
                 </div>
                 <button 
                   onClick={applyBulkToYear}
-                  className="px-8 py-3.5 bg-admin-text text-white rounded-xl font-bold hover:bg-black transition-all flex items-center gap-2 shrink-0"
+                  className="h-8 px-6 bg-admin-text text-white rounded-lg font-bold hover:bg-black transition-all flex items-center gap-2 shrink-0 text-[10px] uppercase"
                 >
-                  <Sparkles size={18} className="text-primary" />
-                  Auto-populate Full Year
+                  <Sparkles size={14} className="text-primary" />
+                  Populate Year
                 </button>
               </div>
 
               {/* Calendar Container */}
               <div className="bg-white rounded-2xl border border-admin-border shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-admin-border flex items-center justify-between bg-slate-50/50">
-                  <div className="flex items-center gap-4">
-                    <h2 className="text-xl font-black text-admin-text uppercase tracking-tight">{format(currentMonth, 'MMMM yyyy')}</h2>
-                    <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1">
-                      <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 hover:bg-slate-50 rounded-md transition-all text-slate-400 hover:text-primary"><ChevronLeft size={20}/></button>
-                      <button onClick={() => setCurrentMonth(new Date())} className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-primary">Today</button>
-                      <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1.5 hover:bg-slate-50 rounded-md transition-all text-slate-400 hover:text-primary"><ChevronRight size={20}/></button>
+                <div className="p-3 border-b border-admin-border flex items-center justify-between bg-slate-50/50">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-sm font-black text-admin-text uppercase tracking-tight">{format(currentMonth, 'MMMM yyyy')}</h2>
+                    <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-0.5">
+                      <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-primary transition-colors"><ChevronLeft size={16}/></button>
+                      <button onClick={() => setCurrentMonth(new Date())} className="px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">Today</button>
+                      <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-primary transition-colors"><ChevronRight size={16}/></button>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
@@ -266,14 +266,14 @@ export default function PricingPage() {
                       <div 
                         key={i} 
                         className={cn(
-                          "min-h-[140px] p-4 border-r border-b border-slate-100 flex flex-col group transition-all",
+                          "min-h-[100px] p-2.5 border-r border-b border-slate-100 flex flex-col group transition-all",
                           !isCurrentMonth ? "bg-slate-50/30" : "bg-white hover:bg-slate-50/50",
                           dayData.stopSale && "bg-rose-50/30"
                         )}
                       >
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start mb-2">
                           <span className={cn(
-                            "text-sm font-black",
+                            "text-xs font-black",
                             !isCurrentMonth ? "text-slate-300" : 
                             isSameDay(day, new Date()) ? "text-primary underline decoration-2 underline-offset-4" : "text-admin-text"
                           )}>

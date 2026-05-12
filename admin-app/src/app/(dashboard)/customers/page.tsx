@@ -61,35 +61,36 @@ export default function CustomersPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-admin-text">Customer Registry</h1>
-        <p className="text-admin-muted">Manage customer profiles and rental history.</p>
-      </div>
-
-      <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-admin-border bg-slate-50/50">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+    <div className="space-y-4">
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-admin-border shadow-sm">
+        <div className="flex items-center gap-6">
+          <div>
+            <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Customer Registry</h1>
+            <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Global User Database</p>
+          </div>
+          <div className="relative w-64 h-8">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
             <input 
               type="text" 
-              placeholder="Search by name, email or license..." 
-              className="input-field pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search customers..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full h-full pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-[10px]" 
             />
           </div>
         </div>
+      </div>
 
+      <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
-                <th className="px-6 py-4">Customer</th>
-                <th className="px-6 py-4">Contact Info</th>
-                <th className="px-6 py-4">Driving License</th>
-                <th className="px-6 py-4">Registered</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+              <tr className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-widest font-black border-b border-slate-100">
+                <th className="px-6 py-3">Customer</th>
+                <th className="px-6 py-3">Contact</th>
+                <th className="px-6 py-3">License</th>
+                <th className="px-6 py-3">Joined</th>
+                <th className="px-6 py-3 text-right"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -99,44 +100,44 @@ export default function CustomersPage() {
                 ))
               ) : filteredCustomers.length > 0 ? (
                 filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border border-slate-200">
+                  <tr key={customer.id} className="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+                    <td className="px-6 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-[10px] border border-primary/20">
                           {customer.name.charAt(0)}
                         </div>
-                        <span className="font-bold text-admin-text">{customer.name}</span>
+                        <span className="font-bold text-admin-text text-xs leading-none">{customer.name}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col text-xs space-y-1 text-admin-muted">
-                        <span className="flex items-center gap-1.5"><Mail size={12} /> {customer.email}</span>
-                        {customer.phone && <span className="flex items-center gap-1.5"><Phone size={12} /> {customer.phone}</span>}
+                    <td className="px-6 py-2.5">
+                      <div className="flex flex-col text-[9px] font-bold text-admin-muted">
+                        <span className="flex items-center gap-1.5 leading-none"><Mail size={10} className="text-primary/40" /> {customer.email}</span>
+                        {customer.phone && <span className="flex items-center gap-1.5 mt-0.5 leading-none"><Phone size={10} className="text-primary/40" /> {customer.phone}</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-2.5">
                       {customer.license_number ? (
-                        <span className="px-2 py-1 bg-slate-100 text-slate-700 text-[10px] font-mono rounded border border-slate-200">
+                        <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-[9px] font-black font-mono rounded border border-slate-200 uppercase">
                           {customer.license_number}
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-300 italic">Not provided</span>
+                        <span className="text-[10px] text-slate-300 italic">N/A</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-admin-muted">
+                    <td className="px-6 py-2.5 text-[10px] font-bold text-admin-muted">
                       {new Date(customer.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-6 py-2.5 text-right">
+                      <div className="flex items-center justify-end gap-1">
                         <button 
                           onClick={() => setSelectedCustomer(customer)}
-                          className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
-                          <History size={18} />
+                          className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="View History">
+                          <History size={14} />
                         </button>
                         <button 
                           onClick={() => deleteCustomer(customer.id)}
-                          className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
-                          <Trash size={18} />
+                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
+                          <Trash size={14} />
                         </button>
                       </div>
                     </td>

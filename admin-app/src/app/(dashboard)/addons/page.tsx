@@ -143,22 +143,24 @@ export default function AddonsPage() {
   if (loading) return <div className="p-8 text-admin-muted">Loading Marketplace Store...</div>;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-admin-text flex items-center gap-2">
-            <Sparkles className="text-[var(--brand-yellow)]" />
-            Marketplace Addons
-          </h1>
-          <p className="text-admin-muted">Supercharge your agency operations with premium utility features.</p>
+    <div className="max-w-5xl mx-auto space-y-4">
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-admin-border shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+            <Sparkles size={16} />
+          </div>
+          <div>
+            <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Marketplace Addons</h1>
+            <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Premium Operational Utilities</p>
+          </div>
         </div>
         <button 
           onClick={handleSave}
           disabled={saving}
-          className="btn-primary px-8 flex items-center gap-2"
+          className="btn-primary h-8 px-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider"
         >
-          {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={18} />}
-          Save Changes
+          {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={14} />}
+          Save Config
         </button>
       </div>
 
@@ -169,26 +171,26 @@ export default function AddonsPage() {
             <div 
               key={addon.id}
               className={cn(
-                "p-5 rounded-2xl border transition-all cursor-pointer group relative",
+                "p-4 rounded-xl border transition-all cursor-pointer group relative",
                 isActive 
-                  ? "bg-white border-[var(--brand-yellow)] shadow-lg" 
+                  ? "bg-white border-primary shadow-md" 
                   : "bg-white border-admin-border hover:border-slate-300"
               )}
               onClick={() => toggleAddon(addon.key)}
             >
               {isActive && (
-                <div className="absolute top-4 right-4 text-[var(--brand-yellow)]">
-                  <CheckCircle2 size={20} />
+                <div className="absolute top-3 right-3 text-primary">
+                  <CheckCircle2 size={16} />
                 </div>
               )}
               <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors",
-                isActive ? "bg-[var(--brand-yellow)]/10 text-[var(--brand-yellow)]" : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
+                "w-9 h-9 rounded-lg flex items-center justify-center mb-3 transition-colors",
+                isActive ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
               )}>
-                <addon.icon size={24} />
+                <addon.icon size={18} />
               </div>
-              <h3 className="font-bold text-admin-text mb-1">{addon.name}</h3>
-              <p className="text-[11px] text-admin-muted mb-4 leading-relaxed">{addon.description}</p>
+              <h3 className="text-xs font-black text-admin-text mb-1 uppercase tracking-tight">{addon.name}</h3>
+              <p className="text-[9px] text-admin-muted mb-3 leading-tight h-7 line-clamp-2">{addon.description}</p>
               <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-50">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{addon.price}</span>
                 <span className={cn(
@@ -206,28 +208,28 @@ export default function AddonsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
         {/* WhatsApp Config */}
         <div className={cn(
-          "bg-white p-6 rounded-2xl border transition-opacity",
+          "bg-white p-4 rounded-xl border transition-opacity",
           !tenant?.addons?.whatsapp_notifications && "opacity-50 pointer-events-none"
         )}>
-          <h2 className="text-lg font-bold text-admin-text mb-4 flex items-center gap-2">
-            <Smartphone size={20} className="text-emerald-500" />
-            WhatsApp Notification Setup
+          <h2 className="text-sm font-black text-admin-text mb-3 flex items-center gap-2 uppercase tracking-tight">
+            <Smartphone size={16} className="text-emerald-500" />
+            WhatsApp Setup
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
-              <label className="block text-[10px] font-bold text-admin-muted uppercase mb-1.5 ml-1">WhatsApp Number (incl. Country Code)</label>
+              <label className="block text-[8px] font-black text-admin-muted uppercase mb-1 ml-1 tracking-widest">WhatsApp Number</label>
               <input 
                 type="text" 
                 placeholder="+230 XXX XXXX"
-                className="input-field"
+                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold"
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
               />
             </div>
-            <div className="p-3 bg-slate-50 rounded-lg flex gap-3">
-              <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-[10px] text-slate-500 leading-relaxed">
-                Ensure this number has an active WhatsApp account. We will send automated booking summaries to this number as soon as a customer reserves a car.
+            <div className="p-2 bg-slate-50 rounded-lg flex gap-2">
+              <AlertCircle size={14} className="text-amber-500 shrink-0" />
+              <p className="text-[9px] text-slate-500 font-medium">
+                Instant booking summaries sent via WhatsApp.
               </p>
             </div>
           </div>
@@ -235,27 +237,27 @@ export default function AddonsPage() {
 
         {/* Email Config */}
         <div className={cn(
-          "bg-white p-6 rounded-2xl border transition-opacity",
+          "bg-white p-4 rounded-xl border transition-opacity",
           !tenant?.addons?.extra_emails && "opacity-50 pointer-events-none"
         )}>
-          <h2 className="text-lg font-bold text-admin-text mb-4 flex items-center gap-2">
-            <Mail size={20} className="text-blue-500" />
-            Additional Notification Emails
+          <h2 className="text-sm font-black text-admin-text mb-3 flex items-center gap-2 uppercase tracking-tight">
+            <Mail size={16} className="text-blue-500" />
+            Email Distribution
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
-              <label className="block text-[10px] font-bold text-admin-muted uppercase mb-1.5 ml-1">Recipient List (Comma separated)</label>
+              <label className="block text-[8px] font-black text-admin-muted uppercase mb-1 ml-1 tracking-widest">Recipient List</label>
               <textarea 
                 placeholder="ops@agency.com, booking@agency.com"
-                className="input-field min-h-[100px] py-3"
+                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold min-h-[60px]"
                 value={emailList}
                 onChange={(e) => setEmailList(e.target.value)}
               />
             </div>
-            <div className="p-3 bg-slate-50 rounded-lg flex gap-3">
-              <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-[10px] text-slate-500 leading-relaxed">
-                The free tier includes 2 primary accounts. Activating this addon allows you to add up to 10 additional operational email addresses.
+            <div className="p-2 bg-slate-50 rounded-lg flex gap-2">
+              <AlertCircle size={14} className="text-amber-500 shrink-0" />
+              <p className="text-[9px] text-slate-500 font-medium">
+                Add up to 10 operational email addresses.
               </p>
             </div>
           </div>

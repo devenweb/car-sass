@@ -396,7 +396,6 @@ function FleetContent() {
                     <p className="text-[var(--bg-dark)]/40 font-bold uppercase tracking-widest text-[10px]">Adjust your filters to see more results</p>
                   </div>
                 ) : (
-                ) : (
                   filteredTemplates.map((template) => (
                     viewMode === 'grid' ? (
                       <Link 
@@ -576,7 +575,6 @@ function FleetContent() {
                       </Link>
                     )
                   ))
-                )}
                 )}
               </div>
             </div>

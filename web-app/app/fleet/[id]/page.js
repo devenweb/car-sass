@@ -19,12 +19,9 @@ import BookingExtras from '@/components/BookingExtras';
 function CarDetailContent() {
   const params = useParams();
   const id = params?.id;
-  const [template, setTemplate] = useState(null);
-  const [units, setUnits] = useState([]);
-  const [minPrice, setMinPrice] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  const { formatPrice } = useLocalization();
+  // Image Gallery state
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [activeImage, setActiveImage] = useState(null);
 
   // Booking form state
   const [formData, setFormData] = useState({
@@ -106,7 +103,25 @@ function CarDetailContent() {
 
       if (templateData) {
         setTemplate(templateData);
+        setActiveImage(templateData.default_thumbnail || templateData.image_url);
+        
         const templateId = templateData.id;
+
+        // Fetch Gallery Images
+        const { data: imageData } = await supabase
+          .from('vehicle_template_images')
+          .select('image_url')
+          .eq('vehicle_template_id', templateId)
+          .order('sort_order', { ascending: true });
+        
+        const gallery = imageData?.map(img => img.image_url) || [];
+        // Ensure default image is in gallery if not already
+        const defaultImg = templateData.default_thumbnail || templateData.image_url;
+        if (defaultImg && !gallery.includes(defaultImg)) {
+          gallery.unshift(defaultImg);
+        }
+        setGalleryImages(gallery);
+
         const { data: unitData, error: unitError } = await supabase
           .from('vehicle_units')
           .select('*')
@@ -241,61 +256,105 @@ function CarDetailContent() {
       <main className="content-container pt-32 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           
-          {/* Left Column: Vehicle Info */}
+          {/* Left Column: Vehicle Visuals & Details */}
           <div className="lg:col-span-7 space-y-12">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 bg-slate-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{template.category}</span>
-                {availableCount > 0 ? (
-                  <span className="px-3 py-1 bg-emerald-50 rounded-lg text-[9px] font-black uppercase tracking-widest text-emerald-600">Available Now</span>
-                ) : (
-                  <span className="px-3 py-1 bg-red-50 rounded-lg text-[9px] font-black uppercase tracking-widest text-red-600">On Waitlist</span>
+            <div className="space-y-8">
+              {/* Main Image Gallery */}
+              <div className="space-y-6">
+                <div className="relative group rounded-[3.5rem] bg-slate-50 p-8 md:p-12 border border-black/5 overflow-hidden shadow-sm">
+                  <SmartImage 
+                    src={activeImage} 
+                    className="w-full h-[300px] md:h-[450px] object-contain drop-shadow-2xl transition-all duration-700 hover:scale-105" 
+                    alt={`${template.brand} ${template.model}`} 
+                  />
+                </div>
+                
+                {/* Thumbnails */}
+                {galleryImages.length > 1 && (
+                  <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                    {galleryImages.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveImage(img)}
+                        className={`relative w-24 h-20 md:w-32 md:h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0 ${
+                          activeImage === img ? 'border-[var(--brand-yellow)] shadow-lg' : 'border-black/5 opacity-60 hover:opacity-100'
+                        }`}
+                      >
+                        <SmartImage src={img} className="w-full h-full object-cover" alt="Gallery thumbnail" />
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
-              <h1 className="text-6xl md:text-8xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
-                {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
-              </h1>
-              <p className="text-[11px] font-bold text-[var(--bg-dark)]/30 uppercase tracking-[0.4em]">Verified Inventory • Mauritius Fleet</p>
+
+              {/* Status & Badges */}
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="px-4 py-1.5 bg-slate-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{template.category}</span>
+                {availableCount > 0 ? (
+                  <span className="px-4 py-1.5 bg-emerald-50 rounded-lg text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    Available Now
+                  </span>
+                ) : (
+                  <span className="px-4 py-1.5 bg-red-50 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-600">On Waitlist</span>
+                )}
+                {template.luggage_large > 0 && (
+                  <span className="px-4 py-1.5 bg-slate-50 rounded-lg text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40">{template.luggage_large} Large Bags</span>
+                )}
+              </div>
+
+              {/* Login CTA Banner (Prominent as seen in competitor image) */}
+              <Link href="/login" className="flex items-center justify-between p-6 bg-slate-50 border border-black/5 rounded-3xl group transition-all hover:bg-[var(--brand-yellow)]/5">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-black/5 flex items-center justify-center text-[var(--brand-yellow)]">
+                    <UserPlus size={20} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--bg-dark)]">Exclusive Member Rates</span>
+                    <span className="text-[9px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-widest">Login or Create an account to Book your Car</span>
+                  </div>
+                </div>
+                <ArrowRight size={18} className="text-[var(--bg-dark)]/20 group-hover:text-[var(--brand-yellow)] group-hover:translate-x-1 transition-all" />
+              </Link>
             </div>
 
-            <div className="relative group rounded-[3.3rem] bg-slate-50 p-11 border border-black/5 overflow-hidden">
-               <SmartImage 
-                 src={templateImageUrl} 
-                 className="w-full h-auto object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-110" 
-                 alt={`${template.brand} ${template.model}`} 
-               />
-            </div>
-
+            {/* Technical Specs Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
               {[
-                { label: 'Seats', value: `${template.seats}`, icon: Users },
+                { label: 'Seats', value: `${template.seats} Adults`, icon: Users },
                 { label: 'Gearbox', value: template.transmission, icon: Settings2 },
-                { label: 'Fuel', value: template.fuel_type || 'Petrol', icon: Fuel },
-                { label: 'Audio', value: template.has_hifi ? 'HiFi' : 'BT', icon: Music },
-                { label: 'Safety', value: `${template.airbag_count || 2} Bags`, icon: Shield },
-                { label: 'Rating', value: Number(template.rating || 5.0).toFixed(1), icon: Star }
+                { label: 'Fuel', value: template.fuel_type || 'Gasoline', icon: Fuel },
+                { label: 'Audio', value: template.has_hifi ? 'HiFi System' : 'Bluetooth', icon: Music },
+                { label: 'Safety', value: `${template.airbag_count || 2} Airbags`, icon: Shield },
+                { label: 'Rating', value: `${Number(template.rating || 5.0).toFixed(1)} / 5.0`, icon: Star }
               ].map((spec, i) => (
-                <div key={i} className="flex items-center gap-4 p-6 bg-white rounded-2xl border border-black/5 shadow-sm">
-                  <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-[var(--brand-yellow)]">
+                <div key={i} className="flex flex-col gap-4 p-8 bg-white rounded-[2.5rem] border border-black/5 shadow-sm hover:shadow-md transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[var(--brand-yellow)]">
                     <spec.icon size={24} />
                   </div>
-                  <div className="flex flex-col min-w-0">
-                     <span className="text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-widest leading-none mb-1">{spec.label}</span>
-                     <span className="text-sm font-black text-[var(--bg-dark)] uppercase truncate">{spec.value}</span>
+                  <div>
+                     <span className="block text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.2em] mb-1">{spec.label}</span>
+                     <span className="block text-sm font-black text-[var(--bg-dark)] uppercase tracking-tight">{spec.value}</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="space-y-6">
-              <h3 className="text-2xl font-black uppercase tracking-tight text-[var(--bg-dark)]">Premium Features</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Features List */}
+            <div className="p-10 bg-slate-50 rounded-[3rem] border border-black/5 space-y-8">
+              <div className="flex items-center gap-4">
+                <Sparkles className="text-[var(--brand-yellow)]" size={24} />
+                <h3 className="text-2xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Premium Standard Features</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-12">
                 {(Array.isArray(template.features_json) && template.features_json.length > 0 
                   ? template.features_json 
-                  : ['Climate Control', 'Reverse Sensors', 'Multimedia System', 'Cruise Control']
+                  : ['Climate Control', 'Reverse Sensors', 'Multimedia System', 'Cruise Control', 'Anti-lock Braking', 'Power Steering']
                 ).map((feat, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <CheckCircle2 size={16} className="text-emerald-500" />
+                  <div key={i} className="flex items-center gap-4 group">
+                    <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                      <CheckCircle2 size={12} />
+                    </div>
                     <span className="text-[11px] font-black uppercase tracking-widest text-[var(--bg-dark)]/60">{feat}</span>
                   </div>
                 ))}
@@ -303,217 +362,187 @@ function CarDetailContent() {
             </div>
           </div>
 
-          {/* Right Column: Booking Form */}
+          {/* Right Column: Booking Form (Sidebar) */}
           <aside className="lg:col-span-5 lg:sticky lg:top-32">
-            <div className="bg-[var(--bg-dark)] rounded-[3.3rem] p-11 md:p-14 text-white shadow-2xl relative overflow-hidden border border-white/5">
-              <div className="absolute top-0 right-0 w-36 h-36 bg-[var(--brand-yellow)] opacity-10 blur-3xl"></div>
+            <div className="bg-[var(--bg-dark)] rounded-[3.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden border border-white/5">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--brand-yellow)] opacity-5 blur-[100px]"></div>
               
+              {/* Header: Title & Base Price */}
               <div className="mb-12 space-y-4">
-                <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em]">Reservation Inquiry</span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-6xl font-black text-[var(--brand-yellow)] tracking-tighter">
+                <h2 className="text-5xl font-black text-white uppercase tracking-tighter leading-none">
+                  {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
+                </h2>
+                <div className="flex items-baseline gap-2 pt-2">
+                  <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">
                     {mounted ? formatPrice(minPrice) : '...'}
                   </span>
-                  <span className="text-sm font-bold text-white/20 uppercase tracking-widest">/ Day</span>
+                  <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">/ Day</span>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Full Name</label>
-                    <input 
-                      required
-                      type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                      placeholder="Your Name" 
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Email Address</label>
-                    <input 
-                      required
-                      type="email" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                      placeholder="your@email.com" 
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Pickup Date & Time</label>
-                      <div className="flex gap-3">
-                        <input 
-                          required
-                          type="date" 
-                          className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                          value={formData.startDate}
-                          onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                        />
-                        <input 
-                          required
-                          type="time" 
-                          className="w-28 bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                          value={formData.startTime}
-                          onChange={(e) => setFormData({...formData, startTime: e.target.value})}
-                        />
-                      </div>
+              <form onSubmit={handleSubmit} className="space-y-10">
+                {/* Logistics: Pickup & Return Grouped */}
+                <div className="space-y-8">
+                  {/* Pickup Section */}
+                  <div className="space-y-5 p-6 bg-white/5 rounded-3xl border border-white/5">
+                    <div className="flex items-center gap-3 ml-2">
+                      <Calendar size={14} className="text-[var(--brand-yellow)]" />
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Pickup Date, Time & Address</label>
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Return Date & Time</label>
-                      <div className="flex gap-3">
-                        <input 
-                          required
-                          type="date" 
-                          className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                          value={formData.endDate}
-                          onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                        />
-                        <input 
-                          required
-                          type="time" 
-                          className="w-28 bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                          value={formData.endTime}
-                          onChange={(e) => setFormData({...formData, endTime: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Delivery Options */}
-                <div className="space-y-8 pt-6 border-t border-white/10">
-                  <div className="space-y-5">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Pickup Location & Address</label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {['airport', 'hotel', 'agency'].map((loc) => (
-                        <button
-                          key={loc}
-                          type="button"
-                          onClick={() => setFormData({...formData, pickupLocation: loc})}
-                          className={`py-4 rounded-xl border text-[8px] font-black uppercase tracking-widest transition-all ${
-                            formData.pickupLocation === loc 
-                              ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)]' 
-                              : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
-                          }`}
-                        >
-                          {loc}
-                        </button>
-                      ))}
+                    <div className="flex gap-3">
+                      <input 
+                        required
+                        type="date" 
+                        className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        value={formData.startDate}
+                        onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                      />
+                      <input 
+                        required
+                        type="time" 
+                        className="w-28 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        value={formData.startTime}
+                        onChange={(e) => setFormData({...formData, startTime: e.target.value})}
+                      />
                     </div>
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                      placeholder={formData.pickupLocation === 'hotel' ? "Hotel / Villa Name" : "Specific Address / Flight No"} 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      placeholder="Pickup Address (Airport, Hotel, Villa...)" 
                       value={formData.pickupAddress}
                       onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
                     />
                   </div>
 
-                  <div className="space-y-5 pt-6 border-t border-white/5">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Return Location & Address</label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {['airport', 'hotel', 'agency'].map((loc) => (
-                        <button
-                          key={loc}
-                          type="button"
-                          onClick={() => setFormData({...formData, returnLocation: loc})}
-                          className={`py-4 rounded-xl border text-[8px] font-black uppercase tracking-widest transition-all ${
-                            formData.returnLocation === loc 
-                              ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)]' 
-                              : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
-                          }`}
-                        >
-                          {loc}
-                        </button>
-                      ))}
+                  {/* Return Section */}
+                  <div className="space-y-5 p-6 bg-white/5 rounded-3xl border border-white/5">
+                    <div className="flex items-center gap-3 ml-2">
+                      <Clock size={14} className="text-[var(--brand-yellow)]" />
+                      <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Return Date, Time & Address</label>
+                    </div>
+                    <div className="flex gap-3">
+                      <input 
+                        required
+                        type="date" 
+                        className="flex-grow bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        value={formData.endDate}
+                        onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                      />
+                      <input 
+                        required
+                        type="time" 
+                        className="w-28 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        value={formData.endTime}
+                        onChange={(e) => setFormData({...formData, endTime: e.target.value})}
+                      />
                     </div>
                     <input 
                       required
                       type="text" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-white font-bold text-sm focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                      placeholder={formData.returnLocation === 'hotel' ? "Hotel / Villa Name" : "Specific Address / Flight No"} 
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      placeholder="Return Address" 
                       value={formData.returnAddress}
                       onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
                     />
                   </div>
                 </div>
 
-                <div className="space-y-5 pt-6 border-t border-white/10">
-                   <h4 className="text-[9px] font-black text-white/40 uppercase tracking-widest ml-4">Premium Extras</h4>
+                {/* Resources (Extras) */}
+                <div className="space-y-6 pt-2">
+                   <div className="flex items-center gap-3 ml-4">
+                     <Plus size={14} className="text-[var(--brand-yellow)]" />
+                     <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Resources / Extras</h4>
+                   </div>
                    <BookingExtras onSelectionChange={setSelectedExtras} isDark={true} />
                 </div>
 
-                {/* Live Invoice Breakdown */}
+                {/* Formal Invoice Table (Aligning with competitor design) */}
                 {invoice.days > 0 && (
-                  <div className="bg-white/5 rounded-[2.5rem] p-8 space-y-6 border border-white/5 animate-in fade-in zoom-in-95 duration-500">
-                    <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5 pb-4">
-                      <span>Description</span>
-                      <span>Amount</span>
-                    </div>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[11px] font-bold text-white/60">Rental ({invoice.days} Days)</span>
-                        <span className="text-[11px] font-black text-white">{formatPrice(minPrice * invoice.days)}</span>
-                      </div>
-                      {invoice.extrasTotal > 0 && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-[11px] font-bold text-white/60">Selected Extras</span>
-                          <span className="text-[11px] font-black text-white">{formatPrice(invoice.extrasTotal)}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between items-center pt-3 border-t border-white/5">
-                        <span className="text-[11px] font-bold text-white/40 italic">Subtotal</span>
-                        <span className="text-[11px] font-black text-white/60">{formatPrice(invoice.subtotal)}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[11px] font-bold text-[var(--brand-yellow)]/60">TVA (15%)</span>
-                        <span className="text-[11px] font-black text-[var(--brand-yellow)]">{formatPrice(invoice.tax)}</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center pt-6 border-t border-white/10">
-                       <span className="text-sm font-black uppercase tracking-widest text-white">Total TTC</span>
-                       <span className="text-3xl font-black text-[var(--brand-yellow)] tracking-tighter">{formatPrice(invoice.total)}</span>
-                    </div>
+                  <div className="bg-white/5 rounded-[2.5rem] overflow-hidden border border-white/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-white/5">
+                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Description</th>
+                          <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-white/30 text-right">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        <tr>
+                          <td className="px-8 py-4 text-[11px] font-bold text-white/60">Rental ({invoice.days} Days)</td>
+                          <td className="px-8 py-4 text-[11px] font-black text-white text-right">{formatPrice(minPrice * invoice.days)}</td>
+                        </tr>
+                        {invoice.extrasTotal > 0 && (
+                          <tr>
+                            <td className="px-8 py-4 text-[11px] font-bold text-white/60">Selected Extras</td>
+                            <td className="px-8 py-4 text-[11px] font-black text-white text-right">{formatPrice(invoice.extrasTotal)}</td>
+                          </tr>
+                        )}
+                        <tr>
+                          <td className="px-8 py-4 text-[11px] font-bold text-white/40 italic">Total excluding tax</td>
+                          <td className="px-8 py-4 text-[11px] font-black text-white/60 text-right">{formatPrice(invoice.subtotal)}</td>
+                        </tr>
+                        <tr>
+                          <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)]/60 uppercase tracking-widest">TVA (15 %)</td>
+                          <td className="px-8 py-4 text-[11px] font-black text-[var(--brand-yellow)] text-right">{formatPrice(invoice.tax)}</td>
+                        </tr>
+                        <tr className="bg-[var(--brand-yellow)]/5">
+                          <td className="px-8 py-6 text-sm font-black uppercase tracking-widest text-white">Total TTC</td>
+                          <td className="px-8 py-6 text-2xl font-black text-[var(--brand-yellow)] tracking-tighter text-right">{formatPrice(invoice.total)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 )}
 
-                <div className="flex flex-col gap-6">
-                  <div className="flex items-start gap-4 px-4">
-                    <input 
-                      type="checkbox" 
-                      required
-                      id="terms"
-                      className="mt-1 w-4 h-4 rounded border-white/10 bg-white/5 text-[var(--brand-yellow)] focus:ring-[var(--brand-yellow)]"
-                      checked={formData.agreedToTerms}
-                      onChange={(e) => setFormData({...formData, agreedToTerms: e.target.checked})}
-                    />
-                    <label htmlFor="terms" className="text-[9px] font-bold text-white/40 leading-relaxed cursor-pointer select-none">
-                      I have read and agree to the <Link href="/terms" className="text-[var(--brand-yellow)] underline">Terms and Conditions of Sale</Link>.
-                    </label>
-                  </div>
-
-                  <button 
-                    disabled={isSubmitting}
-                    className="w-full bg-[var(--brand-yellow)] text-[var(--bg-dark)] py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-xl shadow-[var(--brand-yellow)]/10 disabled:opacity-50"
-                  >
-                     {isSubmitting ? 'Processing...' : 'Confirm Reservation'}
-                     <ArrowRight size={16} />
-                  </button>
+                {/* Comment Area */}
+                <div className="space-y-4">
+                   <div className="flex items-center gap-3 ml-4">
+                     <MessageSquare size={14} className="text-[var(--brand-yellow)]" />
+                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">Comments / Special Requests</label>
+                   </div>
+                   <textarea 
+                     rows="3"
+                     className="w-full bg-white/5 border border-white/10 rounded-3xl px-8 py-6 text-white font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all resize-none" 
+                     placeholder="Add any specific requirements..." 
+                     value={formData.message}
+                     onChange={(e) => setFormData({...formData, message: e.target.value})}
+                   ></textarea>
                 </div>
 
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 space-y-2">
-                   <div className="flex items-center gap-2 text-red-500">
-                      <AlertTriangle size={14} />
-                      <span className="text-[9px] font-black uppercase tracking-widest">Action Required</span>
-                   </div>
-                   <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest leading-relaxed">
-                     Please <Link href="/login" className="text-white underline">login</Link> or <Link href="/register" className="text-white underline">Create an account</Link> to track your booking status.
-                   </p>
+                {/* Final Confirmation */}
+                <div className="space-y-8 pt-4">
+                  <div className="flex flex-col gap-6">
+                    {/* Floating Total display for mobile or quick check */}
+                    <div className="flex items-center justify-between px-6 py-4 bg-white/5 rounded-2xl border border-white/10">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Live Total</span>
+                      <span className="text-xl font-black text-white tracking-tighter">
+                        {invoice.total > 0 ? formatPrice(invoice.total) : formatPrice(minPrice)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-start gap-4 px-4">
+                      <input 
+                        type="checkbox" 
+                        required
+                        id="terms"
+                        className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-white/5 text-[var(--brand-yellow)] focus:ring-[var(--brand-yellow)] transition-all cursor-pointer"
+                        checked={formData.agreedToTerms}
+                        onChange={(e) => setFormData({...formData, agreedToTerms: e.target.checked})}
+                      />
+                      <label htmlFor="terms" className="text-[10px] font-bold text-white/40 leading-relaxed cursor-pointer select-none">
+                        I have read and agree to the <Link href="/terms" className="text-[var(--brand-yellow)] underline hover:text-white transition-colors">Terms and Conditions of Sale</Link>.
+                      </label>
+                    </div>
+
+                    <button 
+                      disabled={isSubmitting}
+                      className="group w-full bg-[var(--brand-yellow)] text-[var(--bg-dark)] py-7 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-2xl shadow-[var(--brand-yellow)]/10 disabled:opacity-50"
+                    >
+                       {isSubmitting ? 'Processing Request...' : 'Confirm Reservation'}
+                       <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

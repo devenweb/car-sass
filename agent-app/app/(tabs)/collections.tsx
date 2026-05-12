@@ -14,7 +14,7 @@ export default function CollectionsScreen() {
     setRefreshing(true);
     const { data, error } = await supabase
       .from('rentals')
-      .select('*, cars(*), customers(*)')
+      .select('*, vehicle_units(*, vehicle_templates(*)), customers(*)')
       .eq('status', 'delivered') // Ready for collection
       .order('end_date', { ascending: true });
 

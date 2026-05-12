@@ -83,10 +83,16 @@ export default function RentalsPage() {
     }
   }
 
-  const filteredRentals = rentals.filter(rental => 
-    rental.customers?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rental.cars?.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRentals = rentals.filter(rental => {
+    const customerName = rental.customers?.name?.toLowerCase() || "";
+    const vehicleBrand = rental.vehicle_units?.vehicle_templates?.brand?.toLowerCase() || "";
+    const vehicleModel = rental.vehicle_units?.vehicle_templates?.model?.toLowerCase() || "";
+    const searchTermLower = searchTerm.toLowerCase();
+    
+    return customerName.includes(searchTermLower) || 
+           vehicleBrand.includes(searchTermLower) || 
+           vehicleModel.includes(searchTermLower);
+  });
 
   return (
     <div className="space-y-6">
@@ -153,7 +159,11 @@ export default function RentalsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-admin-text">{rental.cars?.name}</p>
+                      <p className="text-sm font-medium text-admin-text">
+                        {rental.vehicle_units?.vehicle_templates 
+                          ? `${rental.vehicle_units.vehicle_templates.brand} ${rental.vehicle_units.vehicle_templates.model}`
+                          : "N/A"}
+                      </p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col text-[11px] text-admin-muted">

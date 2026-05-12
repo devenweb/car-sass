@@ -10,7 +10,9 @@ import {
   MessageSquare, 
   Mail, 
   Settings, 
-  LogOut 
+  LogOut,
+  Sparkles,
+  Gauge
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -23,6 +25,8 @@ const menuItems = [
   { icon: MessageSquare, label: "Inquiries", href: "/inquiries" },
   { icon: Mail, label: "Newsletter", href: "/newsletter" },
   { icon: CalendarRange, label: "Pricing", href: "/pricing" },
+  { icon: Sparkles, label: "Addons", href: "/addons" },
+  { icon: Gauge, label: "KM Monitoring", href: "/km-monitoring" },
 ];
 
 export default function Sidebar() {

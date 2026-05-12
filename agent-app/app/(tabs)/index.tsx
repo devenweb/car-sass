@@ -14,7 +14,7 @@ export default function DeliveriesScreen() {
     setRefreshing(true);
     const { data, error } = await supabase
       .from('rentals')
-      .select('*, cars(*), customers(*)')
+      .select('*, vehicle_units(*, vehicle_templates(*)), customers(*)')
       .in('status', ['pending', 'confirmed'])
       .order('start_date', { ascending: true });
 

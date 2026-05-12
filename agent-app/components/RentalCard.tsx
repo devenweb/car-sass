@@ -12,7 +12,14 @@ export default function RentalCard({ rental, onPress, type }: RentalCardProps) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.header}>
-        <Text style={styles.carName}>{rental.cars?.name || 'Unknown Car'}</Text>
+        <View>
+          <Text style={styles.carName}>
+            {rental.vehicle_units?.vehicle_templates?.brand} {rental.vehicle_units?.vehicle_templates?.model}
+          </Text>
+          {rental.vehicle_units?.plate_number && (
+            <Text style={styles.plateText}>{rental.vehicle_units.plate_number}</Text>
+          )}
+        </View>
         <View style={[styles.badge, type === 'delivery' ? styles.deliveryBadge : styles.collectionBadge]}>
           <Text style={styles.badgeText}>{type.toUpperCase()}</Text>
         </View>
@@ -65,6 +72,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1E293B',
+  },
+  plateText: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '600',
+    marginTop: 2,
+    fontFamily: 'monospace',
   },
   badge: {
     paddingHorizontal: 8,

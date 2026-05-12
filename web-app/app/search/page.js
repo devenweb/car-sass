@@ -44,7 +44,8 @@ function SearchResultsContent() {
             *,
             units:vehicle_units(availability_status),
             pricing:vehicle_pricing(daily_price)
-          `);
+          `)
+          .eq('published_status', 'published');
 
         if (supabaseError) throw supabaseError;
         

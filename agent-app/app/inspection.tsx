@@ -31,7 +31,7 @@ export default function InspectionScreen() {
   async function fetchRentalDetails() {
     const { data, error } = await supabase
       .from('rentals')
-      .select('*, cars(*), customers(*)')
+      .select('*, vehicle_units(*, vehicle_templates(*)), customers(*)')
       .eq('id', rentalId)
       .single();
 
@@ -117,12 +117,17 @@ export default function InspectionScreen() {
 
       if (rentalUpdateError) throw rentalUpdateError;
 
-      // 4. Update car status
-      const nextCarStatus = type === 'delivery' ? 'rented' : 'available';
-      await supabase
-        .from('cars')
-        .update({ status: nextCarStatus })
-        .eq('id', rental.car_id);
+      // 4. Update vehicle unit status and mileage
+      const nextUnitStatus = type === 'delivery' ? 'rented' : 'available';
+      const { error: unitUpdateError } = await supabase
+        .from('vehicle_units')
+        .update({ 
+          availability_status: nextUnitStatus,
+          mileage: parseInt(mileage)
+        })
+        .eq('id', rental.vehicle_unit_id);
+
+      if (unitUpdateError) throw unitUpdateError;
 
       Alert.alert('Success', `${type === 'delivery' ? 'Delivery' : 'Collection'} completed successfully!`);
       router.replace('/(tabs)');
@@ -184,7 +189,10 @@ export default function InspectionScreen() {
         <Text style={styles.sectionTitle}>Car Details</Text>
         <View style={styles.infoCard}>
           <Text style={styles.infoLabel}>Vehicle</Text>
-          <Text style={styles.infoValue}>{rental?.cars?.name || 'N/A'}</Text>
+          <Text style={styles.infoValue}>
+            {rental?.vehicle_units?.vehicle_templates?.brand} {rental?.vehicle_units?.vehicle_templates?.model}
+            {rental?.vehicle_units?.plate_number ? ` (${rental.vehicle_units.plate_number})` : ''}
+          </Text>
           <Text style={[styles.infoLabel, { marginTop: 10 }]}>Customer</Text>
           <Text style={styles.infoValue}>{rental?.customers?.name || 'N/A'}</Text>
         </View>

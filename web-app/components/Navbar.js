@@ -33,8 +33,8 @@ export default function Navbar() {
 
   // Colors based on page context and scroll state
   const isDarkHero = pathname === '/' && !scrolled;
-  const linkColor = isDarkHero ? 'text-white/80 hover:text-brand-yellow' : 'text-[#1A1A1A]/70 hover:text-brand-yellow';
-  const logoColor = isDarkHero ? 'text-white' : 'text-[#1A1A1A]';
+  const linkColor = isDarkHero ? 'text-[#1A1A1A] hover:text-brand-yellow' : 'text-[#1A1A1A]/70 hover:text-brand-yellow';
+  const logoColor = 'text-[#1A1A1A]';
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
@@ -58,7 +58,7 @@ export default function Navbar() {
             </Link>
 
             <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-500 ${
-              isDarkHero ? 'bg-white/10 border-white/10 text-white/40' : 'bg-[#F1EDE4] border-black/5 text-[#1A1A1A]/40'
+              isDarkHero ? 'bg-black/5 border-black/5 text-[#1A1A1A]/60' : 'bg-[#F1EDE4] border-black/5 text-[#1A1A1A]/40'
             }`}>
                <div className={`w-1.5 h-1.5 rounded-full ${geo.loading ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'}`}></div>
                <span className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
@@ -89,7 +89,7 @@ export default function Navbar() {
               <button 
                 onClick={() => setShowPicker(showPicker === 'language' ? null : 'language')}
                 className={`flex items-center gap-2 px-3 py-2 border rounded-full font-black text-[10px] uppercase tracking-widest transition-all ${
-                  isDarkHero ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-black/5 text-[#1A1A1A]'
+                  isDarkHero ? 'bg-black/5 border-black/5 text-[#1A1A1A]' : 'bg-white border-black/5 text-[#1A1A1A]'
                 }`}
               >
                 <span className="text-sm">{languages[language].flag}</span>
@@ -121,7 +121,7 @@ export default function Navbar() {
               <button 
                 onClick={() => setShowPicker(showPicker === 'currency' ? null : 'currency')}
                 className={`flex items-center gap-2 px-4 py-2.5 border rounded-full font-black text-[11px] uppercase tracking-widest transition-all ${
-                  isDarkHero ? 'bg-white/10 border-white/10 text-white' : 'bg-white border-black/5 text-[#1A1A1A]'
+                  isDarkHero ? 'bg-black/5 border-black/5 text-[#1A1A1A]' : 'bg-white border-black/5 text-[#1A1A1A]'
                 }`}
               >
                 <Globe size={14} className="text-brand-yellow" />

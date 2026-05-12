@@ -1,20 +1,55 @@
 "use client";
 
-import { Save, User, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package } from "lucide-react";
-import { useState, useRef } from "react";
+import { Save, User, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package, Key, Smartphone, Mail } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
+  const [tenant, setTenant] = useState<any>(null);
+  const [apiKeys, setApiKeys] = useState<any>({});
+  const [saving, setSaving] = useState(false);
 
   const tabs = [
     { id: "general", label: "General", icon: User },
+    { id: "api", label: "API Configurations", icon: Key },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Security", icon: Shield },
     { id: "database", label: "Database", icon: Database },
     { id: "backups", label: "Backup & Restore", icon: History },
   ];
+
+  useEffect(() => {
+    fetchTenant();
+  }, []);
+
+  async function fetchTenant() {
+    const { data } = await supabase.from("tenants").select("*").single();
+    if (data) {
+      setTenant(data);
+      setApiKeys(data.api_keys || {});
+    }
+  }
+
+  const handleApiKeyChange = (key: string, value: string) => {
+    setApiKeys({ ...apiKeys, [key]: value });
+  };
+
+  const handleSaveApiKeys = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("tenants")
+      .update({ api_keys: apiKeys })
+      .eq("id", tenant.id);
+    
+    if (error) {
+      alert("Error saving API keys: " + error.message);
+    } else {
+      alert("API Configurations updated!");
+    }
+    setSaving(false);
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -160,6 +195,82 @@ export default function SettingsPage() {
           </div>
 
           <div className="p-6 space-y-6">
+            {activeTab === "api" && (
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
+                    <Smartphone size={18} />
+                    <h4 className="text-sm font-bold uppercase tracking-wider">Twilio (WhatsApp Business)</h4>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Account SID</label>
+                      <input 
+                        type="password" 
+                        className="input-field" 
+                        value={apiKeys.twilio_sid || ""} 
+                        onChange={(e) => handleApiKeyChange("twilio_sid", e.target.value)}
+                        placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxx"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">Auth Token</label>
+                      <input 
+                        type="password" 
+                        className="input-field" 
+                        value={apiKeys.twilio_auth_token || ""} 
+                        onChange={(e) => handleApiKeyChange("twilio_auth_token", e.target.value)}
+                        placeholder="••••••••••••••••••••••••"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase">WhatsApp Sender Number</label>
+                      <input 
+                        type="text" 
+                        className="input-field" 
+                        value={apiKeys.twilio_whatsapp_number || ""} 
+                        onChange={(e) => handleApiKeyChange("twilio_whatsapp_number", e.target.value)}
+                        placeholder="+14155238886"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
+                    <Mail size={18} />
+                    <h4 className="text-sm font-bold uppercase tracking-wider">Resend (Email Service)</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase">API Key</label>
+                    <input 
+                      type="password" 
+                      className="input-field" 
+                      value={apiKeys.resend_api_key || ""} 
+                      onChange={(e) => handleApiKeyChange("resend_api_key", e.target.value)}
+                      placeholder="re_xxxxxxxxxxxxxx"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary border-b border-primary/10 pb-2">
+                    <Database size={18} />
+                    <h4 className="text-sm font-bold uppercase tracking-wider">External Services</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase">Google Maps API Key</label>
+                    <input 
+                      type="password" 
+                      className="input-field" 
+                      value={apiKeys.google_maps_key || ""} 
+                      onChange={(e) => handleApiKeyChange("google_maps_key", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === "general" && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -246,16 +357,24 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {activeTab !== "general" && activeTab !== "database" && activeTab !== "backups" && (
+            {activeTab !== "general" && activeTab !== "database" && activeTab !== "backups" && activeTab !== "api" && (
               <div className="py-12 text-center text-slate-400 italic">
                 Settings for {activeTab} will be implemented in the next update.
               </div>
             )}
 
             <div className="pt-6 flex justify-end">
-              <button className="btn-primary">
-                <Save size={18} />
-                Save Changes
+              <button 
+                className="btn-primary flex items-center gap-2"
+                disabled={saving}
+                onClick={activeTab === "api" ? handleSaveApiKeys : undefined}
+              >
+                {saving ? (
+                  <RefreshCcw size={18} className="animate-spin" />
+                ) : (
+                  <Save size={18} />
+                )}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

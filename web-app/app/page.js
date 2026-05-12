@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   ArrowRight, Star, Users, Settings2, Fuel, 
-  ShieldCheck, MapPin, Sparkles, ChevronRight
+  ShieldCheck, MapPin, Sparkles, ChevronRight, Music, Shield
 } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
@@ -15,7 +15,12 @@ import { useLocalization } from '@/lib/currency';
 export default function HomePage() {
   const [featuredTemplates, setFeaturedTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const { formatPrice } = useLocalization();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -24,6 +29,7 @@ export default function HomePage() {
         const { data: templates, error: tError } = await supabase
           .from('vehicle_templates')
           .select('*')
+          .eq('published_status', 'published')
           .limit(4);
         if (tError) throw tError;
 
@@ -60,11 +66,11 @@ export default function HomePage() {
   }, []);
 
   const experiences = [
-    { image: "/assets/hyundai_creta.png", label: 'Family & 7-Seaters', filter: 'SUV', desc: 'Space for everyone.' },
-    { image: "/assets/wedding_happy_couple_luxury_car.png", label: 'Honeymoon Premium', filter: 'Premium', desc: 'Romance on wheels.' },
-    { image: "/assets/kia_sportage_gt.png", label: 'Sporty & Dynamic', filter: 'Premium', desc: 'Power and style.' },
-    { image: "/assets/bmw_3series.png", label: 'Luxury Executive', filter: 'Luxury', desc: 'Ultimate comfort.' },
-    { image: "/assets/citroen_c1.png", label: 'Daily Commute', filter: 'Economy', desc: 'Simple & reliable.' }
+    { image: "/assets/hyundai_creta.png", label: 'Family & 7-Seaters', filter: 'family', desc: 'Space for everyone.' },
+    { image: "/assets/wedding_happy_couple_luxury_car.png", label: 'Honeymoon Premium', filter: 'honeymoon', desc: 'Romance on wheels.' },
+    { image: "/assets/kia_sportage_gt.png", label: 'Sporty & Dynamic', filter: 'sporty', desc: 'Power and style.' },
+    { image: "/assets/bmw_3series.png", label: 'Luxury Executive', filter: 'luxury', desc: 'Ultimate comfort.' },
+    { image: "/assets/citroen_c1.png", label: 'Daily Commute', filter: 'economy', desc: 'Simple & reliable.' }
   ];
 
   const categories = [
@@ -81,11 +87,11 @@ export default function HomePage() {
       
       <section className="hero-standard min-h-[75vh] flex items-center">
         <img 
-          src="/assets/hero_bg.png" 
+          src="/assets/vibrant_hero_bg.png" 
           className="hero-bg-image scale-110" 
           alt="Hero Background" 
         />
-        <div className="hero-overlay opacity-60"></div>
+        <div className="hero-overlay"></div>
 
         <div className="content-container relative z-10 py-16">
           <div className="max-w-4xl space-y-8">
@@ -121,7 +127,7 @@ export default function HomePage() {
                 {experiences.map((exp, i) => (
                   <Link 
                     key={i} 
-                    href={`/fleet?category=${exp.filter}`}
+                    href={`/fleet?experience=${exp.filter}`}
                     className="group relative h-[450px] rounded-[3.5rem] overflow-hidden flex flex-col items-center justify-end border-8 border-white shadow-2xl shadow-black/20 hover:-translate-y-3 transition-all duration-500 active:scale-95 bg-[var(--bg-primary)]"
                   >
                     <div className="absolute inset-0 z-0">
@@ -218,7 +224,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {loading ? (
               [1, 2].map(i => <div key={i} className="aspect-[16/9] bg-white rounded-[3rem] animate-pulse" />)
             ) : (
@@ -226,14 +232,14 @@ export default function HomePage() {
                 <Link 
                   key={template.id} 
                   href={`/fleet/${template.id}`}
-                  className="group bg-white rounded-[3.5rem] overflow-hidden border border-black/5 shadow-xl hover:shadow-3xl transition-all duration-700 hover:-translate-y-4 flex flex-col h-full"
+                  className="group bg-white rounded-[2.5rem] overflow-hidden border border-black/5 shadow-xl hover:shadow-3xl transition-all duration-700 hover:-translate-y-4 flex flex-col h-full"
                 >
-                  <div className="relative h-[320px] w-full bg-white overflow-hidden group-hover:bg-slate-50/50 transition-colors duration-700">
+                  <div className="relative h-[220px] w-full bg-white overflow-hidden group-hover:bg-slate-50/50 transition-colors duration-700">
                     <div className="absolute top-8 left-8 z-20 flex flex-col gap-2">
-                       <span className="px-6 py-2 bg-white/95 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)] shadow-xl border border-black/5">
+                       <span className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-[0.1em] text-[var(--bg-dark)] shadow-xl border border-black/5">
                         {template.category} Verified
                        </span>
-                       {template.available_count > 0 && (
+                       {mounted && template.available_count > 0 && (
                          <span className="px-4 py-1.5 bg-emerald-500 text-white rounded-full text-[8px] font-black uppercase tracking-[0.2em] shadow-xl w-fit">
                            {template.available_count} Available
                          </span>
@@ -248,32 +254,62 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="px-10 py-10 space-y-10 flex-grow flex flex-col">
+                  <div className="px-6 py-6 space-y-6 flex-grow flex flex-col">
                     <div className="flex justify-between items-start">
                        <div className="space-y-2">
-                          <h3 className="text-5xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-[0.8] group-hover:text-[var(--brand-yellow)] transition-colors duration-500">
+                          <h3 className="text-2xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-[0.9] group-hover:text-[var(--brand-yellow)] transition-colors duration-500">
                              {template.brand} {template.model}
                           </h3>
                        </div>
-                       <div className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-primary)] rounded-xl border border-black/5">
-                          <Star className="w-4 h-4 fill-[var(--brand-yellow)] text-[var(--brand-yellow)]" />
-                          <span className="text-[16px] font-black text-[var(--bg-dark)]">4.9</span>
+                       <div className="flex items-center gap-2 px-3 py-1 bg-[var(--bg-primary)] rounded-lg border border-black/5 shrink-0">
+                          <Star className="w-3 h-3 fill-[var(--brand-yellow)] text-[var(--brand-yellow)]" />
+                          <span className="text-[12px] font-black text-[var(--bg-dark)]">{Number(template.rating || 5.0).toFixed(1)}</span>
                        </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="flex items-center gap-4 p-5 bg-[var(--bg-primary)]/50 rounded-2xl border border-black/5">
-                          <Users className="w-6 h-6 text-[var(--bg-dark)]/20" />
-                          <div className="flex flex-col">
-                             <span className="text-[9px] font-black text-[var(--bg-dark)]/40 uppercase tracking-[0.2em]">Capacity</span>
-                             <span className="text-sm font-black text-[var(--bg-dark)] uppercase">{template.seats} Adults</span>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-4 border-y border-black/5 mb-5">
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-primary)] border border-black/5 flex items-center justify-center shrink-0">
+                             <Users className="w-4 h-4 text-[var(--brand-yellow)]" />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                             <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.2em] leading-none">Seats</span>
+                             <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                               {mounted ? `${template.seats}` : '...'}
+                             </span>
                           </div>
                        </div>
-                       <div className="flex items-center gap-4 p-5 bg-[var(--bg-primary)]/50 rounded-2xl border border-black/5">
-                          <Settings2 className="w-6 h-6 text-[var(--bg-dark)]/20" />
-                          <div className="flex flex-col text-left">
-                             <span className="text-[9px] font-black text-[var(--bg-dark)]/40 uppercase tracking-[0.2em]">Transmission</span>
-                             <span className="text-sm font-black text-[var(--bg-dark)] uppercase">{template.transmission}</span>
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-primary)] border border-black/5 flex items-center justify-center shrink-0">
+                             <Settings2 className="w-4 h-4 text-[var(--brand-yellow)]" />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                             <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.2em] leading-none">Gearbox</span>
+                             <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                               {mounted ? (template.transmission?.slice(0, 4) || 'Auto') : '...'}
+                             </span>
+                          </div>
+                       </div>
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-primary)] border border-black/5 flex items-center justify-center shrink-0">
+                             <Music className="w-4 h-4 text-[var(--brand-yellow)]" />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                             <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.2em] leading-none">Audio</span>
+                             <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                               {mounted ? (template.has_hifi ? 'HiFi' : 'BT') : '...'}
+                             </span>
+                          </div>
+                       </div>
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-primary)] border border-black/5 flex items-center justify-center shrink-0">
+                             <Shield className="w-4 h-4 text-[var(--brand-yellow)]" />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                             <span className="text-[7px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.2em] leading-none">Safety</span>
+                             <span className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-tight truncate">
+                               {mounted ? `${template.airbag_count || 2} Airbags` : '...'}
+                             </span>
                           </div>
                        </div>
                     </div>
@@ -282,7 +318,7 @@ export default function HomePage() {
                       <div className="flex flex-col">
                          <span className="text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.3em] leading-none mb-1">Starting At</span>
                          <span className="text-[26px] font-black text-[var(--bg-dark)] tracking-tighter leading-none">
-                           {formatPrice(template.min_price)}
+                           {mounted ? formatPrice(template.min_price) : '...'}
                          </span>
                       </div>
                       <div className="w-14 h-14 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-lg group-hover:scale-110 transition-all duration-500">

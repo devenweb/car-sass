@@ -24,6 +24,8 @@ export default function FleetPage() {
   const [selectedUnitForMaint, setSelectedUnitForMaint] = useState<any>(null);
   
   const [uploading, setUploading] = useState(false);
+  const [maintDescription, setMaintDescription] = useState("");
+  const [isSavingMaint, setIsSavingMaint] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchFleet(); }, []);
@@ -118,7 +120,34 @@ export default function FleetPage() {
 
   const openMaintenance = (unit: any) => {
     setSelectedUnitForMaint(unit);
+    setMaintDescription("");
     setIsMaintModalOpen(true);
+  };
+
+  const handleLogMaintenance = async () => {
+    if (!maintDescription || !selectedUnitForMaint) return;
+    setIsSavingMaint(true);
+    try {
+      const { error } = await supabase.from('vehicle_maintenance_records').insert({
+        vehicle_unit_id: selectedUnitForMaint.id,
+        maintenance_type: maintDescription,
+        service_date: new Date().toISOString().split('T')[0],
+        description: `Logged via Fleet Manager: ${maintDescription}`
+      });
+
+      if (error) throw error;
+
+      // Optional: Update unit status to maintenance if it wasn't already?
+      // Or just leave it as is. Let's just log for now as requested.
+
+      setIsMaintModalOpen(false);
+      fetchFleet();
+    } catch (error: any) {
+      console.error("Maintenance log error:", error);
+      alert("Error logging maintenance: " + error.message);
+    } finally {
+      setIsSavingMaint(false);
+    }
   };
 
   const handleImageUpload = async (e: any) => {
@@ -277,11 +306,81 @@ export default function FleetPage() {
                 <input type="text" value={editingTemplate.model || ''} onChange={e => setEditingTemplate({...editingTemplate, model: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Model" />
               </div>
               <div className="grid grid-cols-3 gap-4">
-                <select value={editingTemplate.category || ''} onChange={e => setEditingTemplate({...editingTemplate, category: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Economy</option><option>Sedan</option><option>SUV</option><option>MPV</option><option>Luxury</option></select>
+                <select value={editingTemplate.category || ''} onChange={e => setEditingTemplate({...editingTemplate, category: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Economy</option><option>Sedan</option><option>SUV</option><option>MPV</option><option>Luxury</option><option>Hatchback</option></select>
                 <select value={editingTemplate.transmission || ''} onChange={e => setEditingTemplate({...editingTemplate, transmission: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Automatic</option><option>Manual</option></select>
-                <input type="number" value={editingTemplate.seats ?? 5} onChange={e => setEditingTemplate({...editingTemplate, seats: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Seats" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="number" value={editingTemplate.seats ?? 5} onChange={e => setEditingTemplate({...editingTemplate, seats: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Seats" />
+                  <input type="number" step="0.1" min="0" max="5" value={editingTemplate.rating ?? 5.0} onChange={e => setEditingTemplate({...editingTemplate, rating: parseFloat(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold text-amber-500" placeholder="Rating" />
+                </div>
               </div>
               <textarea value={editingTemplate.description || ""} onChange={e => setEditingTemplate({...editingTemplate, description: e.target.value})} className="w-full p-4 bg-slate-50 border rounded-xl min-h-[100px]" placeholder="Description" />
+              
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Vehicle Experiences (Tags)</h3>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: 'family', label: 'Family & 7-Seaters' },
+                    { id: 'honeymoon', label: 'Honeymoon Premium' },
+                    { id: 'sporty', label: 'Sporty & Dynamic' },
+                    { id: 'luxury', label: 'Luxury Executive' },
+                    { id: 'economy', label: 'Daily Commute' }
+                  ].map((tag) => {
+                    const isSelected = editingTemplate.tags?.includes(tag.id);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => {
+                          const currentTags = editingTemplate.tags || [];
+                          const newTags = isSelected
+                            ? currentTags.filter((t: string) => t !== tag.id)
+                            : [...currentTags, tag.id];
+                          setEditingTemplate({ ...editingTemplate, tags: newTags });
+                        }}
+                        className={cn(
+                          "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2",
+                          isSelected 
+                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20" 
+                            : "bg-white border-slate-100 text-slate-400 hover:border-primary/30"
+                        )}
+                      >
+                        {tag.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Technical Specifications</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <label className="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input type="checkbox" checked={editingTemplate.air_conditioning ?? true} onChange={e => setEditingTemplate({...editingTemplate, air_conditioning: e.target.checked})} className="w-4 h-4 text-primary rounded" />
+                    <span className="text-[10px] font-bold uppercase">Air Con</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input type="checkbox" checked={editingTemplate.has_hifi ?? true} onChange={e => setEditingTemplate({...editingTemplate, has_hifi: e.target.checked})} className="w-4 h-4 text-primary rounded" />
+                    <span className="text-[10px] font-bold uppercase">HiFi Audio</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input type="checkbox" checked={editingTemplate.has_bluetooth ?? true} onChange={e => setEditingTemplate({...editingTemplate, has_bluetooth: e.target.checked})} className="w-4 h-4 text-primary rounded" />
+                    <span className="text-[10px] font-bold uppercase">Bluetooth</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input type="checkbox" checked={editingTemplate.has_apple_carplay ?? false} onChange={e => setEditingTemplate({...editingTemplate, has_apple_carplay: e.target.checked})} className="w-4 h-4 text-primary rounded" />
+                    <span className="text-[10px] font-bold uppercase">CarPlay</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input type="checkbox" checked={editingTemplate.has_android_auto ?? false} onChange={e => setEditingTemplate({...editingTemplate, has_android_auto: e.target.checked})} className="w-4 h-4 text-primary rounded" />
+                    <span className="text-[10px] font-bold uppercase">Android Auto</span>
+                  </label>
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl">
+                    <span className="text-[10px] font-bold uppercase text-slate-400">Airbags:</span>
+                    <input type="number" value={editingTemplate.airbag_count ?? 2} onChange={e => setEditingTemplate({...editingTemplate, airbag_count: parseInt(e.target.value)})} className="w-full bg-transparent font-bold text-xs focus:outline-none" />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex justify-between items-center pt-4">
                 <label className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 cursor-pointer"><input type="checkbox" checked={editingTemplate.published_status === 'published'} onChange={e => setEditingTemplate({...editingTemplate, published_status: e.target.checked ? 'published' : 'draft'})} /> Visible</label>
                 <button onClick={handleSaveTemplate} className="px-10 py-4 bg-primary text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-primary/20">Save Model</button>
@@ -310,13 +409,26 @@ export default function FleetPage() {
 
       {isMaintModalOpen && selectedUnitForMaint && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsMaintModalOpen(false)}></div>
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isSavingMaint && setIsMaintModalOpen(false)}></div>
           <div className="relative bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-10 text-center animate-in zoom-in-95">
              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6 shadow-sm"><Wrench size={32} /></div>
              <h3 className="text-xl font-black uppercase mb-2">Record Maintenance</h3>
              <p className="text-slate-500 text-sm mb-6 font-medium">Record entry for <span className="font-bold text-admin-text">{selectedUnitForMaint.plate_number}</span></p>
-             <input type="text" placeholder="Service (e.g. Oil Change)" className="w-full p-4 bg-slate-50 border rounded-xl font-bold text-sm mb-4" />
-             <button className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase text-xs">Log Service</button>
+             <input 
+               type="text" 
+               placeholder="Service (e.g. Oil Change)" 
+               className="w-full p-4 bg-slate-50 border rounded-xl font-bold text-sm mb-4 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+               value={maintDescription}
+               onChange={(e) => setMaintDescription(e.target.value)}
+               disabled={isSavingMaint}
+             />
+             <button 
+               onClick={handleLogMaintenance}
+               disabled={isSavingMaint || !maintDescription}
+               className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
+             >
+               {isSavingMaint ? <Loader2 className="animate-spin" size={16} /> : "Log Service"}
+             </button>
           </div>
         </div>
       )}

@@ -25,6 +25,12 @@ function ContactContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (templateId) {
       fetchTemplate(templateId);
@@ -32,12 +38,18 @@ function ContactContent() {
   }, [templateId]);
 
   async function fetchTemplate(id) {
-    const { data } = await supabase
-      .from('vehicle_templates')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (data) setTemplate(data);
+    try {
+      const { data, error } = await supabase
+        .from('vehicle_templates')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      if (data) setTemplate(data);
+    } catch (err) {
+      console.error('Error fetching template:', err);
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -45,13 +57,47 @@ function ContactContent() {
     setIsSubmitting(true);
     
     try {
-      const payload = {
-        ...formData,
-        vehicle_template_id: templateId,
-        extras: selectedExtras.map(e => e.name),
-        status: 'new'
-      };
+      // 1. Create or Get Customer
+      let customerId;
+      const { data: existingCustomer } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('email', formData.email)
+        .single();
+      
+      if (existingCustomer) {
+        customerId = existingCustomer.id;
+      } else {
+        const { data: newCustomer, error: customerError } = await supabase
+          .from('customers')
+          .insert([{
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone
+          }])
+          .select()
+          .single();
+        
+        if (customerError) throw customerError;
+        customerId = newCustomer.id;
+      }
 
+      // 2. Create Rental Record if template is selected
+      if (templateId && customerId) {
+        const { error: rentalError } = await supabase
+          .from('rentals')
+          .insert([{
+            customer_id: customerId,
+            start_date: formData.startDate,
+            end_date: formData.endDate,
+            status: 'pending',
+            total_price: 0 // Will be calculated by admin/concierge
+          }]);
+        
+        if (rentalError) throw rentalError;
+      }
+
+      // 3. Create Contact Message (for history)
       const { error } = await supabase
         .from('contact_messages')
         .insert([{

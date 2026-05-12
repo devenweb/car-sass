@@ -96,41 +96,43 @@ export default function RentalsPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-admin-text">Rentals & Bookings</h1>
-        <p className="text-admin-muted">Monitor and manage all car rental transactions.</p>
+    <div className="space-y-5">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-xl font-black text-admin-text uppercase tracking-tight">Rentals & Bookings</h1>
+          <p className="text-[11px] text-admin-muted font-bold tracking-tight uppercase">Live oversight of all car rental transactions and reservations.</p>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-admin-border flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-50/50">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+        <div className="p-3 border-b border-admin-border flex flex-col md:flex-row gap-3 items-center justify-between bg-slate-50/50">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
               type="text" 
-              placeholder="Search by customer or car..." 
-              className="input-field pl-10"
+              placeholder="Search reservations..." 
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-xs"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="btn-secondary w-full md:w-auto">
-            <Filter size={18} />
-            Filter Status
+          <button className="btn-secondary h-8 px-4 text-xs">
+            <Filter size={14} />
+            Filters
           </button>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
-                <th className="px-6 py-4">Booking Info</th>
-                <th className="px-6 py-4">Customer</th>
-                <th className="px-6 py-4">Car</th>
-                <th className="px-6 py-4">Dates</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Amount</th>
-                <th className="px-6 py-4"></th>
+              <tr className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-widest font-black border-b border-slate-100">
+                <th className="px-5 py-3">ID</th>
+                <th className="px-5 py-3">Customer</th>
+                <th className="px-5 py-3">Vehicle</th>
+                <th className="px-5 py-3">Logistics</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">Revenue</th>
+                <th className="px-5 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -144,50 +146,47 @@ export default function RentalsPage() {
                 ))
               ) : filteredRentals.length > 0 ? (
                 filteredRentals.map((rental) => (
-                  <tr key={rental.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <p className="text-xs font-mono text-slate-400 uppercase">#{rental.id.slice(0, 8)}</p>
+                  <tr key={rental.id} className="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+                    <td className="px-5 py-2.5">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none">#{rental.id.slice(0, 6)}</p>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                          <User size={16} />
+                    <td className="px-5 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-primary/5 flex items-center justify-center text-primary/60">
+                          <User size={12} />
                         </div>
                         <div>
-                          <p className="font-semibold text-admin-text text-sm">{rental.customers?.name}</p>
-                          <p className="text-[10px] text-admin-muted">{rental.customers?.email}</p>
+                          <p className="font-bold text-admin-text text-xs leading-none">{rental.customers?.name}</p>
+                          <p className="text-[9px] text-admin-muted font-bold tracking-tight">{rental.customers?.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-admin-text">
+                    <td className="px-5 py-2.5">
+                      <p className="text-xs font-bold text-admin-text leading-none">
                         {rental.vehicle_units?.vehicle_templates 
                           ? `${rental.vehicle_units.vehicle_templates.brand} ${rental.vehicle_units.vehicle_templates.model}`
                           : "N/A"}
                       </p>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col text-[11px] text-admin-muted">
-                        <span className="flex items-center gap-1 font-bold">
-                          <Clock size={10} /> {rental.pickup_datetime ? new Date(rental.pickup_datetime).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
-                        </span>
+                    <td className="px-5 py-2.5">
+                      <div className="flex flex-col text-[10px] font-bold text-admin-muted">
                         <span className="flex items-center gap-1">
-                          <CheckCircle2 size={10} className="text-emerald-500" /> {rental.return_datetime ? new Date(rental.return_datetime).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                          <Clock size={10} className="text-primary/40" /> {rental.pickup_datetime ? new Date(rental.pickup_datetime).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-5 py-2.5">
                       <span className={cn(
-                        "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border",
+                        "px-2 py-0.5 rounded-full text-[9px] font-black uppercase border",
                         statusColors[rental.status.toLowerCase()] || "bg-slate-100 text-slate-600 border-slate-200"
                       )}>
                         {rental.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="font-bold text-admin-text text-sm">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
+                    <td className="px-5 py-2.5">
+                      <p className="font-black text-admin-text text-xs leading-none">Rs {(rental.total_amount || rental.total_price || 0).toLocaleString()}</p>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-5 py-2.5 text-right">
                       <div className="flex justify-end gap-2">
                         {rental.status === "pending" && (
                           <button 

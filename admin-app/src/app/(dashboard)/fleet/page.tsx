@@ -167,51 +167,60 @@ export default function FleetPage() {
   const filteredTemplates = templates.filter(t => 
     `${t.brand} ${t.model}`.toLowerCase().includes(searchQuery.toLowerCase())
   );  return (
-    <div className="space-y-8 pb-20">
-      <div className="flex justify-between bg-white p-8 rounded-2xl border border-admin-border shadow-sm">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Fleet Manager</h1>
-          <p className="text-slate-500">Manage models and units.</p>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-admin-border shadow-sm">
+        <div className="flex items-center gap-6">
+          <div>
+            <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Fleet Manager</h1>
+            <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Vehicle Control Center</p>
+          </div>
+          <div className="relative w-64 h-8">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+            <input 
+              type="text" 
+              placeholder="Filter models..." 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              className="w-full h-full pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-[10px]" 
+            />
+          </div>
         </div>
-        <button onClick={() => openEditModal(null)} className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-          <Plus size={20} /> Add New Model
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => openEditModal(null)} className="btn-primary h-8 px-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
+            <Plus size={14} /> New Model
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {[
           { label: "Total Models", value: templates.length, color: "bg-blue-500" },
           { label: "Total Units", value: templates.reduce((acc, t) => acc + (t.units?.length || 0), 0), color: "bg-indigo-500" },
           { label: "Available", value: templates.reduce((acc, t) => acc + (t.units?.filter((u:any) => u.availability_status === 'available').length || 0), 0), color: "bg-emerald-500" },
           { label: "Maintenance", value: templates.reduce((acc, t) => acc + (t.units?.filter((u:any) => u.availability_status === 'maintenance').length || 0), 0), color: "bg-amber-500" },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-2xl border border-admin-border shadow-sm flex items-center gap-4">
-            <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg", stat.color)}><CarIcon size={24} /></div>
+          <div key={i} className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex items-center gap-3">
+            <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-md", stat.color)}><CarIcon size={18} /></div>
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
-              <p className="text-2xl font-black text-admin-text">{stat.value}</p>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+              <p className="text-lg font-black text-admin-text leading-tight">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white p-6 rounded-2xl border border-admin-border shadow-sm">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
-        </div>
-      </div>
+      {/* Search bar removed from here and integrated into header */}
 
-      <div className="bg-white rounded-2xl border border-admin-border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-admin-border">
-                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Model Details</th>
-                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Category</th>
-                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Inventory</th>
-                <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Catalog</th>
-                <th className="px-8 py-5 text-right text-slate-400">Actions</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Model Details</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Inventory</th>
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Catalog</th>
+                <th className="px-6 py-3 text-right text-slate-400"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -221,43 +230,50 @@ export default function FleetPage() {
                 const units = template.units || [];
                 return (
                   <React.Fragment key={template.id}>
-                    <tr className={cn("group hover:bg-slate-50/50 cursor-pointer", expandedRows.has(template.id) && "bg-slate-50/80")} onClick={() => toggleRow(template.id)}>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          {expandedRows.has(template.id) ? <ChevronDown size={20}/> : <ChevronRight size={20}/>}
-                          <div className="w-20 h-12 relative rounded-lg overflow-hidden border bg-slate-100">
+                    <tr className={cn("group hover:bg-slate-50/50 cursor-pointer border-b border-slate-50 transition-colors", expandedRows.has(template.id) && "bg-slate-50/80")} onClick={() => toggleRow(template.id)}>
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-3">
+                          {expandedRows.has(template.id) ? <ChevronDown size={14} className="text-primary" /> : <ChevronRight size={14} className="text-slate-300" />}
+                          <div className="w-14 h-9 relative rounded-lg overflow-hidden border bg-slate-100 shrink-0">
                             <Image src={template.image_url || template.default_thumbnail || "/placeholder-car.png"} alt={template.brand} fill className="object-cover" />
                           </div>
-                          <div><p className="text-lg font-bold">{template.brand} {template.model}</p></div>
+                          <div><p className="text-sm font-bold tracking-tight">{template.brand} {template.model}</p></div>
                         </div>
                       </td>
-                      <td className="px-8 py-6"><span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-black uppercase">{template.category}</span></td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-3"><span className="px-1.5 py-0.5 bg-slate-100 rounded text-[9px] font-black uppercase border border-slate-200">{template.category}</span></td>
+                      <td className="px-6 py-3">
                         <div className="flex gap-4">
-                          <div><p className="text-lg font-black">{units.length}</p><p className="text-[8px] uppercase text-slate-400 font-bold">Total</p></div>
-                          <div><p className="text-lg font-black text-emerald-500">{units.filter((u:any) => u.availability_status === 'available').length}</p><p className="text-[8px] uppercase text-slate-400 font-bold">Ready</p></div>
+                          <div><p className="text-sm font-black">{units.length}</p><p className="text-[7px] uppercase text-slate-400 font-bold">Total</p></div>
+                          <div><p className="text-sm font-black text-emerald-500">{units.filter((u:any) => u.availability_status === 'available').length}</p><p className="text-[7px] uppercase text-slate-400 font-bold">Ready</p></div>
                         </div>
                       </td>
-                      <td className="px-8 py-6"><span className="text-xs font-bold capitalize">{template.published_status}</span></td>
-                      <td className="px-8 py-6 text-right" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => openEditModal(template)} className="p-2 hover:bg-primary/10 rounded-xl"><Edit2 size={18}/></button>
-                          <button onClick={() => handleDeleteTemplate(template.id)} className="p-2 hover:bg-rose-500/10 rounded-xl"><Trash size={18}/></button>
+                      <td className="px-6 py-3">
+                        <span className={cn(
+                          "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border",
+                          template.published_status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+                        )}>
+                          {template.published_status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-right" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-end gap-1">
+                          <button onClick={() => openEditModal(template)} className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors"><Edit2 size={14}/></button>
+                          <button onClick={() => handleDeleteTemplate(template.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors"><Trash size={14}/></button>
                         </div>
                       </td>
                     </tr>
                     {expandedRows.has(template.id) && (
                       <tr className="bg-slate-50/30">
-                        <td colSpan={5} className="px-20 py-6">
-                          <div className="flex justify-between border-b pb-2 mb-4">
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Physical Units</h4>
-                            <button onClick={() => openUnitModal(null, template.id)} className="text-[9px] font-black text-primary uppercase">+ Add Unit</button>
+                        <td colSpan={5} className="px-8 py-4">
+                          <div className="flex justify-between border-b border-slate-200 pb-1.5 mb-3">
+                            <h4 className="text-[9px] font-black uppercase tracking-widest text-slate-400">Physical Units ({units.length})</h4>
+                            <button onClick={() => openUnitModal(null, template.id)} className="text-[9px] font-black text-primary uppercase hover:underline">+ Add Unit</button>
                           </div>
-                          <div className="grid gap-3">
+                          <div className="grid gap-2">
                             {units.map((unit: any) => (
-                              <div key={unit.id} className="bg-white p-4 rounded-xl border flex justify-between items-center group/unit">
-                                <div className="flex gap-6 items-center">
-                                  <div onClick={() => openUnitModal(unit)} className="px-3 py-1 bg-slate-900 text-white rounded font-mono text-sm cursor-pointer hover:bg-primary transition-colors">{unit.plate_number}</div>
+                              <div key={unit.id} className="bg-white p-2.5 rounded-lg border border-slate-100 flex justify-between items-center group/unit shadow-sm">
+                                <div className="flex gap-4 items-center">
+                                  <div onClick={() => openUnitModal(unit)} className="px-2 py-0.5 bg-slate-900 text-white rounded font-mono text-[10px] cursor-pointer hover:bg-primary transition-colors">{unit.plate_number}</div>
                                   <div className="flex gap-4 text-xs font-bold text-slate-500">
                                     <span className="flex items-center gap-1"><Gauge size={14}/>{unit.mileage} KM</span>
                                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full" style={{backgroundColor:unit.color}}/>{unit.color}</span>

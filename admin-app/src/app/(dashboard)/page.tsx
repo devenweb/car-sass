@@ -103,48 +103,50 @@ export default async function Dashboard() {
   const maintenancePercent = totalCars > 0 ? (maintenanceCount / totalCars) * 100 : 0;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-admin-text">Dashboard Overview</h1>
-        <p className="text-admin-muted">Welcome back, here&apos;s what&apos;s happening today.</p>
+    <div className="space-y-5">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-xl font-black text-admin-text uppercase tracking-tight">System Overview</h1>
+          <p className="text-xs text-admin-muted font-medium">Real-time status of Royal Car Rental ecosystems.</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Link key={stat.label} href={stat.href} className="card-stat hover:border-primary/50 transition-all group">
+          <Link key={stat.label} href={stat.href} className="bg-white p-4 rounded-xl border border-admin-border shadow-sm hover:border-primary/50 transition-all group">
             <div className="flex items-start justify-between">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                <stat.icon size={24} />
+              <div className="p-1.5 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                <stat.icon size={20} />
               </div>
-              <div className={`flex items-center gap-1 text-xs font-medium ${
+              <div className={`flex items-center gap-1 text-[10px] font-black ${
                 stat.trend === 'up' ? 'text-emerald-600' : 'text-rose-600'
               }`}>
                 {stat.change}
-                {stat.trend === 'up' ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                {stat.trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
               </div>
             </div>
-            <div className="mt-4">
-              <h3 className="text-admin-muted text-sm font-medium">{stat.label}</h3>
-              <p className="text-2xl font-bold text-admin-text mt-1">{stat.value}</p>
+            <div className="mt-3">
+              <h3 className="text-admin-muted text-[10px] font-black uppercase tracking-widest">{stat.label}</h3>
+              <p className="text-xl font-black text-admin-text mt-0.5">{stat.value}</p>
             </div>
           </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
-          <h3 className="text-lg font-bold text-admin-text mb-4">Recent Bookings</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="bg-white p-5 rounded-xl border border-admin-border shadow-sm">
+          <h3 className="text-sm font-black text-admin-text uppercase tracking-tight mb-4">Recent Bookings</h3>
           <div className="space-y-4">
             {recentRentals && recentRentals.length > 0 ? (
               recentRentals.map((rental: any) => (
-                <Link key={rental.id} href="/rentals" className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center">
-                      <Car size={20} className="text-slate-400" />
+                <Link key={rental.id} href="/rentals" className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
+                      <Car size={16} className="text-slate-400" />
                     </div>
                     <div>
-                      <p className="font-semibold text-admin-text">{(rental.vehicle_templates as any)?.brand} {(rental.vehicle_templates as any)?.model}</p>
-                      <p className="text-xs text-admin-muted">Customer: {(rental.customers as any)?.name || 'Unknown Customer'}</p>
+                      <p className="font-bold text-admin-text text-sm">{(rental.vehicle_templates as any)?.brand} {(rental.vehicle_templates as any)?.model}</p>
+                      <p className="text-[10px] text-admin-muted font-bold uppercase tracking-tight">{(rental.customers as any)?.name || 'Guest'}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -172,10 +174,10 @@ export default async function Dashboard() {
           </Link>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-admin-border shadow-sm">
+        <div className="bg-white p-5 rounded-xl border border-admin-border shadow-sm">
           <Link href="/fleet" className="group flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-admin-text">Fleet Status</h3>
-            <span className="text-xs font-bold text-primary transition-opacity">Manage Fleet →</span>
+            <h3 className="text-sm font-black text-admin-text uppercase tracking-tight">Fleet Status</h3>
+            <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Manage Fleet →</span>
           </Link>
           <div className="space-y-6">
             <Link href="/fleet" className="block group">

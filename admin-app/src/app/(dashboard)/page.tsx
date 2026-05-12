@@ -1,3 +1,5 @@
+"use client";
+
 import { 
   Car, 
   CalendarCheck, 
@@ -11,96 +13,114 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-async function getDashboardData() {
-  const now = new Date();
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
-  // Parallel fetching for performance
-  const [
-    { count: carCount },
-    { count: rentalCount },
-    { count: customerCount },
-    { data: recentRentals },
-    { data: allCars },
-    { data: revenueData }
-  ] = await Promise.all([
-    supabase.from("cars").select("*", { count: "exact" }).limit(1),
-    supabase.from("rentals").select("*", { count: "exact" }).limit(1),
-    supabase.from("customers").select("*", { count: "exact" }).limit(1),
-    supabase.from("rentals").select(`
-      id,
-      total_amount,
-      total_price,
-      status,
-      created_at,
-      vehicle_templates (brand, model),
-      customers (name)
-    `).order("created_at", { ascending: false }).limit(5),
-    supabase.from("vehicle_units").select("availability_status"),
-    supabase.from("rentals").select("total_amount, total_price").gte("created_at", firstDayOfMonth)
-  ]);
-
-  if (revenueData?.[0]) {
-    console.log('Revenue Data Sample:', revenueData[0]);
-  }
-
-  const mtdRevenue = revenueData?.reduce((acc, curr) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
-
-  console.log('Dashboard Data Debug:', {
-    carCount,
-    rentalCount,
-    customerCount,
-    recentRentalsCount: recentRentals?.length,
-    revenueDataCount: revenueData?.length
+export default function Dashboard() {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>({
+    stats: [],
+    recentRentals: [],
+    totalCars: 0,
+    availableCount: 0,
+    inUseCount: 0,
+    maintenanceCount: 0
   });
 
-  // Calculate fleet status
-  const availableCount = allCars?.filter(c => c.availability_status === 'available').length || 0;
-  const inUseCount = allCars?.filter(c => (c as any).availability_status === 'rented').length || 0;
-  const maintenanceCount = allCars?.filter(c => (c as any).availability_status === 'maintenance').length || 0;
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const stats = [
-    { 
-      label: "Total Cars", 
-      value: carCount?.toString() || "0", 
-      icon: Car, 
-      change: "+0", 
-      trend: "up",
-      href: "/fleet"
-    },
-    { 
-      label: "Active Rentals", 
-      value: rentalCount?.toString() || "0", 
-      icon: CalendarCheck, 
-      change: "+0", 
-      trend: "up",
-      href: "/rentals"
-    },
-    { 
-      label: "Total Customers", 
-      value: customerCount?.toString() || "0", 
-      icon: Users, 
-      change: "+0", 
-      trend: "up",
-      href: "/customers"
-    },
-    { 
-      label: "Revenue (MTD)", 
-      value: `Rs ${mtdRevenue.toLocaleString()}`, 
-      icon: TrendingUp, 
-      change: "+0%", 
-      trend: "up",
-      href: "/rentals"
-    },
-  ];
+  async function fetchDashboardData() {
+    setLoading(true);
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-  return { stats, recentRentals, totalCars: carCount || 0, availableCount, inUseCount, maintenanceCount };
-}
+    const [
+      { count: carCount },
+      { count: rentalCount },
+      { count: customerCount },
+      { data: recentRentals },
+      { data: allCars },
+      { data: revenueData }
+    ] = await Promise.all([
+      supabase.from("vehicle_units").select("*", { count: "exact" }).limit(1),
+      supabase.from("rentals").select("*", { count: "exact" }).limit(1),
+      supabase.from("customers").select("*", { count: "exact" }).limit(1),
+      supabase.from("rentals").select(`
+        id,
+        total_amount,
+        total_price,
+        status,
+        created_at,
+        vehicle_templates (brand, model),
+        customers (name)
+      `).order("created_at", { ascending: false }).limit(5),
+      supabase.from("vehicle_units").select("availability_status"),
+      supabase.from("rentals").select("total_amount, total_price").gte("created_at", firstDayOfMonth)
+    ]);
 
-export default async function Dashboard() {
-  const { stats, recentRentals, totalCars, availableCount, inUseCount, maintenanceCount } = await getDashboardData();
+    const mtdRevenue = revenueData?.reduce((acc, curr) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
 
+    const availableCount = allCars?.filter(c => c.availability_status === 'available').length || 0;
+    const inUseCount = allCars?.filter(c => c.availability_status === 'rented' || c.availability_status === 'booked').length || 0;
+    const maintenanceCount = allCars?.filter(c => c.availability_status === 'maintenance').length || 0;
+
+    const stats = [
+      { 
+        label: "Total Cars", 
+        value: carCount?.toString() || "0", 
+        icon: Car, 
+        change: "+0", 
+        trend: "up",
+        href: "/fleet"
+      },
+      { 
+        label: "Active Rentals", 
+        value: rentalCount?.toString() || "0", 
+        icon: CalendarCheck, 
+        change: "+0", 
+        trend: "up",
+        href: "/rentals"
+      },
+      { 
+        label: "Total Customers", 
+        value: customerCount?.toString() || "0", 
+        icon: Users, 
+        change: "+0", 
+        trend: "up",
+        href: "/customers"
+      },
+      { 
+        label: "Revenue (MTD)", 
+        value: `Rs ${mtdRevenue.toLocaleString()}`, 
+        icon: TrendingUp, 
+        change: "+0%", 
+        trend: "up",
+        href: "/rentals"
+      },
+    ];
+
+    setData({
+      stats,
+      recentRentals: recentRentals || [],
+      totalCars: carCount || 0,
+      availableCount,
+      inUseCount,
+      maintenanceCount
+    });
+    setLoading(false);
+  }
+
+  async function deleteRental(id: string) {
+    if (!confirm("Delete rental record?")) return;
+    const { error } = await supabase.from("rentals").delete().eq("id", id);
+    if (error) alert("Error deleting rental");
+    else fetchDashboardData();
+  }
+
+  if (loading) return <div className="p-8 text-admin-muted font-bold uppercase tracking-widest animate-pulse">Initializing Command Center...</div>;
+
+  const { stats, recentRentals, totalCars, availableCount, inUseCount, maintenanceCount } = data;
   const availablePercent = totalCars > 0 ? (availableCount / totalCars) * 100 : 0;
   const inUsePercent = totalCars > 0 ? (inUseCount / totalCars) * 100 : 0;
   const maintenancePercent = totalCars > 0 ? (maintenanceCount / totalCars) * 100 : 0;
@@ -115,7 +135,7 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
+        {stats.map((stat: any) => (
           <Link key={stat.label} href={stat.href} className="bg-white p-4 rounded-xl border border-admin-border shadow-sm hover:border-primary/50 transition-all group">
             <div className="flex items-start justify-between">
               <div className="p-1.5 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-colors">
@@ -169,13 +189,7 @@ export default async function Dashboard() {
                       <Link href="/rentals" className="p-1 text-slate-400 hover:text-primary transition-colors" title="View"><Eye size={14} /></Link>
                       <Link href="/rentals" className="p-1 text-slate-400 hover:text-primary transition-colors" title="Edit"><Edit2 size={14} /></Link>
                       <button 
-                        onClick={async () => {
-                          if (confirm("Delete rental record?")) {
-                            const { error } = await supabase.from("rentals").delete().eq("id", rental.id);
-                            if (error) alert("Error deleting rental");
-                            else window.location.reload();
-                          }
-                        }}
+                        onClick={(e) => { e.stopPropagation(); deleteRental(rental.id); }}
                         className="p-1 text-slate-400 hover:text-rose-500 transition-colors" title="Delete"
                       ><Trash2 size={14} /></button>
                     </div>

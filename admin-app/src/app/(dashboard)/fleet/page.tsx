@@ -79,10 +79,18 @@ export default function FleetPage() {
   };
 
   const handleDeleteTemplate = async (id: string) => {
-    if (!confirm("Are you sure?")) return;
+    if (!confirm("Are you sure? This will delete the template and all associated vehicle units. Rental records may block this deletion.")) return;
+    
+    // Try to delete associated units first (soft cascade)
+    await supabase.from('vehicle_units').delete().eq('vehicle_template_id', id);
+
     const { error } = await supabase.from('vehicle_templates').delete().eq('id', id);
-    if (error) alert("Error deleting template");
-    else fetchFleet();
+    if (error) {
+      console.error("Delete error:", error);
+      alert("Error deleting template: " + error.message);
+    } else {
+      fetchFleet();
+    }
   };
 
   const openUnitModal = (unit: any, templateId?: string) => {
@@ -256,11 +264,11 @@ export default function FleetPage() {
                           {template.published_status === 'published' ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-6 py-3 text-right" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-end gap-1">
-                          <Link href={`https://royalcarmuritius.vercel.app/fleet/${template.slug || template.id}`} target="_blank" className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" title="View Public"><Eye size={14}/></Link>
-                          <button onClick={() => openEditModal(template)} className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" title="Edit"><Edit2 size={14}/></button>
-                          <button onClick={() => handleDeleteTemplate(template.id)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-500 transition-colors" title="Delete"><Trash2 size={14}/></button>
+                      <td className="px-6 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-end gap-1.5">
+                          <Link href={`https://royalcarmuritius.vercel.app/fleet/${template.id}`} target="_blank" className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View on Public Site"><Eye size={14}/></Link>
+                          <button onClick={(e) => { e.stopPropagation(); openEditModal(template); }} className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit Template"><Edit2 size={14}/></button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDeleteTemplate(template.id); }} className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all" title="Delete Template"><Trash2 size={14}/></button>
                         </div>
                       </td>
                     </tr>

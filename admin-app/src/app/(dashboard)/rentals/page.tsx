@@ -209,8 +209,12 @@ export default function RentalsPage() {
                           onClick={async () => {
                             if (confirm("Delete rental record?")) {
                               const { error } = await supabase.from("rentals").delete().eq("id", rental.id);
-                              if (error) alert("Error deleting rental");
-                              else fetchRentals();
+                              if (error) {
+                                console.error("Rental delete error:", error);
+                                alert("Error deleting rental: " + error.message);
+                              } else {
+                                fetchRentals();
+                              }
                             }
                           }}
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all"

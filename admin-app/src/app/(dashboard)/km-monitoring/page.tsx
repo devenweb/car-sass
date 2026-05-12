@@ -236,14 +236,19 @@ export default function KMMonitoringPage() {
                     </td>
                     <td className="px-6 py-2.5 text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        <button className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View History">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); alert("KM history view placeholder."); }}
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View History">
                           <Eye size={14} />
                         </button>
-                        <button className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); alert("KM record edit placeholder."); }}
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit">
                           <Edit2 size={14} />
                         </button>
                         <button 
-                          onClick={async () => {
+                          onClick={async (e) => {
+                            e.stopPropagation();
                             if (confirm("Remove KM tracking record?")) {
                               const { error } = await supabase.from("vehicle_units").delete().eq("id", record.id);
                               if (error) alert("Error deleting record");

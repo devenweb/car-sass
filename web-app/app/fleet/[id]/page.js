@@ -499,6 +499,42 @@ function CarDetailContent() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Contact Information */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 ml-2">
+                    <UserPlus size={14} className="text-[var(--brand-yellow)]" />
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/40">Contact Information</label>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="Full Name"
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input 
+                        required
+                        type="email" 
+                        placeholder="Email Address"
+                        className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      />
+                      <input 
+                        required
+                        type="tel" 
+                        placeholder="Phone Number"
+                        className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        value={formData.phone}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* Logistics: Pickup & Return Grouped */}
                 <div className="space-y-4">
                   <div className="space-y-3 p-0 bg-transparent">
@@ -654,6 +690,7 @@ function CarDetailContent() {
                     </div>
 
                     <button 
+                      type="submit"
                       disabled={isSubmitting}
                       className="group w-full bg-[var(--bg-dark)] text-white py-5 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] hover:bg-[var(--brand-yellow)] hover:text-[var(--bg-dark)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 shadow-xl disabled:opacity-50"
                     >

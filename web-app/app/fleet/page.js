@@ -69,17 +69,9 @@ function FleetContent() {
     setEndDate('');
   };
 
-  const [addons, setAddons] = useState({});
-
   useEffect(() => {
     fetchTemplates();
-    fetchAddons();
   }, []);
-
-  async function fetchAddons() {
-    const { data } = await supabase.from("tenants").select("addons").single();
-    if (data?.addons) setAddons(data.addons);
-  }
 
   async function fetchTemplates() {
     setLoading(true);
@@ -422,7 +414,6 @@ function FleetContent() {
                       viewMode={viewMode}
                       formatPrice={formatPrice}
                       mounted={mounted}
-                      addons={addons}
                     />
                   ))
                 )}

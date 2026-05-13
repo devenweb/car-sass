@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
       supabase.from("customers").select("id", { count: "exact" })
     ]);
 
-    const totalRevenue = rentals?.reduce((acc, curr) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
+    const totalRevenue = rentals?.reduce((acc: number, curr: any) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
     const avgBookingValue = rentals && rentals.length > 0 ? totalRevenue / rentals.length : 0;
     
     // Simulated Time-Series Data (Weekly)
@@ -58,9 +58,9 @@ export default function AnalyticsPage() {
       totalCustomers: customers?.length || 0,
       weeklyRevenue,
       utilization: {
-        available: cars?.filter(c => c.availability_status === 'available').length || 0,
-        rented: cars?.filter(c => c.availability_status === 'rented' || c.availability_status === 'booked').length || 0,
-        maintenance: cars?.filter(c => c.availability_status === 'maintenance').length || 0,
+        available: cars?.filter((c: any) => c.availability_status === 'available').length || 0,
+        rented: cars?.filter((c: any) => c.availability_status === 'rented' || c.availability_status === 'booked').length || 0,
+        maintenance: cars?.filter((c: any) => c.availability_status === 'maintenance').length || 0,
       }
     });
     setLoading(false);

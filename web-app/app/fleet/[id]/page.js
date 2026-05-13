@@ -138,17 +138,15 @@ function CarDetailContent() {
 
   const availableCount = units.filter(u => u.availability_status === 'available').length;
 
-  const [addons, setAddons] = useState({});
+  // Remove addon fetching since all features are now core
+  // useEffect(() => {
+  //   fetchAddons();
+  // }, []);
 
-  useEffect(() => {
-    setMounted(true);
-    fetchAddons();
-  }, []);
-
-  async function fetchAddons() {
-    const { data } = await supabase.from("tenants").select("addons").single();
-    if (data?.addons) setAddons(data.addons);
-  }
+  // async function fetchAddons() {
+  //   const { data } = await supabase.from("tenants").select("addons").single();
+  //   if (data?.addons) setAddons(data.addons);
+  // }
 
   useEffect(() => {
     if (id) fetchCarData();
@@ -598,7 +596,7 @@ function CarDetailContent() {
                 </h2>
                   <div className="flex flex-col gap-1 pt-2">
                     <div className="flex items-baseline gap-2">
-                      {addons.dynamic_pricing !== false && template.marketing_strikethrough_price && (
+                      {template.marketing_strikethrough_price && (
                         <span className="text-xl font-bold text-rose-500 line-through opacity-40">
                           {formatPrice(template.marketing_strikethrough_price)}
                         </span>
@@ -608,7 +606,7 @@ function CarDetailContent() {
                       </span>
                       <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-[0.3em]">/ Day</span>
                     </div>
-                    {addons.dynamic_pricing !== false && invoice.longTermDiscountApplied > 0 && (
+                    {invoice.longTermDiscountApplied > 0 && (
                       <div className="flex items-center gap-2">
                          <Sparkles size={12} className="text-emerald-500" />
                          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
@@ -680,16 +678,14 @@ function CarDetailContent() {
                         onChange={(e) => setFormData({...formData, startTime: e.target.value})}
                       />
                     </div>
-                    {addons.delivery_logistics !== false && (
-                      <input 
-                        required
-                        type="text" 
-                        className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                        placeholder="Pickup Address (Airport, Hotel, Villa...)" 
-                        value={formData.pickupAddress}
-                        onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
-                      />
-                    )}
+                    <input 
+                      required
+                      type="text" 
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      placeholder="Pickup Address (Airport, Hotel, Villa...)" 
+                      value={formData.pickupAddress}
+                      onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
+                    />
                   </div>
 
                   {/* Return Section */}
@@ -715,31 +711,27 @@ function CarDetailContent() {
                         onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                       />
                     </div>
-                    {addons.delivery_logistics !== false && (
-                      <input 
-                        required
-                        type="text" 
-                        className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                        placeholder="Return Address" 
-                        value={formData.returnAddress}
-                        onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
-                      />
-                    )}
+                    <input 
+                      required
+                      type="text" 
+                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                      placeholder="Return Address" 
+                      value={formData.returnAddress}
+                      onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
+                    />
                   </div>
                 </div>
 
-                   {addons.premium_extras === true && (
-                     <div className="space-y-6 pt-2">
-                        <div className="flex items-center gap-3 ml-4">
-                          <Plus size={14} className="text-[var(--brand-yellow)]" />
-                          <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
-                        </div>
-                        <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
-                     </div>
-                   )}
+                   <div className="space-y-6 pt-2">
+                      <div className="flex items-center gap-3 ml-4">
+                        <Plus size={14} className="text-[var(--brand-yellow)]" />
+                        <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
+                      </div>
+                      <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
+                   </div>
 
                 {/* Formal Invoice Table */}
-                {addons.dynamic_pricing !== false && invoice.days > 0 && (
+                {invoice.days > 0 && (
                   <div className="bg-transparent rounded-2xl overflow-hidden border border-black/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <table className="w-full text-left border-collapse">
                       <thead>

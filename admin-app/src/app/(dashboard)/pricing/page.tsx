@@ -62,7 +62,7 @@ export default function PricingPage() {
       .eq('vehicle_template_id', templateId);
     
     const mapped: Record<string, any> = {};
-    data?.forEach(row => {
+    data?.forEach((row: any) => {
       mapped[row.pricing_date] = { price: row.daily_price, stopSale: row.is_stop_sale };
     });
     setPricingData(mapped);

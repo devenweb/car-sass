@@ -47,7 +47,7 @@ export default function EditFleetCarPage() {
       .eq('vehicle_template_id', id)
       .order('sort_order', { ascending: true });
     
-    if (data) setGallery(data.map(img => img.image_url));
+    if (data) setGallery(data.map((img: any) => img.image_url));
   }
 
   const handleSave = async () => {

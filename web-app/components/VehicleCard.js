@@ -7,10 +7,9 @@ import {
 } from 'lucide-react';
 import { SmartImage } from '@/lib/image';
 
-export default function VehicleCard({ template, viewMode = 'grid', formatPrice, mounted, addons = {} }) {
+export default function VehicleCard({ template, viewMode = 'grid', formatPrice, mounted }) {
   const isGrid = viewMode === 'grid';
   const slug = template.slug || template.id;
-  const showDynamicPricing = addons.dynamic_pricing !== false;
 
   if (isGrid) {
     return (
@@ -27,7 +26,7 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
           <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent opacity-100"></div>
           <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-20">
             <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em]">{template.category}</span>
-            {mounted && showDynamicPricing && template.percentage_discount_rate > 0 && (
+            {mounted && template.percentage_discount_rate > 0 && (
               <span className="px-3 py-1 bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg animate-bounce">
                 -{template.percentage_discount_rate}% DISCOUNT
               </span>
@@ -64,7 +63,7 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
           
             <div className="mt-auto flex items-center justify-between pt-4 border-t border-black/5">
               <div className="flex flex-col">
-                {showDynamicPricing && template.marketing_strikethrough_price && (
+                {template.marketing_strikethrough_price && (
                   <div className="flex items-center gap-2 mb-1">
                      <span className="text-[10px] text-rose-500 font-bold line-through opacity-50">
                        {formatPrice(template.marketing_strikethrough_price)}

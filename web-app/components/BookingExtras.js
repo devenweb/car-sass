@@ -42,18 +42,7 @@ export default function BookingExtras({ onSelectionChange, isDark = false }) {
         .order('category', { ascending: true });
 
       if (error) throw error;
-      const excludedNames = [
-        'CHILD CAR SEAT (0-2 YRS)',
-        'CHILD SEAT (2-4 YRS)',
-        'BOOSTER SEAT (4-12 YRS)',
-        'APPLE CARPLAY / ANDROID AUTO',
-        'GPS NAVIGATION',
-        'CHILD CAR SEAT',
-        'ADDITIONAL DRIVER',
-        'ADDITIONAL DRIVERS'
-      ];
-      const filtered = (data || []).filter(item => !excludedNames.includes(item.name.toUpperCase()));
-      setExtras(filtered);
+      setExtras(data || []);
     } catch (err) {
       console.error('Error fetching extras:', err);
     } finally {

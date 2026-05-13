@@ -12,7 +12,8 @@ import {
   Settings, 
   LogOut,
   Sparkles,
-  Gauge
+  Gauge,
+  Package
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -25,6 +26,7 @@ const menuItems = [
   { icon: MessageSquare, label: "Inquiries", href: "/inquiries" },
   { icon: Mail, label: "Newsletter", href: "/newsletter" },
   { icon: CalendarRange, label: "Pricing", href: "/pricing" },
+  { icon: Package, label: "Extras", href: "/extras" },
   { icon: Sparkles, label: "Addons", href: "/addons" },
   { icon: Gauge, label: "KM Monitoring", href: "/km-monitoring" },
 ];

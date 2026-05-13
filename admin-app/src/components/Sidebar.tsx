@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
@@ -33,13 +34,31 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-
   const router = useRouter();
+  const [addons, setAddons] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetchAddons();
+  }, []);
+
+  const fetchAddons = async () => {
+    const { data } = await supabase.from("tenants").select("addons").single();
+    if (data?.addons) setAddons(data.addons);
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/login");
   };
+
+  // Filter menu items based on addons
+  const visibleMenuItems = menuItems.filter(item => {
+    if (item.label === "KM Monitoring") return addons.km_monitoring;
+    if (item.label === "Newsletter") return addons.marketing_suite;
+    if (item.label === "Pricing") return addons.dynamic_pricing;
+    if (item.label === "Inquiries") return addons.advanced_inquiries;
+    return true; // Dashboard, Fleet, Rentals, Customers, Extras, Addons are core
+  });
 
   return (
     <div className="w-56 bg-secondary text-white h-screen flex flex-col fixed left-0 top-0 border-r border-white/5">
@@ -51,7 +70,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 p-2 space-y-1 mt-2 overflow-y-auto">
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link

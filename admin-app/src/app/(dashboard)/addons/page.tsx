@@ -14,7 +14,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Smartphone,
-  Save
+  Save,
+  Gauge,
+  Car
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,28 +31,44 @@ interface Addon {
 
 const ADDONS: Addon[] = [
   {
-    id: "whatsapp",
-    key: "whatsapp_notifications",
-    name: "WhatsApp Notifications",
-    description: "Receive instant WhatsApp messages for every new booking and customer inquiry.",
-    icon: Smartphone,
-    price: "Rs 500 / mo"
+    id: "km",
+    key: "km_monitoring",
+    name: "Odometer & KM Tracking",
+    description: "Monitor vehicle mileage, track maintenance intervals, and prevent fleet misuse.",
+    icon: Gauge,
+    price: "Rs 450 / mo"
   },
   {
-    id: "emails",
-    key: "extra_emails",
-    name: "Extended Email Network",
-    description: "Add more than 2 notification recipients to keep your entire operations team informed.",
+    id: "marketing",
+    key: "marketing_suite",
+    name: "Marketing & Newsletter",
+    description: "Manage customer subscriptions, send broadcast emails, and build loyalty campaigns.",
     icon: Mail,
-    price: "Rs 250 / mo"
+    price: "Rs 600 / mo"
   },
   {
-    id: "boost",
-    key: "priority_boost",
-    name: "Priority 'Boost' Visibility",
-    description: "Get featured at the top of search results and category pages for 2.5x more clicks.",
+    id: "pricing",
+    key: "dynamic_pricing",
+    name: "Dynamic Pricing Engine",
+    description: "Enable marketing strikethrough prices, member-only rates, and advanced discount rules.",
     icon: Zap,
-    price: "Rs 1,500 / mo"
+    price: "Rs 1,200 / mo"
+  },
+  {
+    id: "logistics",
+    key: "delivery_logistics",
+    name: "Advanced Logistics Suite",
+    description: "Enable flexible pickup/return at Airports, Hotels, and Custom locations.",
+    icon: Car,
+    price: "Rs 800 / mo"
+  },
+  {
+    id: "inquiries",
+    key: "advanced_inquiries",
+    name: "Lead & Inquiry Pro",
+    description: "Track inquiry statuses, manage response times, and centralize customer leads.",
+    icon: MessageSquare,
+    price: "Rs 350 / mo"
   },
   {
     id: "multi-agent",

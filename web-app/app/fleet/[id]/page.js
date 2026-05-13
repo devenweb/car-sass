@@ -138,9 +138,17 @@ function CarDetailContent() {
 
   const availableCount = units.filter(u => u.availability_status === 'available').length;
 
+  const [addons, setAddons] = useState({});
+
   useEffect(() => {
     setMounted(true);
+    fetchAddons();
   }, []);
+
+  async function fetchAddons() {
+    const { data } = await supabase.from("tenants").select("addons").single();
+    if (data?.addons) setAddons(data.addons);
+  }
 
   useEffect(() => {
     if (id) fetchCarData();
@@ -566,27 +574,27 @@ function CarDetailContent() {
                 <h2 className="text-5xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
                   {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
                 </h2>
-                <div className="flex flex-col gap-1 pt-2">
-                  <div className="flex items-baseline gap-2">
-                    {template.marketing_strikethrough_price && (
-                      <span className="text-xl font-bold text-rose-500 line-through opacity-40">
-                        {formatPrice(template.marketing_strikethrough_price)}
+                  <div className="flex flex-col gap-1 pt-2">
+                    <div className="flex items-baseline gap-2">
+                      {addons.dynamic_pricing !== false && template.marketing_strikethrough_price && (
+                        <span className="text-xl font-bold text-rose-500 line-through opacity-40">
+                          {formatPrice(template.marketing_strikethrough_price)}
+                        </span>
+                      )}
+                      <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">
+                        {mounted ? formatPrice(invoice.dailyBaseApplied || minPrice) : '...'}
                       </span>
-                    )}
-                    <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">
-                      {mounted ? formatPrice(invoice.dailyBaseApplied || minPrice) : '...'}
-                    </span>
-                    <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-[0.3em]">/ Day</span>
-                  </div>
-                  {invoice.longTermDiscountApplied > 0 && (
-                    <div className="flex items-center gap-2">
-                       <Sparkles size={12} className="text-emerald-500" />
-                       <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
-                         {invoice.longTermDiscountApplied}% Long-Term Reward Applied
-                       </span>
+                      <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-[0.3em]">/ Day</span>
                     </div>
-                  )}
-                </div>
+                    {addons.dynamic_pricing !== false && invoice.longTermDiscountApplied > 0 && (
+                      <div className="flex items-center gap-2">
+                         <Sparkles size={12} className="text-emerald-500" />
+                         <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
+                           {invoice.longTermDiscountApplied}% Long-Term Reward Applied
+                         </span>
+                      </div>
+                    )}
+                  </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -650,14 +658,16 @@ function CarDetailContent() {
                         onChange={(e) => setFormData({...formData, startTime: e.target.value})}
                       />
                     </div>
-                    <input 
-                      required
-                      type="text" 
-                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                      placeholder="Pickup Address (Airport, Hotel, Villa...)" 
-                      value={formData.pickupAddress}
-                      onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
-                    />
+                    {addons.delivery_logistics !== false && (
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        placeholder="Pickup Address (Airport, Hotel, Villa...)" 
+                        value={formData.pickupAddress}
+                        onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
+                      />
+                    )}
                   </div>
 
                   {/* Return Section */}
@@ -683,14 +693,16 @@ function CarDetailContent() {
                         onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                       />
                     </div>
-                    <input 
-                      required
-                      type="text" 
-                      className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
-                      placeholder="Return Address" 
-                      value={formData.returnAddress}
-                      onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
-                    />
+                    {addons.delivery_logistics !== false && (
+                      <input 
+                        required
+                        type="text" 
+                        className="w-full bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-bold text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
+                        placeholder="Return Address" 
+                        value={formData.returnAddress}
+                        onChange={(e) => setFormData({...formData, returnAddress: e.target.value})}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -704,7 +716,7 @@ function CarDetailContent() {
                 </div>
 
                 {/* Formal Invoice Table */}
-                {invoice.days > 0 && (
+                {addons.dynamic_pricing !== false && invoice.days > 0 && (
                   <div className="bg-transparent rounded-2xl overflow-hidden border border-black/5 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <table className="w-full text-left border-collapse">
                       <thead>

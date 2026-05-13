@@ -206,8 +206,7 @@ function ContactContent() {
 
             <div className="grid grid-cols-1 gap-6">
               {[
-                { icon: Phone, title: 'Concierge', value: '+230 5XXX XXXX' },
-                { icon: Mail, title: 'Email', value: 'devenpawaray@gmail.com' }
+                { icon: Phone, title: 'Concierge', value: '(+230) 58 16 94 20' }
               ].map((item, i) => (
                 <div key={i} className="bg-white rounded-3xl p-8 border border-black/5 flex items-center gap-6">
                   <div className="w-12 h-12 rounded-xl bg-[var(--bg-primary)] flex items-center justify-center text-[var(--brand-yellow)]">
@@ -262,7 +261,7 @@ function ContactContent() {
                       required
                       type="tel" 
                       className="form-input-premium" 
-                      placeholder="+230 5XXX XXXX" 
+                      placeholder="(+230) 58 16 94 20" 
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />

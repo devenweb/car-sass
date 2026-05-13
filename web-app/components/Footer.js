@@ -85,7 +85,7 @@ export default function Footer() {
                 </li>
                 <li className="flex items-center gap-4 text-white/40 group">
                   <Phone className="w-5 h-5 shrink-0 text-[var(--brand-yellow)]/50 group-hover:text-[var(--brand-yellow)] transition-colors" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest">+230 5XXX XXXX</span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest">(+230) 58 16 94 20</span>
                 </li>
               </ul>
             </div>

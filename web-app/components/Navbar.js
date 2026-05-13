@@ -148,7 +148,7 @@ export default function Navbar() {
             </div>
 
             <a 
-              href="https://wa.me/23051234567" 
+              href="https://wa.me/23058169420" 
               className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#25D366] text-white rounded-full font-black text-[11px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-[#25D366]/20"
             >
               <MessageSquare className="w-4 h-4 fill-current" />
@@ -231,7 +231,7 @@ export default function Navbar() {
                 </div>
              </div>
 
-             <a href="https://wa.me/23051234567" className="w-full max-w-xs flex items-center justify-center gap-3 bg-[#25D366] text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-2xl shadow-[#25D366]/20">
+             <a href="https://wa.me/23058169420" className="w-full max-w-xs flex items-center justify-center gap-3 bg-[#25D366] text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-2xl shadow-[#25D366]/20">
                 <MessageSquare className="w-5 h-5 fill-current" />
                 Contact via WhatsApp
              </a>

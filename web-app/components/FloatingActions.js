@@ -41,7 +41,7 @@ export default function FloatingActions() {
       <div className={`flex flex-col gap-4 transition-all duration-500 transform ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}>
         {/* WhatsApp */}
         <a 
-          href="https://wa.me/2301234567" 
+          href="https://wa.me/23058169420" 
           target="_blank" 
           rel="noopener noreferrer"
           className="w-12 h-12 bg-[#00D95F] text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-[4px] border-[#2C3344]"
@@ -67,14 +67,6 @@ export default function FloatingActions() {
           className="w-12 h-12 bg-[#1877F2] text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-[4px] border-[#2C3344]"
         >
           <Facebook className="w-6 h-6 fill-current" />
-        </a>
-
-        {/* Email */}
-        <a 
-          href="mailto:devenpawaray@gmail.com" 
-          className="w-12 h-12 bg-[#4F46E5] text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-[4px] border-[#2C3344]"
-        >
-          <Mail className="w-6 h-6" />
         </a>
 
         {/* Toggle Button (X) */}

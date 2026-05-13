@@ -106,8 +106,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-xl text-white/60 max-w-xl font-medium leading-relaxed italic">
-              Experience Mauritius with a curated fleet of verified vehicles. <br className="hidden md:block" />
-              Transparent pricing and 24/7 support across the island.
+              Experience Mauritius with a curated fleet of verified vehicles. Transparent pricing and 24/7 support across the island.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5 pt-4">

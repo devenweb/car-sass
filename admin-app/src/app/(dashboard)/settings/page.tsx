@@ -22,6 +22,7 @@ export default function SettingsPage() {
     { id: "general", label: "General", icon: User },
     { id: "api", label: "API Configurations", icon: Key },
     { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "staff", label: "Staff & Access", icon: Users },
     { id: "security", label: "Security", icon: Shield },
     { id: "database", label: "Database", icon: Database },
     { id: "backups", label: "Backup & Restore", icon: History },
@@ -534,16 +535,16 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {activeTab === "security" && (
+                {activeTab === "staff" && (
                   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-slate-900 p-8 rounded-3xl text-white relative overflow-hidden shadow-2xl shadow-slate-200">
                       <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
-                            <ShieldCheck size={24} />
+                            <Users size={24} />
                           </div>
                           <div>
-                            <h4 className="text-lg font-black uppercase tracking-tight">Access Management</h4>
+                            <h4 className="text-lg font-black uppercase tracking-tight">Staff Management</h4>
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Ecosystem Governance & Personnel Control</p>
                           </div>
                         </div>
@@ -584,9 +585,10 @@ export default function SettingsPage() {
                                   </div>
                                   <div>
                                     <p className="text-sm font-black text-slate-900 leading-none flex items-center gap-2">
-                                      {admin.role === 'super_admin' ? 'Ecosystem Owner' : 'Administrative Staff'}
+                                      {admin.name || (admin.role === 'super_admin' ? 'Ecosystem Owner' : 'Administrative Staff')}
                                       {admin.role === 'super_admin' && <Shield size={12} className="text-amber-500" />}
                                     </p>
+                                    <p className="text-[10px] text-slate-400 font-medium mt-1">{admin.email}</p>
                                     <div className="flex items-center gap-2 mt-2">
                                       <span className={cn(
                                         "text-[8px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest",
@@ -616,7 +618,7 @@ export default function SettingsPage() {
 
                       {/* Add Admin Form */}
                       {currentUser?.role === 'super_admin' ? (
-                        <div className="space-y-6 bg-slate-50/50 p-8 rounded-3xl border border-slate-100">
+                        <div className="space-y-6 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
                           <div>
                             <h4 className="text-xs font-black uppercase tracking-tight text-slate-900 flex items-center gap-2">
                               <UserPlus size={16} className="text-primary" /> Provision New Account
@@ -634,7 +636,7 @@ export default function SettingsPage() {
                                   value={newAdmin.name}
                                   onChange={(e) => setNewAdmin({...newAdmin, name: e.target.value})}
                                   required
-                                  className="w-full h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
+                                  className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
                                   placeholder="Ex: John Doe"
                                 />
                               </div>
@@ -649,7 +651,7 @@ export default function SettingsPage() {
                                   value={newAdmin.email}
                                   onChange={(e) => setNewAdmin({...newAdmin, email: e.target.value})}
                                   required
-                                  className="w-full h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
+                                  className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
                                   placeholder="staff@royalrentals.com"
                                 />
                               </div>
@@ -666,7 +668,7 @@ export default function SettingsPage() {
                                     onChange={(e) => setNewAdmin({...newAdmin, password: e.target.value})}
                                     required
                                     minLength={6}
-                                    className="w-full h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
+                                    className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
                                     placeholder="••••••••"
                                   />
                                 </div>
@@ -677,7 +679,7 @@ export default function SettingsPage() {
                                 <select 
                                   value={newAdmin.role}
                                   onChange={(e) => setNewAdmin({...newAdmin, role: e.target.value})}
-                                  className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none cursor-pointer"
+                                  className="w-full h-11 px-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none cursor-pointer"
                                 >
                                   <option value="admin">Administrator</option>
                                   <option value="secretary">Secretary</option>
@@ -707,6 +709,38 @@ export default function SettingsPage() {
                           </p>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "security" && (
+                  <div className="max-w-xl space-y-8 animate-in fade-in duration-500">
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-black uppercase tracking-tight text-slate-900">Security Overview</h4>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Account Protection & Access Logs</p>
+                    </div>
+
+                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm border border-slate-100">
+                          <Lock size={20} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-slate-900 uppercase">Change Password</p>
+                          <p className="text-[9px] text-slate-400 font-bold mt-1">Update your administrative credentials</p>
+                        </div>
+                      </div>
+                      <button className="h-9 px-4 bg-white border border-slate-200 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
+                        Update Key
+                      </button>
+                    </div>
+
+                    <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100 flex items-center gap-4">
+                      <AlertTriangle className="text-amber-500" size={24} />
+                      <div>
+                        <p className="text-xs font-black text-amber-900 uppercase">Two-Factor Authentication</p>
+                        <p className="text-[9px] text-amber-700 font-bold mt-1">Enhance security by adding an extra layer of protection (Coming Soon)</p>
+                      </div>
                     </div>
                   </div>
                 )}

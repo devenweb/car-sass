@@ -29,15 +29,9 @@ export default function Dashboard() {
     maintenanceCount: 0
   });
 
-  // Remove addon fetching
-  // useEffect(() => {
-  //   fetchAddons();
-  // }, []);
-
-  // async function fetchAddons() {
-  //   const { data } = await supabase.from("tenants").select("addons").single();
-  //   if (data?.addons) setAddons(data.addons);
-  // }
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   async function fetchDashboardData() {
     setLoading(true);

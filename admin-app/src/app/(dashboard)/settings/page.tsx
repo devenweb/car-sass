@@ -12,6 +12,7 @@ export default function SettingsPage() {
   const [notificationSettings, setNotificationSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const tabs = [
     { id: "general", label: "General", icon: User },
@@ -20,11 +21,21 @@ export default function SettingsPage() {
     { id: "security", label: "Security", icon: Shield },
     { id: "database", label: "Database", icon: Database },
     { id: "backups", label: "Backup & Restore", icon: History },
+    { id: "maintenance", label: "Maintenance", icon: Trash2 },
   ];
 
   useEffect(() => {
     fetchTenant();
+    fetchUserRole();
   }, []);
+
+  async function fetchUserRole() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase.from("users").select("role").eq("id", user.id).single();
+      setUserRole(data?.role || null);
+    }
+  }
 
   async function fetchTenant() {
     setLoading(true);
@@ -135,7 +146,7 @@ export default function SettingsPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!confirm("CRITICAL WARNING: Restoring a backup will attempt to merge data with your current database. It is highly recommended to have a manual SQL backup of your Supabase instance before proceeding. Continue?")) {
+    if (!confirm("CRITICAL WARNING: Restoring a backup will attempt to merge data with your current database. Continue?")) {
       event.target.value = '';
       return;
     }
@@ -179,6 +190,110 @@ export default function SettingsPage() {
         } finally {
           setIsProcessing(false);
           if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+      };
+      reader.readAsText(file);
+    } catch (error: any) {
+      setBackupStatus({ type: 'error', message: 'Failed to read file' });
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSystemWipe = async () => {
+    if (!confirm("CRITICAL ACTION: This will permanently DELETE all bookings, customers, rentals, and operational data. Configuration (Templates, Pricing, Extras) will be preserved. This cannot be undone. Are you absolutely sure?")) {
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/system-maintenance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ action: 'wipe' })
+      });
+
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      
+      setBackupStatus({ type: 'success', message: 'System wiped successfully! Operational tables are now empty.' });
+    } catch (error: any) {
+      setBackupStatus({ type: 'error', message: error.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleExportConfig = async () => {
+    setIsProcessing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/system-maintenance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ action: 'export_config' })
+      });
+
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      
+      const blob = new Blob([JSON.stringify(result.config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ecosystem-config-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      
+      setBackupStatus({ type: 'success', message: 'System configuration exported successfully!' });
+    } catch (error: any) {
+      setBackupStatus({ type: 'error', message: error.message });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleImportConfig = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!confirm("Restoring configuration will overwrite current templates, pricing, and settings. Operational data (bookings) will not be affected but might reference missing templates. Proceed?")) {
+      event.target.value = '';
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const config = JSON.parse(e.target?.result as string);
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/system-maintenance`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`
+            },
+            body: JSON.stringify({ action: 'import_config', data: { config } })
+          });
+
+          const result = await response.json();
+          if (result.error) throw new Error(result.error);
+          
+          setBackupStatus({ type: 'success', message: 'Configuration restored successfully!' });
+          fetchTenant();
+        } catch (err: any) {
+          setBackupStatus({ type: 'error', message: err.message });
+        } finally {
+          setIsProcessing(false);
+          if (event.target) event.target.value = '';
         }
       };
       reader.readAsText(file);
@@ -396,7 +511,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="flex-1 text-center md:text-left">
                         <h4 className="text-lg font-black text-admin-text uppercase">Full Ecosystem Snapshot</h4>
-                        <p className="text-sm text-admin-muted mt-1">Generate a comprehensive JSON backup of all tables, configurations, and system states.</p>
+                        <p className="text-sm text-admin-muted mt-1">Generate a comprehensive JSON backup of all tables, customers, and rentals.</p>
                       </div>
                       <button 
                         onClick={handleCreateBackup}
@@ -404,7 +519,7 @@ export default function SettingsPage() {
                         className="btn-primary whitespace-nowrap"
                       >
                         {isProcessing ? <RefreshCcw size={18} className="animate-spin" /> : <Download size={18} />}
-                        Create Backup
+                        Create Snapshot
                       </button>
                     </div>
 
@@ -413,8 +528,8 @@ export default function SettingsPage() {
                         <Upload size={32} />
                       </div>
                       <div className="flex-1 text-center md:text-left">
-                        <h4 className="text-lg font-black text-admin-text uppercase">Restore System State</h4>
-                        <p className="text-sm text-admin-muted mt-1">Upload a previous ecosystem snapshot to restore the database to its previous state.</p>
+                        <h4 className="text-lg font-black text-admin-text uppercase">Restore Full State</h4>
+                        <p className="text-sm text-admin-muted mt-1">Merge a previous ecosystem snapshot with the current database.</p>
                       </div>
                       <button 
                         onClick={() => fileInputRef.current?.click()}
@@ -436,6 +551,79 @@ export default function SettingsPage() {
                         <p className="text-sm font-bold">{backupStatus.message}</p>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {activeTab === "maintenance" && userRole === "super_admin" && (
+                  <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="p-6 bg-rose-50 rounded-2xl border border-rose-100 flex flex-col md:flex-row items-center gap-8">
+                      <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-200">
+                        <Trash2 size={32} />
+                      </div>
+                      <div className="flex-1 text-center md:text-left">
+                        <h4 className="text-lg font-black text-rose-900 uppercase">System Wipe (Clean Slate)</h4>
+                        <p className="text-sm text-rose-700 mt-1">This will permanently delete all operational data (bookings, customers, messages). Core configuration and assets will be kept.</p>
+                      </div>
+                      <button 
+                        onClick={handleSystemWipe}
+                        disabled={isProcessing}
+                        className="bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-[10px] tracking-widest px-6 py-3 rounded-xl transition-all disabled:opacity-50"
+                      >
+                        {isProcessing ? <RefreshCcw size={18} className="animate-spin" /> : "Initiate Wipe"}
+                      </button>
+                    </div>
+
+                    <div className="p-6 bg-white rounded-2xl border border-admin-border flex flex-col md:flex-row items-center gap-8">
+                      <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white shrink-0">
+                        <Package size={32} />
+                      </div>
+                      <div className="flex-1 text-center md:text-left">
+                        <h4 className="text-lg font-black text-admin-text uppercase">Configuration Portability</h4>
+                        <p className="text-sm text-admin-muted mt-1">Export only the system configuration (Pricing, Templates, Extras) to sell or move the ecosystem copy.</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={handleExportConfig}
+                          disabled={isProcessing}
+                          className="btn-secondary h-10 px-4"
+                        >
+                          Export Config
+                        </button>
+                        <button 
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = '.json';
+                            input.onchange = (e: any) => handleImportConfig(e);
+                            input.click();
+                          }}
+                          disabled={isProcessing}
+                          className="btn-primary h-10 px-4"
+                        >
+                          Import Config
+                        </button>
+                      </div>
+                    </div>
+
+                    {backupStatus && (
+                      <div className={cn(
+                        "p-4 rounded-xl border flex items-center gap-3",
+                        backupStatus.type === 'success' ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
+                      )}>
+                        {backupStatus.type === 'success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
+                        <p className="text-sm font-bold">{backupStatus.message}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {activeTab === "maintenance" && userRole !== "super_admin" && (
+                  <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
+                      <Shield size={32} />
+                    </div>
+                    <h4 className="text-lg font-black text-slate-900 uppercase">Restricted Access</h4>
+                    <p className="text-sm text-slate-500 max-w-xs">System maintenance tools are only available to the Super Admin account.</p>
                   </div>
                 )}
               </div>

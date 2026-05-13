@@ -33,6 +33,7 @@ const menuItems = [
   { icon: Gauge, label: "KM Monitoring", href: "/km-monitoring" },
   { icon: BarChart3, label: "Analytics", href: "/analytics" },
   { icon: Users, label: "Agents", href: "/agents" },
+  { icon: MessageSquare, label: "Blog", href: "/blog" },
 ];
 
 export default function Sidebar() {
@@ -73,6 +74,7 @@ export default function Sidebar() {
     if (item.label === "Analytics") return addons.advanced_analytics;
     if (item.label === "Agents") return addons.multi_agent && isAdmin;
     if (item.label === "Extras") return addons.premium_extras;
+    if (item.label === "Blog") return addons.blog_system;
     if (item.label === "Customers") return addons.customer_registry !== false; // Default to true if not specified
     if (item.label === "Rentals") return addons.rental_operations !== false; // Default to true if not specified
     return true; // Dashboard, Fleet, Addons are core

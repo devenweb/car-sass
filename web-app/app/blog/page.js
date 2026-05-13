@@ -1,43 +1,33 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { MoveRight, Calendar, User, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-
-const posts = [
-  {
-    id: 1,
-    title: "Driving Around Mauritius in 3 Days – Complete Itinerary",
-    excerpt: "Mauritius may be a small island, but it’s packed with beaches, mountains, waterfalls, culture, and scenic coastal roads. The best way to explore it all? Renting a car and hitting the road.",
-    date: "28 February 2026",
-    author: "DRIVE Team",
-    category: "Road Trips",
-    image: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?q=80&w=2070&auto=format&fit=crop",
-    featured: true
-  },
-  {
-    id: 2,
-    title: "Hire a car or a taxi in Mauritius?",
-    excerpt: "Mauritius may be famous for its beaches and luxury resorts, but the real magic of the island reveals itself when you’re behind the wheel. We compare the freedom of self-drive vs traditional taxis.",
-    date: "23 February 2026",
-    author: "DRIVE Team",
-    category: "Travel Tips",
-    image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2070&auto=format&fit=crop"
-  },
-  {
-    id: 3,
-    title: "Top 10 Road Trips in Mauritius",
-    excerpt: "From the dramatic cliffs of Gris Gris to the winding roads of Chamarel, these are the routes that will make your Mauritius holiday unforgettable.",
-    date: "23 February 2026",
-    author: "DRIVE Team",
-    category: "Guides",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop"
-  }
-];
+import { supabase } from '@/lib/supabaseClient';
 
 export default function BlogPage() {
-  const featuredPost = posts.find(p => p.featured);
-  const regularPosts = posts.filter(p => !p.featured);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  async function fetchPosts() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
+
+    if (!error) setPosts(data || []);
+    setLoading(false);
+  }
+
+  const featuredPost = posts[0];
+  const regularPosts = posts.slice(1);
 
   return (
     <div className="min-h-screen bg-[#F1EDE4] selection:bg-brand-yellow/30">
@@ -57,19 +47,35 @@ export default function BlogPage() {
             </p>
           </div>
 
+          {/* Loading State */}
+          {loading && (
+             <div className="flex justify-center items-center py-20">
+                <div className="w-12 h-12 border-4 border-brand-yellow/20 border-t-brand-yellow rounded-full animate-spin" />
+             </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && posts.length === 0 && (
+            <div className="text-center py-20 bg-white rounded-[3rem] border border-black/5 shadow-sm">
+               <MessageSquare className="w-12 h-12 text-[#1A1A1A]/10 mx-auto mb-4" />
+               <h2 className="text-2xl font-black text-[#1A1A1A] uppercase">The journal is empty</h2>
+               <p className="text-[#1A1A1A]/40 font-bold mt-2">Check back soon for new stories.</p>
+            </div>
+          )}
+
           {/* Featured Post */}
-          {featuredPost && (
+          {!loading && featuredPost && (
             <div className="group relative bg-white rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5 mb-20">
                <div className="grid grid-cols-1 lg:grid-cols-2">
                   <div className="relative h-[400px] lg:h-auto overflow-hidden">
                      <img 
-                       src={featuredPost.image} 
+                       src={featuredPost.thumbnail_url || 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?q=80&w=2070&auto=format&fit=crop'} 
                        alt={featuredPost.title}
                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                      />
                      <div className="absolute top-8 left-8">
                         <span className="bg-brand-yellow text-[#1A1A1A] px-4 py-1.5 rounded-full font-black text-[12px] uppercase tracking-wider">
-                           {featuredPost.category}
+                           {featuredPost.category || 'General'}
                         </span>
                      </div>
                   </div>
@@ -77,11 +83,11 @@ export default function BlogPage() {
                      <div className="flex items-center gap-6 text-[#1A1A1A]/40 font-bold text-sm uppercase tracking-widest">
                         <span className="flex items-center gap-2">
                            <Calendar className="w-4 h-4" />
-                           {featuredPost.date}
+                           {new Date(featuredPost.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
                         <span className="flex items-center gap-2">
                            <User className="w-4 h-4" />
-                           {featuredPost.author}
+                           DRIVE TEAM
                         </span>
                      </div>
                      <h2 className="text-4xl md:text-5xl font-black text-[#1A1A1A] uppercase tracking-tight leading-tight group-hover:text-brand-yellow transition-colors">
@@ -90,12 +96,12 @@ export default function BlogPage() {
                      <p className="text-lg text-[#1A1A1A]/60 leading-relaxed font-medium line-clamp-3">
                         {featuredPost.excerpt}
                      </p>
-                     <button className="flex items-center gap-3 text-[#1A1A1A] font-black uppercase tracking-widest text-sm group/btn">
+                     <Link href={`/blog/${featuredPost.slug}`} className="flex items-center gap-3 text-[#1A1A1A] font-black uppercase tracking-widest text-sm group/btn text-left">
                         Read full article
                         <div className="w-10 h-10 rounded-full bg-[#F1EDE4] flex items-center justify-center group-hover/btn:bg-brand-yellow transition-colors">
                            <ArrowRight className="w-5 h-5" />
                         </div>
-                     </button>
+                     </Link>
                   </div>
                </div>
             </div>
@@ -103,24 +109,24 @@ export default function BlogPage() {
 
           {/* Post Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {regularPosts.map((post) => (
-              <div key={post.id} className="group space-y-8">
+            {!loading && regularPosts.map((post) => (
+              <Link href={`/blog/${post.slug}`} key={post.id} className="group space-y-8 block text-left">
                 <div className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-xl shadow-black/5">
                    <img 
-                     src={post.image} 
+                     src={post.thumbnail_url || 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2070&auto=format&fit=crop'} 
                      alt={post.title}
                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                    />
                    <div className="absolute top-6 left-6">
                       <span className="bg-white/90 backdrop-blur-md text-[#1A1A1A] px-4 py-1.5 rounded-full font-black text-[11px] uppercase tracking-wider">
-                         {post.category}
+                         {post.category || 'General'}
                       </span>
                    </div>
                 </div>
                 <div className="space-y-4 px-2">
                    <div className="flex items-center gap-4 text-[#1A1A1A]/40 font-bold text-[12px] uppercase tracking-widest">
                       <span className="flex items-center gap-2 italic">
-                         {post.date}
+                         {new Date(post.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </span>
                    </div>
                    <h3 className="text-2xl md:text-3xl font-black text-[#1A1A1A] uppercase tracking-tight leading-tight group-hover:text-brand-yellow transition-colors">
@@ -129,12 +135,12 @@ export default function BlogPage() {
                    <p className="text-[#1A1A1A]/60 leading-relaxed font-medium line-clamp-2">
                       {post.excerpt}
                    </p>
-                   <button className="flex items-center gap-2 text-[#1A1A1A] font-bold text-sm uppercase tracking-widest pt-2">
+                   <div className="flex items-center gap-2 text-[#1A1A1A] font-bold text-sm uppercase tracking-widest pt-2">
                       Read more
                       <MoveRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                   </button>
+                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 

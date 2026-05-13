@@ -114,6 +114,14 @@ const ADDONS: Addon[] = [
     price: "Rs 400 / mo"
   },
   {
+    id: "blog",
+    key: "blog_system",
+    name: "Blog Management",
+    description: "Full content management system for publishing articles, news, and SEO-optimized blog posts.",
+    icon: MessageSquare,
+    price: "Rs 650 / mo"
+  },
+  {
     id: "customers",
     key: "customer_registry",
     name: "Customer Registry",

@@ -72,7 +72,7 @@ export default function AboutPage() {
               </h1>
 
               <p className="text-xl sm:text-2xl text-[var(--bg-dark)]/50 max-w-2xl font-medium leading-relaxed">
-                DRIVE Mauritius was established to bridge the gap between traditional car rental and the modern traveler’s need for speed, transparency, and high-fidelity service.
+                DRIVE Mauritius was created to make car rental simple, fast, and reliable — giving modern travelers a smoother experience with transparent pricing, quick booking, and quality service they can trust.
               </p>
             </div>
 

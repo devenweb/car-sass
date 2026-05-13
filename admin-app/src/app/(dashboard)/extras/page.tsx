@@ -20,7 +20,8 @@ import {
   Flower, 
   Smartphone, 
   Wifi,
-  Search
+  Search,
+  AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,10 +43,17 @@ export default function ExtrasPage() {
   const [saving, setSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentExtra, setCurrentExtra] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    checkAuth();
     fetchExtras();
   }, []);
+
+  async function checkAuth() {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+  }
 
   async function fetchExtras() {
     setLoading(true);
@@ -70,13 +78,19 @@ export default function ExtrasPage() {
   };
 
   const handleSave = async () => {
+    if (!user) {
+      alert("Authentication required: You are currently identified as a guest. Please ensure you are logged in to save changes.");
+      return;
+    }
+
     setSaving(true);
     const { error } = await supabase
       .from('booking_extras')
       .upsert(currentExtra);
 
     if (error) {
-      alert("Error saving extra: " + error.message);
+      console.error("Save Error:", error);
+      alert("Error saving extra: " + error.message + " (Check console for detailed logs)");
     } else {
       setIsModalOpen(false);
       fetchExtras();
@@ -85,6 +99,11 @@ export default function ExtrasPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!user) {
+      alert("Authentication required to delete.");
+      return;
+    }
+
     if (!confirm("Are you sure you want to delete this extra?")) return;
     
     const { error } = await supabase
@@ -93,6 +112,7 @@ export default function ExtrasPage() {
       .eq('id', id);
 
     if (error) {
+      console.error("Delete Error:", error);
       alert("Error deleting extra: " + error.message);
     } else {
       fetchExtras();
@@ -100,12 +120,18 @@ export default function ExtrasPage() {
   };
 
   const toggleStatus = async (extra: any) => {
+    if (!user) {
+      alert("Authentication required to change status.");
+      return;
+    }
+
     const { error } = await supabase
       .from('booking_extras')
       .update({ is_active: !extra.is_active })
       .eq('id', extra.id);
 
     if (error) {
+      console.error("Status Update Error:", error);
       alert("Error updating status: " + error.message);
     } else {
       fetchExtras();
@@ -117,6 +143,15 @@ export default function ExtrasPage() {
   return (
     <div className="space-y-4">
       {/* Header */}
+      {!user && (
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center gap-3">
+          <AlertCircle className="text-amber-500" size={20} />
+          <p className="text-xs font-bold text-amber-700 uppercase tracking-tight">
+            Authentication Required: You are currently viewing as a guest. Saving changes will be blocked by RLS policies.
+          </p>
+        </div>
+      )}
+
       <div className="bg-white p-4 rounded-xl border border-admin-border shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">

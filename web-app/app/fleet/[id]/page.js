@@ -62,6 +62,9 @@ function CarDetailContent() {
     longTermDiscountApplied: 0
   });
 
+  // Get today's date for validation
+  const todayStr = new Date().toISOString().split('T')[0];
+
   const calculatedInvoice = useMemo(() => {
     if (!template) return null;
     
@@ -186,6 +189,26 @@ function CarDetailContent() {
     // 1. Block Rs 0 bookings
     if (invoice.total <= 0) {
       alert('Invalid booking total. Please check your selected dates and extras.');
+      return;
+    }
+
+    // 1.5 Date Validations
+    if (!formData.startDate || !formData.endDate) {
+      alert('Please select both Pickup and Return dates.');
+      return;
+    }
+
+    const start = new Date(`${formData.startDate}T${formData.startTime}`);
+    const end = new Date(`${formData.endDate}T${formData.endTime}`);
+    const now = new Date();
+
+    if (start < now && formData.startDate !== todayStr) {
+      alert('Pickup date cannot be in the past.');
+      return;
+    }
+
+    if (end <= start) {
+      alert('Return date must be after the Pickup date.');
       return;
     }
 
@@ -608,9 +631,10 @@ function CarDetailContent() {
                       <input 
                         required
                         type="date" 
+                        min={todayStr}
                         className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.startDate}
-                        onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                        onChange={(e) => setFormData({...formData, startDate: e.target.value, endDate: e.target.value > formData.endDate ? e.target.value : formData.endDate})}
                       />
                       <input 
                         required
@@ -640,6 +664,7 @@ function CarDetailContent() {
                       <input 
                         required
                         type="date" 
+                        min={formData.startDate || todayStr}
                         className="flex-grow bg-white border border-black/5 rounded-2xl px-6 py-3 text-[var(--bg-dark)] font-black text-[11px] focus:ring-1 focus:ring-[var(--brand-yellow)] outline-none transition-all" 
                         value={formData.endDate}
                         onChange={(e) => setFormData({...formData, endDate: e.target.value})}

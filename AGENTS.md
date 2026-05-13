@@ -1,6 +1,16 @@
 # Agents Log
 <!-- Last Sync: 2026-05-13 20:03 -->
 
+## 2026-05-13 - Full-Scale Modularization (Customers & Rentals)
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Core Module Decoupling**: Successfully converted the `Customer Registry` and `Rental Operations` modules into toggleable marketplace addons.
+- **Dynamic Gating**: Updated the administrative sidebar to selectively render core operational links based on active tenant subscriptions, providing a cleaner, more focused experience for basic plans.
+- **Marketplace Integration**: Integrated both modules into the Addons portal with high-density icons (`Users`, `CalendarRange`) and pricing metadata.
+- **Data Persistence**: Synchronized the production database to explicitly enable these core features for the current tenant, ensuring a seamless transition.
+- **Verification**: Validated the modular configuration with a full production build and synchronized all changes to the main repository.
+
 ## 2026-05-13 - Super Admin Protection & Administrative Infrastructure
 **Agent: Antigravity**
 

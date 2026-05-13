@@ -5,16 +5,16 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--bg-dark)] text-white pt-32 pb-12 overflow-hidden relative">
+    <footer className="bg-[var(--bg-dark)] text-white pt-32 pb-6 overflow-hidden relative">
       {/* Decorative Brand Background Text */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.03]">
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.03]">
         <span className="text-[25vw] font-black leading-none uppercase whitespace-nowrap tracking-tighter">
           DRIVE
         </span>
       </div>
 
       <div className="content-container relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 pb-24 border-b border-white/5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 pb-12 border-b border-white/5">
           {/* Brand Identity */}
           <div className="lg:col-span-5 space-y-10">
             <Link href="/" className="inline-block">
@@ -93,7 +93,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-12 flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">
               © 2026 DRIVE Mauritius. All Rights Reserved.

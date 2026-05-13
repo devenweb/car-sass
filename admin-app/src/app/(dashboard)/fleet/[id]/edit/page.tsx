@@ -11,6 +11,7 @@ export default function EditFleetCarPage() {
   const [template, setTemplate] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [gallery, setGallery] = useState<string[]>([]);
 
   const fetchTemplate = React.useCallback(async () => {
     setLoading(true);
@@ -33,8 +34,21 @@ export default function EditFleetCarPage() {
   }, [id, router]);
 
   useEffect(() => {
-    if (id) fetchTemplate();
+    if (id) {
+      fetchTemplate();
+      fetchGallery();
+    }
   }, [id, fetchTemplate]);
+
+  async function fetchGallery() {
+    const { data } = await supabase
+      .from('vehicle_template_images')
+      .select('image_url')
+      .eq('vehicle_template_id', id)
+      .order('sort_order', { ascending: true });
+    
+    if (data) setGallery(data.map(img => img.image_url));
+  }
 
   const handleSave = async () => {
     if (!template.brand || !template.model) return;
@@ -69,11 +83,29 @@ export default function EditFleetCarPage() {
           fixed_discount_amount: template.fixed_discount_amount,
           percentage_discount_rate: template.percentage_discount_rate,
           long_term_threshold_days: template.long_term_threshold_days,
-          long_term_discount_percent: template.long_term_discount_percent
+          long_term_discount_percent: template.long_term_discount_percent,
+          daily_price: template.daily_price,
+          slug: template.slug,
+          features_json: template.features_json
         })
         .eq('id', id);
 
       if (error) throw error;
+
+      // Update Gallery
+      // 1. Delete existing gallery records for this template
+      await supabase.from('vehicle_template_images').delete().eq('vehicle_template_id', id);
+      
+      // 2. Insert new gallery records
+      if (gallery.length > 0) {
+        const galleryRecords = gallery.map((url, index) => ({
+          vehicle_template_id: id,
+          image_url: url,
+          sort_order: index
+        }));
+        await supabase.from('vehicle_template_images').insert(galleryRecords);
+      }
+
       router.push('/fleet');
     } catch (error: any) {
       console.error("Save error:", error);
@@ -83,27 +115,39 @@ export default function EditFleetCarPage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isGallery: boolean = false) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     setUploading(true);
     
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `templates/${fileName}`;
+      const uploadedUrls: string[] = [];
 
-      const { error: uploadError } = await supabase.storage
-        .from('car-assets')
-        .upload(filePath, file);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `templates/${fileName}`;
 
-      if (uploadError) throw uploadError;
+        const { error: uploadError } = await supabase.storage
+          .from('car-assets')
+          .upload(filePath, file);
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('car-assets')
-        .getPublicUrl(filePath);
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('car-assets')
+          .getPublicUrl(filePath);
+        
+        uploadedUrls.push(publicUrl);
+        if (!isGallery) break; // Only upload first for hero
+      }
           
-      setTemplate({ ...template, default_thumbnail: publicUrl });
+      if (isGallery) {
+        setGallery([...gallery, ...uploadedUrls]);
+      } else {
+        setTemplate({ ...template, default_thumbnail: uploadedUrls[0] });
+      }
     } catch (error: any) {
       console.error("Upload error:", error);
       alert(`Upload failed: ${error.message}`);
@@ -127,6 +171,8 @@ export default function EditFleetCarPage() {
         onSave={handleSave}
         uploading={uploading}
         handleImageUpload={handleImageUpload}
+        gallery={gallery}
+        setGallery={setGallery}
       />
     </div>
   );

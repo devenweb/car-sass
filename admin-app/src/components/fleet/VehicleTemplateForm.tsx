@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import { Upload, Loader2, Zap, ArrowLeft, Save } from "lucide-react";
+import { Upload, Loader2, Zap, ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -12,6 +12,8 @@ interface VehicleTemplateFormProps {
   onSave: () => void;
   uploading: boolean;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  gallery: string[];
+  setGallery: (gallery: string[]) => void;
   isNew?: boolean;
 }
 
@@ -21,11 +23,38 @@ export function VehicleTemplateForm({
   onSave,
   uploading,
   handleImageUpload,
+  gallery,
+  setGallery,
   isNew = false
 }: VehicleTemplateFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [newFeature, setNewFeature] = React.useState("");
 
   if (!template) return null;
+
+  const handleAddFeature = () => {
+    if (!newFeature.trim()) return;
+    const currentFeatures = template.features_json || [];
+    setTemplate({ ...template, features_json: [...currentFeatures, newFeature.trim()] });
+    setNewFeature("");
+  };
+
+  const handleRemoveFeature = (index: number) => {
+    const currentFeatures = [...(template.features_json || [])];
+    currentFeatures.splice(index, 1);
+    setTemplate({ ...template, features_json: currentFeatures });
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    // We pass this to the parent or handle it here?
+    // Let's handle it in the parent to maintain state consistency with Supabase
+    // But for now let's just trigger the parent's handler
+    (handleImageUpload as any)(e, true);
+  };
 
   return (
     <div className="space-y-6">
@@ -94,6 +123,39 @@ export function VehicleTemplateForm({
                  Recommended: Transparent PNG or high-quality studio shot. 4:3 Aspect ratio for best marketplace display.
                </p>
             </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2.5rem] border border-admin-border shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Gallery Assets</h3>
+              <button 
+                onClick={() => galleryInputRef.current?.click()}
+                className="p-2 hover:bg-primary/5 text-primary rounded-lg transition-all"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {gallery.map((img, idx) => (
+                <div key={idx} className="aspect-square relative rounded-2xl overflow-hidden border border-slate-100 group">
+                  <Image src={img} alt="Gallery" fill className="object-cover" />
+                  <button 
+                    onClick={() => setGallery(gallery.filter((_, i) => i !== idx))}
+                    className="absolute top-1 right-1 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              ))}
+              <button 
+                onClick={() => galleryInputRef.current?.click()}
+                className="aspect-square rounded-2xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center gap-2 text-slate-300 hover:text-primary hover:border-primary/20 transition-all"
+              >
+                <Plus size={20} />
+                <span className="text-[8px] font-black uppercase tracking-widest">Add Image</span>
+              </button>
+            </div>
+            <input type="file" ref={galleryInputRef} onChange={(e) => (handleImageUpload as any)(e, true)} className="hidden" accept="image/*" multiple />
           </div>
         </div>
         
@@ -202,9 +264,45 @@ export function VehicleTemplateForm({
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest">Marketplace URL (Slug)</label>
+                <input type="text" value={template.slug || ''} onChange={e => setTemplate({...template, slug: e.target.value.toLowerCase().replace(/ /g, '-')})} className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-xs text-primary" placeholder="e.g. bmw-x3-luxury" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest">Base Rate (Fallback)</label>
+                <input type="number" value={template.daily_price || ''} onChange={e => setTemplate({...template, daily_price: parseFloat(e.target.value)})} className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-black text-xs" placeholder="e.g. 1500" />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest">Marketing Description</label>
-              <textarea value={template.description || ""} onChange={e => setTemplate({...template, description: e.target.value})} className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] min-h-[150px] text-sm font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Describe the vehicle's unique selling points..." />
+              <textarea value={template.description || ""} onChange={e => setTemplate({...template, description: e.target.value})} className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] min-h-[120px] text-sm font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Describe the vehicle's unique selling points..." />
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">Marketing Highlights (Features)</h3>
+              <div className="flex gap-2 mb-4">
+                <input 
+                  type="text" 
+                  value={newFeature}
+                  onChange={e => setNewFeature(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleAddFeature()}
+                  className="flex-1 p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-xs"
+                  placeholder="Add a feature (e.g. Free Delivery)"
+                />
+                <button onClick={handleAddFeature} className="px-6 bg-primary text-white rounded-2xl font-black uppercase text-[10px]">Add</button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(template.features_json || []).map((feat: string, idx: number) => (
+                  <div key={idx} className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-3">
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">{feat}</span>
+                    <button onClick={() => handleRemoveFeature(idx)} className="text-slate-300 hover:text-rose-500 transition-colors">
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div className="space-y-4">

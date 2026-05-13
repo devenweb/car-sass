@@ -56,7 +56,12 @@ export default function FleetPage() {
     setEditingTemplate(template || {
       brand: "", model: "", category: "Economy",
       transmission: "Automatic", seats: 5, description: "",
-      published_status: "published"
+      published_status: "published",
+      marketing_strikethrough_price: null,
+      fixed_discount_amount: 0,
+      percentage_discount_rate: 0,
+      long_term_threshold_days: 5,
+      long_term_discount_percent: 10
     });
     setIsModalOpen(true);
   };
@@ -87,7 +92,12 @@ export default function FleetPage() {
       luggage_small: editingTemplate.luggage_small,
       doors: editingTemplate.doors,
       engine_size: editingTemplate.engine_size,
-      tags: editingTemplate.tags
+      tags: editingTemplate.tags,
+      marketing_strikethrough_price: editingTemplate.marketing_strikethrough_price,
+      fixed_discount_amount: editingTemplate.fixed_discount_amount,
+      percentage_discount_rate: editingTemplate.percentage_discount_rate,
+      long_term_threshold_days: editingTemplate.long_term_threshold_days,
+      long_term_discount_percent: editingTemplate.long_term_discount_percent
     };
     
     const { error } = await supabase.from('vehicle_templates').upsert(templateToSave);
@@ -443,6 +453,47 @@ export default function FleetPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <input type="number" value={editingTemplate.seats ?? 5} onChange={e => setEditingTemplate({...editingTemplate, seats: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" title="Seats" />
                   <input type="number" step="0.1" min="0" max="5" value={editingTemplate.rating ?? 5.0} onChange={e => setEditingTemplate({...editingTemplate, rating: parseFloat(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold text-amber-500" title="Rating" />
+                </div>
+              </div>
+
+              <div className="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100/50 space-y-6">
+                <div className="flex items-center justify-between">
+                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Marketing & Pricing Effects</h3>
+                   <div className="flex items-center gap-1 bg-emerald-100 px-2 py-1 rounded-md">
+                      <Zap size={10} className="text-emerald-600" />
+                      <span className="text-[8px] font-black uppercase text-emerald-600">Premium Control</span>
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Strike Price (Rs)</label>
+                    <input type="number" value={editingTemplate.marketing_strikethrough_price || ''} onChange={e => setEditingTemplate({...editingTemplate, marketing_strikethrough_price: parseFloat(e.target.value)})} className="p-4 bg-white border rounded-xl font-bold text-rose-500 shadow-sm" placeholder="e.g. 2500" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Fixed Discount (Rs)</label>
+                    <input type="number" value={editingTemplate.fixed_discount_amount ?? 0} onChange={e => setEditingTemplate({...editingTemplate, fixed_discount_amount: parseFloat(e.target.value)})} className="p-4 bg-white border rounded-xl font-bold text-emerald-600 shadow-sm" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Standard Disc (%)</label>
+                    <input type="number" value={editingTemplate.percentage_discount_rate ?? 0} onChange={e => setEditingTemplate({...editingTemplate, percentage_discount_rate: parseFloat(e.target.value)})} className="p-4 bg-white border rounded-xl font-bold text-emerald-600 shadow-sm" />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-emerald-100/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">Long-Term Rental Rule</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Duration Threshold (Days)</label>
+                      <input type="number" value={editingTemplate.long_term_threshold_days ?? 5} onChange={e => setEditingTemplate({...editingTemplate, long_term_threshold_days: parseInt(e.target.value)})} className="p-4 bg-white border rounded-xl font-bold shadow-sm" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Long-Term Discount (%)</label>
+                      <input type="number" value={editingTemplate.long_term_discount_percent ?? 10} onChange={e => setEditingTemplate({...editingTemplate, long_term_discount_percent: parseFloat(e.target.value)})} className="p-4 bg-white border rounded-xl font-bold text-indigo-600 shadow-sm" />
+                    </div>
+                  </div>
                 </div>
               </div>
 

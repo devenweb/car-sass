@@ -73,19 +73,40 @@ function CarDetailContent() {
 
     // Always calculate preview based on at least 1 day for the "Live Total"
     const effectiveDays = diffDays || 1;
+    
+    // 1. Base Price Calculation
+    let dailyBase = minPrice;
+    
+    // 2. Apply Standard Marketing Discounts (Rs and % independently)
+    if (template?.fixed_discount_amount) {
+      dailyBase = Math.max(0, dailyBase - template.fixed_discount_amount);
+    }
+    if (template?.percentage_discount_rate) {
+      dailyBase = dailyBase * (1 - (template.percentage_discount_rate / 100));
+    }
+
+    // 3. Apply Long-Term Discount if applicable
+    let appliedLongTermDiscount = 0;
+    if (diffDays >= (template?.long_term_threshold_days || 5)) {
+      appliedLongTermDiscount = template?.long_term_discount_percent || 0;
+      dailyBase = dailyBase * (1 - (appliedLongTermDiscount / 100));
+    }
+
     const extrasTotal = selectedExtras.reduce((acc, curr) => acc + (Number(curr.price_per_day) * effectiveDays), 0);
-    const subtotal = (minPrice * effectiveDays) + extrasTotal;
+    const subtotal = (dailyBase * effectiveDays) + extrasTotal;
     const tax = subtotal * 0.15;
     const total = subtotal + tax;
 
     setInvoice({
-      days: diffDays, // Store actual days for the invoice table visibility
+      days: diffDays, 
       subtotal,
       tax,
       total,
-      extrasTotal
+      extrasTotal,
+      longTermDiscountApplied: appliedLongTermDiscount,
+      dailyBaseApplied: dailyBase
     });
-  }, [formData.startDate, formData.startTime, formData.endDate, formData.endTime, selectedExtras, minPrice]);
+  }, [formData.startDate, formData.startTime, formData.endDate, formData.endTime, selectedExtras, minPrice, template]);
 
   useEffect(() => {
     setMounted(true);
@@ -509,11 +530,26 @@ function CarDetailContent() {
                 <h2 className="text-5xl font-black text-[var(--bg-dark)] uppercase tracking-tighter leading-none">
                   {template.brand} <span className="text-[var(--brand-yellow)]">{template.model}</span>
                 </h2>
-                <div className="flex items-baseline gap-2 pt-2">
-                  <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">
-                    {mounted ? formatPrice(minPrice) : '...'}
-                  </span>
-                  <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-[0.3em]">/ Day</span>
+                <div className="flex flex-col gap-1 pt-2">
+                  <div className="flex items-baseline gap-2">
+                    {template.marketing_strikethrough_price && (
+                      <span className="text-xl font-bold text-rose-500 line-through opacity-40">
+                        {formatPrice(template.marketing_strikethrough_price)}
+                      </span>
+                    )}
+                    <span className="text-4xl font-black text-[var(--brand-yellow)] tracking-tighter">
+                      {mounted ? formatPrice(invoice.dailyBaseApplied || minPrice) : '...'}
+                    </span>
+                    <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-[0.3em]">/ Day</span>
+                  </div>
+                  {invoice.longTermDiscountApplied > 0 && (
+                    <div className="flex items-center gap-2">
+                       <Sparkles size={12} className="text-emerald-500" />
+                       <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
+                         {invoice.longTermDiscountApplied}% Long-Term Reward Applied
+                       </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -641,8 +677,15 @@ function CarDetailContent() {
                       </thead>
                       <tbody className="divide-y divide-black/5">
                         <tr>
-                          <td className="px-8 py-2.5 text-[11px] font-bold text-[var(--bg-dark)]/60">Rental ({invoice.days} Days)</td>
-                          <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(minPrice * invoice.days)}</td>
+                          <td className="px-8 py-2.5 text-[11px] font-bold text-[var(--bg-dark)]/60">
+                             Rental ({invoice.days} Days)
+                             {invoice.longTermDiscountApplied > 0 && (
+                               <span className="block text-[8px] text-emerald-600 font-black uppercase tracking-widest mt-1">
+                                 {invoice.longTermDiscountApplied}% Duration Discount
+                               </span>
+                             )}
+                          </td>
+                          <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(invoice.dailyBaseApplied * invoice.days)}</td>
                         </tr>
                         {invoice.extrasTotal > 0 && (
                           <tr>

@@ -319,6 +319,11 @@ export default function HomePage() {
 
                     <div className="pt-5 border-t border-black/5 flex items-center justify-between mt-3">
                       <div className="flex flex-col">
+                         {template.marketing_strikethrough_price && (
+                           <span className="text-[11px] font-bold text-rose-500 line-through mb-0.5 opacity-60 leading-none">
+                             {formatPrice(template.marketing_strikethrough_price)}
+                           </span>
+                         )}
                          <span className="text-[8px] font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.3em] leading-none mb-1">Starting At</span>
                          <span className="text-[26px] font-black text-[var(--bg-dark)] tracking-tighter leading-none">
                            {mounted ? formatPrice(template.min_price) : '...'}

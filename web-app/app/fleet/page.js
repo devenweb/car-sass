@@ -482,17 +482,29 @@ function FleetContent() {
                               </div>
                             </div>
                             
-                            <div className="mt-auto flex items-center justify-between">
-                              <div className="flex flex-col">
-                                <span className="text-[8px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em] mb-0.5 leading-none">Starting At</span>
-                                <span className="text-2xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
-                                  {mounted ? formatPrice(template.min_price) : '...'}
-                                </span>
-                              </div>
-                              <div className="w-12 h-12 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-md group-hover:scale-110 transition-transform">
-                                <ArrowRight className="w-6 h-6" />
-                              </div>
-                            </div>
+                             <div className="mt-auto flex items-center justify-between">
+                               <div className="flex flex-col">
+                                 {template.marketing_strikethrough_price && (
+                                   <span className="text-[10px] text-rose-500 font-bold line-through mb-0.5 opacity-60">
+                                     {formatPrice(template.marketing_strikethrough_price)}
+                                   </span>
+                                 )}
+                                 <span className="text-[8px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em] mb-0.5 leading-none">Starting At</span>
+                                 <span className="text-2xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
+                                   {mounted ? formatPrice(template.min_price) : '...'}
+                                 </span>
+                               </div>
+                               <div className="flex flex-col items-end gap-2">
+                                  {template.percentage_discount_rate > 0 && (
+                                    <span className="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[8px] font-black uppercase rounded-md border border-emerald-200 shadow-sm">
+                                      -{template.percentage_discount_rate}% Off
+                                    </span>
+                                  )}
+                                  <div className="w-12 h-12 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-md group-hover:scale-110 transition-transform">
+                                    <ArrowRight className="w-6 h-6" />
+                                  </div>
+                               </div>
+                             </div>
                           </div>
                       </Link>
                     ) : (
@@ -522,7 +534,7 @@ function FleetContent() {
                                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Immediate Confirmation • Premium Quality</span>
                                   </div>
                                </div>
-                               <div className="bg-white/90 border border-black/5 px-4 py-1.5 rounded-xl shadow-sm flex items-center gap-2">
+                               <div className="bg-white/90 backdrop-blur-md border border-black/5 px-4 py-1.5 rounded-xl shadow-sm flex items-center gap-2">
                                   <Star className="w-4 h-4 text-[var(--brand-yellow)] fill-[var(--brand-yellow)]" />
                                   <span className="text-sm font-black text-[var(--bg-dark)]">{Number(template.rating || 5.0).toFixed(1)}</span>
                                </div>
@@ -555,14 +567,28 @@ function FleetContent() {
                                ))}
                             </div>
 
-                            <div className="mt-auto flex items-center justify-between pt-6 border-t border-black/5">
-                               <div className="flex items-baseline gap-2">
-                                  <span className="text-[11px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em]">Starting At</span>
-                                  <span className="text-4xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
-                                    {mounted ? formatPrice(template.min_price) : '...'}
-                                  </span>
-                                  <span className="text-[9px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-widest">/ Per Day</span>
-                                </div>
+                             <div className="mt-auto flex items-center justify-between pt-6 border-t border-black/5">
+                                <div className="flex flex-col">
+                                   <div className="flex items-baseline gap-2 mb-1">
+                                      <span className="text-[11px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em]">Starting At</span>
+                                      {template.marketing_strikethrough_price && (
+                                        <span className="text-sm font-bold text-rose-500 line-through opacity-60">
+                                          {formatPrice(template.marketing_strikethrough_price)}
+                                        </span>
+                                      )}
+                                      {template.percentage_discount_rate > 0 && (
+                                        <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                                          -{template.percentage_discount_rate}% Member Rate
+                                        </span>
+                                      )}
+                                   </div>
+                                   <div className="flex items-baseline gap-2">
+                                      <span className="text-4xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
+                                        {mounted ? formatPrice(template.min_price) : '...'}
+                                      </span>
+                                      <span className="text-[9px] font-bold text-[var(--bg-dark)]/40 uppercase tracking-widest">/ Per Day</span>
+                                   </div>
+                                 </div>
                                <div className="flex items-center gap-6">
                                   {mounted && template.available_count > 0 && (
                                     <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{template.available_count} Cars Left</span>

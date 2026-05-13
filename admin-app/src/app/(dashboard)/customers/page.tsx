@@ -2,19 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { 
-  Search, 
-  User, 
-  Phone, 
-  Mail, 
-  FileText,
-  Calendar,
-  Trash2,
-  Eye,
-  Edit2,
-  History,
-  X
-} from "lucide-react";
+
+// New Components
+import { CustomersHeader } from "@/components/customers/CustomersHeader";
+import { CustomersStats } from "@/components/customers/CustomersStats";
+import { CustomersTable } from "@/components/customers/CustomersTable";
+import { EditCustomerModal } from "@/components/customers/EditCustomerModal";
+import { CustomerDetailsModal } from "@/components/customers/CustomerDetailsModal";
 
 interface Customer {
   id: string;
@@ -74,7 +68,7 @@ export default function CustomersPage() {
     setSaving(false);
   }
 
-  async function deleteCustomer(id: string) {
+  async function handleDeleteCustomer(id: string) {
     if (!confirm("Permanently remove customer record? This cannot be undone.")) return;
     const { error } = await supabase.from("customers").delete().eq("id", id);
     if (error) {
@@ -94,173 +88,33 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-admin-border shadow-sm">
-        <div className="flex items-center gap-6">
-          <div>
-            <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Customer Registry</h1>
-            <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Global User Database</p>
-          </div>
-          <div className="relative w-64 h-8">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-            <input 
-              type="text" 
-              placeholder="Search customers..." 
-              value={searchTerm} 
-              onChange={(e) => setSearchTerm(e.target.value)} 
-              className="w-full h-full pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-[10px]" 
-            />
-          </div>
-        </div>
-      </div>
+      <CustomersHeader 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+      />
 
-      <div className="bg-white rounded-xl border border-admin-border shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-50/50 text-slate-400 text-[10px] uppercase tracking-widest font-black border-b border-slate-100">
-                <th className="px-6 py-3">Customer</th>
-                <th className="px-6 py-3">Contact</th>
-                <th className="px-6 py-3">License</th>
-                <th className="px-6 py-3">Joined</th>
-                <th className="px-6 py-3 text-right"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading ? (
-                [1, 2, 3].map(i => (
-                  <tr key={i} className="animate-pulse h-16"><td colSpan={5} className="px-6"><div className="h-4 bg-slate-100 rounded w-full"></div></td></tr>
-                ))
-              ) : filteredCustomers.length > 0 ? (
-                filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                    <td className="px-6 py-2.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-[10px] border border-primary/20">
-                          {customer.name.charAt(0)}
-                        </div>
-                        <span className="font-bold text-admin-text text-xs leading-none">{customer.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-2.5">
-                      <div className="flex flex-col text-[9px] font-bold text-admin-muted">
-                        <span className="flex items-center gap-1.5 leading-none"><Mail size={10} className="text-primary/40" /> {customer.email}</span>
-                        {customer.phone && <span className="flex items-center gap-1.5 mt-0.5 leading-none"><Phone size={10} className="text-primary/40" /> {customer.phone}</span>}
-                      </div>
-                    </td>
-                    <td className="px-6 py-2.5">
-                      {customer.license_number ? (
-                        <span className="px-1.5 py-0.5 bg-slate-100 text-slate-700 text-[9px] font-black font-mono rounded border border-slate-200 uppercase">
-                          {customer.license_number}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-slate-300 italic">N/A</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-2.5 text-[10px] font-bold text-admin-muted">
-                      {new Date(customer.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-2.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setSelectedCustomer(customer); }}
-                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View History">
-                          <Eye size={14} />
-                        </button>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setEditingCustomer(customer); }}
-                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit">
-                          <Edit2 size={14} />
-                        </button>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); deleteCustomer(customer.id); }}
-                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all" title="Delete">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-admin-muted">
-                    No customers found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <CustomersStats customers={customers} />
 
-      {/* Edit Customer Modal */}
-      {editingCustomer && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Edit Customer</h2>
-              <button onClick={() => setEditingCustomer(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={20} className="text-slate-400" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Full Name</label>
-                <input 
-                  type="text"
-                  value={editingCustomer.name}
-                  onChange={(e) => setEditingCustomer({...editingCustomer, name: e.target.value})}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
+      <CustomersTable 
+        customers={filteredCustomers}
+        loading={loading}
+        onView={setSelectedCustomer}
+        onEdit={setEditingCustomer}
+        onDelete={handleDeleteCustomer}
+      />
 
-              <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Email Address</label>
-                <input 
-                  type="email"
-                  value={editingCustomer.email}
-                  onChange={(e) => setEditingCustomer({...editingCustomer, email: e.target.value})}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
+      <EditCustomerModal 
+        customer={editingCustomer}
+        setCustomer={setEditingCustomer}
+        onClose={() => setEditingCustomer(null)}
+        onSave={handleSaveCustomer}
+        saving={saving}
+      />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone</label>
-                  <input 
-                    type="text"
-                    value={editingCustomer.phone || ""}
-                    onChange={(e) => setEditingCustomer({...editingCustomer, phone: e.target.value})}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">License Number</label>
-                  <input 
-                    type="text"
-                    value={editingCustomer.license_number || ""}
-                    onChange={(e) => setEditingCustomer({...editingCustomer, license_number: e.target.value})}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <button 
-                  onClick={() => setEditingCustomer(null)}
-                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200 transition-all"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleSaveCustomer}
-                  disabled={saving}
-                  className="flex-1 py-2 text-xs font-black uppercase tracking-widest text-white bg-primary rounded-lg hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
-                >
-                  {saving ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomerDetailsModal 
+        customer={selectedCustomer}
+        onClose={() => setSelectedCustomer(null)}
+      />
     </div>
   );
 }

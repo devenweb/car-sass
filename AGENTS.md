@@ -6,7 +6,10 @@
 
 ### Accomplishments:
 - **Pricing Infrastructure**: Created database migrations for marketing strikethrough prices, independent fixed (Rs) and percentage (%) discounts, and long-term rental rules.
-- **Admin Dashboard**: Integrated high-fidelity "Marketing & Pricing Effects" controls into the Fleet Manager, allowing per-model configuration of all discount parameters.
+- **Admin Dashboard Cleanup**: Systematically refactored the Admin App into a high-density, modular "Command Center" architecture.
+  - **Fleet Manager**: Extracted model management and unit tracking into atomic sub-components.
+  - **Rentals & Bookings**: Integrated live operational stats (Revenue, Pending, Active) and simplified the main transaction controller.
+  - **Customer Registry**: Implemented a premium profile view with glassmorphic UI, contact cards, and quick-action history tracking.
 - **Marketplace UI**: Implemented premium strikethrough pricing display on the Homepage and Fleet Marketplace (Grid/List views) with dynamic "Member Rate" and "Discount" badges.
 - **Dynamic Booking Engine**: Refactored the booking detail page to automatically calculate and apply duration-based discounts (e.g., > 5 days) with live invoice feedback for the user.
 - **Branding Alignment**: Continued the "Drive" branding migration with updated labels and badges across all newly modified pricing components.

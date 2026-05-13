@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { 
   ArrowRight, Users, Settings2, Fuel, Star, 
   MapPin, CheckCircle2, ShieldCheck, Clock, 
@@ -21,6 +21,7 @@ function CarDetailContent() {
   const id = params?.id;
   const [template, setTemplate] = useState(null);
   const [units, setUnits] = useState([]);
+  const [pricing, setPricing] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -56,117 +57,124 @@ function CarDetailContent() {
     subtotal: 0,
     tax: 0,
     total: 0,
-    extrasTotal: 0
+    extrasTotal: 0,
+    dailyBaseApplied: 0,
+    longTermDiscountApplied: 0
   });
 
-  useEffect(() => {
-    let diffDays = 0;
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(`${formData.startDate}T${formData.startTime}`);
-      const end = new Date(`${formData.endDate}T${formData.endTime}`);
-      
-      if (end > start) {
-        const diffTime = Math.abs(end - start);
-        diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      }
+  const calculatedInvoice = useMemo(() => {
+    if (!template) return null;
+    
+    const start = new Date(`${formData.startDate}T${formData.startTime}`);
+    const end = new Date(`${formData.endDate}T${formData.endTime}`);
+    const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+    
+    // Base Price logic
+    const basePriceFromUnits = units.length > 0 ? Math.min(...units.map(u => u.daily_price).filter(p => p > 0)) : Infinity;
+    const basePriceFromPricing = pricing.length > 0 ? Math.min(...pricing.map(p => p.daily_price)) : Infinity;
+    const basePriceFromTemplate = template.daily_price || 1500;
+    
+    let dailyRate = Math.min(basePriceFromUnits, basePriceFromPricing, basePriceFromTemplate);
+    const originalDailyRate = dailyRate;
+
+    // Apply Fixed Discount
+    if (template.fixed_discount_amount > 0) {
+      dailyRate = Math.max(0, dailyRate - template.fixed_discount_amount);
     }
 
-    // Always calculate preview based on at least 1 day for the "Live Total"
-    const effectiveDays = diffDays || 1;
-    
-    // 1. Base Price Calculation
-    let dailyBase = minPrice;
-    
-    // 2. Apply Standard Marketing Discounts (Rs and % independently)
-    if (template?.fixed_discount_amount) {
-      dailyBase = Math.max(0, dailyBase - template.fixed_discount_amount);
-    }
-    if (template?.percentage_discount_rate) {
-      dailyBase = dailyBase * (1 - (template.percentage_discount_rate / 100));
+    // Apply Percentage Discount
+    if (template.percentage_discount_rate > 0) {
+      dailyRate = dailyRate * (1 - (template.percentage_discount_rate / 100));
     }
 
-    // 3. Apply Long-Term Discount if applicable
+    // Apply Long-Term Rental Reward
+    const threshold = template.long_term_threshold_days || 5;
+    const longTermDiscount = template.long_term_discount_percent || 10;
     let appliedLongTermDiscount = 0;
-    if (diffDays >= (template?.long_term_threshold_days || 5)) {
-      appliedLongTermDiscount = template?.long_term_discount_percent || 0;
-      dailyBase = dailyBase * (1 - (appliedLongTermDiscount / 100));
+    if (days >= threshold) {
+      dailyRate = dailyRate * (1 - (longTermDiscount / 100));
+      appliedLongTermDiscount = longTermDiscount;
     }
 
-    const extrasTotal = selectedExtras.reduce((acc, curr) => acc + (Number(curr.price_per_day) * effectiveDays), 0);
-    const subtotal = (dailyBase * effectiveDays) + extrasTotal;
-    const tax = subtotal * 0.15;
-    const total = subtotal + tax;
+    const subtotal = dailyRate * days;
+    const marketingSaving = (originalDailyRate - dailyRate) * days;
+    
+    const extrasTotal = selectedExtras.reduce((sum, extra) => {
+      return sum + (Number(extra.price_per_day) * days);
+    }, 0);
 
-    setInvoice({
-      days: diffDays, 
-      subtotal,
+    const totalBeforeTax = subtotal + extrasTotal;
+    const tax = totalBeforeTax * 0.15;
+    const total = totalBeforeTax + tax;
+
+    return {
+      days,
+      dailyBaseApplied: dailyRate,
+      originalDailyRate,
+      subtotal: totalBeforeTax,
+      marketingSaving,
+      extrasTotal,
       tax,
       total,
-      extrasTotal,
       longTermDiscountApplied: appliedLongTermDiscount,
-      dailyBaseApplied: dailyBase
-    });
-  }, [formData.startDate, formData.startTime, formData.endDate, formData.endTime, selectedExtras, minPrice, template]);
+      threshold
+    };
+  }, [template, pricing, units, formData, selectedExtras]);
+
+  // Sync calculatedInvoice to invoice state for backward compatibility with existing JSX if needed, 
+  // though we should ideally use calculatedInvoice directly.
+  useEffect(() => {
+    if (calculatedInvoice) {
+      setInvoice(calculatedInvoice);
+    }
+  }, [calculatedInvoice]);
+
+  const availableCount = units.filter(u => u.availability_status === 'available').length;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (id) fetchTemplateData();
+    if (id) fetchCarData();
   }, [id]);
 
-  async function fetchTemplateData() {
-    setLoading(true);
+  async function fetchCarData() {
     try {
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-      let query = supabase.from('vehicle_templates').select('*');
-      if (isUUID) {
-        query = query.eq('id', id);
-      } else {
-        query = query.eq('slug', id);
+      const { data, error } = await supabase
+        .from("vehicle_templates")
+        .select(`
+          *,
+          vehicle_pricing (*),
+          vehicle_units (*)
+        `)
+        .or(`id.eq.${id},slug.eq.${id}`)
+        .single();
+
+      if (error) throw error;
+      setTemplate(data);
+      setPricing(data.vehicle_pricing || []);
+      setUnits(data.vehicle_units || []);
+      setActiveImage(data.default_thumbnail || data.image_url);
+
+      const { data: imageData } = await supabase
+        .from('vehicle_template_images')
+        .select('image_url')
+        .eq('vehicle_template_id', data.id)
+        .order('sort_order', { ascending: true });
+      
+      const gallery = imageData?.map(img => img.image_url) || [];
+      const defaultImg = data.default_thumbnail || data.image_url;
+      if (defaultImg && !gallery.includes(defaultImg)) {
+        gallery.unshift(defaultImg);
       }
+      setGalleryImages(gallery);
 
-      const { data: templateData, error: templateError } = await query.single();
-      if (templateError) throw templateError;
-
-      if (templateData) {
-        setTemplate(templateData);
-        setActiveImage(templateData.default_thumbnail || templateData.image_url);
-        
-        const templateId = templateData.id;
-
-        // Fetch Gallery Images
-        const { data: imageData } = await supabase
-          .from('vehicle_template_images')
-          .select('image_url')
-          .eq('vehicle_template_id', templateId)
-          .order('sort_order', { ascending: true });
-        
-        const gallery = imageData?.map(img => img.image_url) || [];
-        const defaultImg = templateData.default_thumbnail || templateData.image_url;
-        if (defaultImg && !gallery.includes(defaultImg)) {
-          gallery.unshift(defaultImg);
-        }
-        setGalleryImages(gallery);
-
-        // Fetch Units and Prices
-        const { data: unitData, error: unitError } = await supabase
-          .from('vehicle_units')
-          .select('*')
-          .eq('vehicle_template_id', templateId)
-          .eq('availability_status', 'available');
-        
-        if (unitError) throw unitError;
-        setUnits(unitData || []);
-
-        // Get minimum daily price from available units
-        const unitPrices = unitData?.map(u => u.daily_price) || [];
-        const dynamicMin = unitPrices.length > 0 ? Math.min(...unitPrices) : 1500;
-        setMinPrice(dynamicMin);
-      }
+      const unitPrices = data.vehicle_units?.map(u => u.daily_price) || [];
+      const dynamicMin = unitPrices.length > 0 ? Math.min(...unitPrices) : 1500;
+      setMinPrice(dynamicMin);
     } catch (err) {
-      console.error('Fetch error:', err);
+      console.error("Error fetching car:", err);
     } finally {
       setLoading(false);
     }

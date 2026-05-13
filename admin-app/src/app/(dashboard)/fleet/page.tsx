@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Plus, Search, Filter, MoreVertical, Edit2, Trash2, Eye, Car as CarIcon, 
   X, ChevronDown, ChevronRight, Settings, Calendar, Wrench, AlertTriangle, CheckCircle2,
-  Trash, Upload, Save, Loader2, Info, History, Gauge
+  Trash, Upload, Save, Loader2, Info, History, Gauge, Zap
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

@@ -90,10 +90,10 @@ function FleetContent() {
         const units = t.vehicle_units || [];
         const availableCount = units.filter(u => u.availability_status === "available").length;
         
-        // Dynamic Pricing Logic: Min from specific dates OR available units OR default template price
+        // Dynamic Pricing Logic: Overrides (Dates/Units) take precedence over Template Base
         const prices = [
-          ...pricing.map(p => p.daily_price),
-          ...units.map(u => u.daily_price).filter(p => p > 0)
+          ...(t.vehicle_pricing?.map(p => p.daily_price).filter(p => p && Number(p) > 0) || []),
+          ...(t.vehicle_units?.map(u => u.daily_price).filter(p => p && Number(p) > 0) || [])
         ];
         
         const minPrice = prices.length > 0 ? Math.min(...prices) : (t.daily_price || 1500);

@@ -72,12 +72,16 @@ function CarDetailContent() {
     const end = new Date(`${formData.endDate}T${formData.endTime}`);
     const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
     
-    // Base Price logic
-    const basePriceFromUnits = units.length > 0 ? Math.min(...units.map(u => u.daily_price).filter(p => p > 0)) : Infinity;
-    const basePriceFromPricing = pricing.length > 0 ? Math.min(...pricing.map(p => p.daily_price)) : Infinity;
-    const basePriceFromTemplate = template.daily_price || 1500;
+    // Base Price logic - Robust filtering to exclude null/zero prices
+    const validUnitPrices = units.map(u => u.daily_price).filter(p => p && Number(p) > 0);
+    const basePriceFromUnits = validUnitPrices.length > 0 ? Math.min(...validUnitPrices) : Infinity;
+
+    const validPricingPrices = pricing.map(p => p.daily_price).filter(p => p && Number(p) > 0);
+    const basePriceFromPricing = validPricingPrices.length > 0 ? Math.min(...validPricingPrices) : Infinity;
+
+    const overridePrices = [basePriceFromUnits, basePriceFromPricing].filter(p => p !== Infinity);
+    let dailyRate = overridePrices.length > 0 ? Math.min(...overridePrices) : (template.daily_price || 1500);
     
-    let dailyRate = Math.min(basePriceFromUnits, basePriceFromPricing, basePriceFromTemplate);
     const originalDailyRate = dailyRate;
 
     // Apply Fixed Discount
@@ -173,8 +177,8 @@ function CarDetailContent() {
       }
       setGalleryImages(gallery);
 
-      const pricingPrices = data.vehicle_pricing?.map(p => p.daily_price) || [];
-      const unitPrices = data.vehicle_units?.map(u => u.daily_price).filter(p => p > 0) || [];
+      const pricingPrices = data.vehicle_pricing?.map(p => p.daily_price).filter(p => p && Number(p) > 0) || [];
+      const unitPrices = data.vehicle_units?.map(u => u.daily_price).filter(p => p && Number(p) > 0) || [];
       const allPrices = [...pricingPrices, ...unitPrices];
       const dynamicMin = allPrices.length > 0 ? Math.min(...allPrices) : (data.daily_price || 1500);
       setMinPrice(dynamicMin);

@@ -92,7 +92,7 @@ export function FleetTable({
                     <td className="px-6 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1.5">
                         <Link 
-                          href={`https://royalcarmauritius.vercel.app/fleet/${template.slug || template.id}`} 
+                          href={`https://royalcarmauritius.vercel.app/fleet/${template.id}`} 
                           target="_blank" 
                           className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" 
                           title="View on Public Site"

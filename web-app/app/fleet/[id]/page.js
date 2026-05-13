@@ -173,8 +173,10 @@ function CarDetailContent() {
       }
       setGalleryImages(gallery);
 
-      const unitPrices = data.vehicle_units?.map(u => u.daily_price) || [];
-      const dynamicMin = unitPrices.length > 0 ? Math.min(...unitPrices) : 1500;
+      const pricingPrices = data.vehicle_pricing?.map(p => p.daily_price) || [];
+      const unitPrices = data.vehicle_units?.map(u => u.daily_price).filter(p => p > 0) || [];
+      const allPrices = [...pricingPrices, ...unitPrices];
+      const dynamicMin = allPrices.length > 0 ? Math.min(...allPrices) : (data.daily_price || 1500);
       setMinPrice(dynamicMin);
     } catch (err) {
       console.error("Error fetching car:", err);
@@ -393,7 +395,7 @@ function CarDetailContent() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
                       <span className="text-[11px] font-bold text-white/50">Rental ({invoice.days} Days)</span>
-                      <span className="text-[11px] font-black text-white">{formatPrice(minPrice * invoice.days)}</span>
+                      <span className="text-[11px] font-black text-white">{formatPrice((invoice.dailyBaseApplied || minPrice) * invoice.days)}</span>
                     </div>
                     {invoice.extrasTotal > 0 && (
                       <div className="flex justify-between items-center">

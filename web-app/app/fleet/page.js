@@ -207,7 +207,7 @@ function FleetContent() {
 
           <div className="flex flex-col lg:flex-row gap-12">
             {showFilters && (
-              <aside className="w-full lg:w-[280px] shrink-0">
+              <aside className="w-full lg:w-[320px] shrink-0">
                 <div className="bg-white rounded-[2.5rem] p-8 border border-black/5 space-y-10 shadow-sm sticky top-32 max-h-[85vh] overflow-y-auto no-scrollbar">
                   <div className="flex justify-between items-center pb-4 border-b border-black/5">
                     <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]">Filters</span>

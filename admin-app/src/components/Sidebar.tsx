@@ -73,7 +73,9 @@ export default function Sidebar() {
     if (item.label === "Analytics") return addons.advanced_analytics;
     if (item.label === "Agents") return addons.multi_agent && isAdmin;
     if (item.label === "Extras") return addons.premium_extras;
-    return true; // Dashboard, Fleet, Rentals, Customers, Addons are core
+    if (item.label === "Customers") return addons.customer_registry !== false; // Default to true if not specified
+    if (item.label === "Rentals") return addons.rental_operations !== false; // Default to true if not specified
+    return true; // Dashboard, Fleet, Addons are core
   });
 
   return (

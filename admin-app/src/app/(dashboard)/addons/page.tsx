@@ -17,7 +17,9 @@ import {
   Save,
   Gauge,
   Car,
-  Package
+  Package,
+  Users,
+  CalendarRange
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -110,6 +112,22 @@ const ADDONS: Addon[] = [
     description: "Manage and upsell additional services like Child Seats, GPS, and Airport Meet & Greet.",
     icon: Package,
     price: "Rs 400 / mo"
+  },
+  {
+    id: "customers",
+    key: "customer_registry",
+    name: "Customer Registry",
+    description: "Build a comprehensive database of your clients, track rental history, and manage driver licenses.",
+    icon: Users,
+    price: "Rs 500 / mo"
+  },
+  {
+    id: "rentals",
+    key: "rental_operations",
+    name: "Rental Operations",
+    description: "The core engine for booking management, fleet scheduling, and live availability tracking.",
+    icon: CalendarRange,
+    price: "Rs 1,800 / mo"
   }
 ];
 

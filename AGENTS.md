@@ -1,15 +1,18 @@
 # Agents Log
-<!-- Last Sync: 2026-05-13 21:21 -->
+<!-- Last Sync: 2026-05-13 21:30 -->
 
-## 2026-05-13 - Staff Governance & Administrative Infrastructure
+## 2026-05-13 - Admin Portal Stability & RLS Governance
 **Agent: Antigravity**
 
 ### Accomplishments:
-- **Staff & Access Portal**: Formalized administrative governance by decoupling staff management into a dedicated, high-fidelity tab within the Settings module.
-- **Enhanced User Provisioning**: Refined the 'Provision New Account' interface with a premium, structured form, enabling the Super Admin to securely create team identities (Admin, Secretary, Consultant, Accountant).
-- **Security Logic Optimization**: Corrected JSX nesting errors in the Settings layout and isolated the Security tab to focus on account protection (Password management, 2FA readiness).
-- **Access Control Visualization**: Reinforced role-based access control through an updated personnel list featuring distinct status indicators and Super Admin protection badges.
-- **Repository Synchronization**: Validated and synchronized all governance refinements with the `freelance` branch.
+- **RLS Recursion Resolution**: Identified and resolved a critical infinite recursion loop in the `public.users` Row-Level Security policies. This issue was blocking Super Admins from accessing the user provisioning form and the personnel list.
+- **Dynamic Identity Integration**: Replaced the hardcoded "John Doe" placeholder in the dashboard header with a dynamic `UserHeader` component that pulls real-time initials and names from Supabase Auth and the `users` table.
+- **Enhanced Personnel Registry**: 
+    - Added `name` and `email` columns to the `public.users` table for better administrative visibility.
+    - Synchronized existing Super Admin data with the new columns.
+    - Updated the `Settings` page UI to correctly display these new fields in the Active Personnel list.
+- **UI Robustness**: Improved the personnel list empty state and loading states, ensuring a professional feedback loop when no records are present.
+- **Security Logic Hardening**: Implemented `is_super_admin()` and `is_admin()` SECURITY DEFINER helpers to ensure performant and non-recursive permission checks across the governance module.
 
 
 ## 2026-05-13 - System Maintenance & Portability Suite

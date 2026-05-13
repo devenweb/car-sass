@@ -1,4 +1,5 @@
 import Sidebar from "@/components/Sidebar";
+import UserHeader from "@/components/UserHeader";
 
 export default function DashboardLayout({
   children,
@@ -14,10 +15,7 @@ export default function DashboardLayout({
             <h2 className="text-md font-bold text-admin-text tracking-tight">Dashboard</h2>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">
-              JD
-            </div>
-            <span className="text-xs font-bold text-admin-text">John Doe</span>
+            <UserHeader />
           </div>
         </header>
         <div className="p-6">

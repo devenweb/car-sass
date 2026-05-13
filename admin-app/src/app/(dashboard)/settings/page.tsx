@@ -570,6 +570,12 @@ export default function SettingsPage() {
                             <div className="space-y-3">
                               {[1, 2, 3].map(i => <div key={i} className="h-20 bg-slate-50 rounded-2xl animate-pulse" />)}
                             </div>
+                          ) : admins.length === 0 ? (
+                            <div className="py-20 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                              <Users className="mx-auto text-slate-300 mb-3" size={40} />
+                              <p className="text-sm font-black text-slate-900 uppercase">No personnel records</p>
+                              <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Use the form to provision your first team member</p>
+                            </div>
                           ) : admins.map((admin) => (
                             <div key={admin.id} className={cn(
                               "p-5 rounded-2xl border transition-all hover:shadow-lg hover:shadow-slate-100 group",
@@ -588,7 +594,9 @@ export default function SettingsPage() {
                                       {admin.name || (admin.role === 'super_admin' ? 'Ecosystem Owner' : 'Administrative Staff')}
                                       {admin.role === 'super_admin' && <Shield size={12} className="text-amber-500" />}
                                     </p>
-                                    <p className="text-[10px] text-slate-400 font-medium mt-1">{admin.email}</p>
+                                    <p className="text-[10px] text-slate-400 font-bold mt-1 tracking-tight">
+                                      {admin.email || "No email assigned"}
+                                    </p>
                                     <div className="flex items-center gap-2 mt-2">
                                       <span className={cn(
                                         "text-[8px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest",
@@ -597,7 +605,7 @@ export default function SettingsPage() {
                                         {admin.role}
                                       </span>
                                       <span className="text-[9px] text-slate-400 font-bold uppercase tabular-nums">
-                                        Added {new Date(admin.created_at).toLocaleDateString()}
+                                        Joined {new Date(admin.created_at).toLocaleDateString()}
                                       </span>
                                     </div>
                                   </div>

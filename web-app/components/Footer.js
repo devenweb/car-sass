@@ -16,7 +16,7 @@ export default function Footer() {
       <div className="content-container relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 pb-24 border-b border-white/5">
           {/* Brand Identity */}
-          <div className="lg:col-span-5 space-y-10 -mt-[60px]">
+          <div className="lg:col-span-5 space-y-10 -mt-[35px]">
             <Link href="/" className="inline-block">
               <span className="text-5xl font-black tracking-tighter uppercase leading-none">
                 DRIVE<span className="text-[var(--brand-yellow)]">.</span>

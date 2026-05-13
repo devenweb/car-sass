@@ -9,6 +9,7 @@
 - **Dynamic Pricing**: Enabled live price updates and active/hidden toggles for all extras, synchronized instantly with the marketplace booking form.
 - **Removed Hardcoded Filters**: Eliminated legacy exclusion filters in the web application, giving the admin total control over which extras are displayed to customers.
 - **Sidebar Integration**: Integrated the "Extras" management link into the primary administrative navigation.
+- **RLS Resolution**: Provided a dedicated SQL migration (`20260513_fix_extras_rls.sql`) to resolve Row-Level Security errors, granting authenticated admins full management permissions.
 - **Verification**: Validated both applications with production builds and deployed to the main branch.
 
 ## 2026-05-13 - Footer UI Refinement & Brand Positioning

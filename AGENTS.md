@@ -5,6 +5,7 @@
 **Agent: Antigravity**
 
 ### Accomplishments:
+- **UI Scaling**: Increased vehicle image sizes in the "Featured Selections" section on the homepage by 15% (increased container height to 300px and reduced internal padding) to enhance visual impact.
 - **Branding Migration**: Rebranded "Our Fleet" to **"Our Drive"** across the entire web application (Fleet page, Navbar, Homepage, Search, Detail pages, and Footer).
 - **Typography & Case Styling**: Standardized branding to sentence case ("Drive" instead of "DRIVE") and removed `uppercase` CSS constraints in navigation and headings to support a more modern, readable aesthetic.
 - **Homepage Optimization**: Commented out the "Experiences" section (vertical category cards) to streamline the landing page flow as requested.

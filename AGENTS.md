@@ -1,6 +1,16 @@
 # Agents Log
 <!-- Last Sync: 2026-05-13 11:48 -->
 
+## 2026-05-13 - Extras Management & Booking Enhancements
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Extras Manager**: Developed a dedicated "Extras" module in the Admin App to allow full CRUD management of booking add-ons (GPS, Child Seats, Insurance, etc.).
+- **Dynamic Pricing**: Enabled live price updates and active/hidden toggles for all extras, synchronized instantly with the marketplace booking form.
+- **Removed Hardcoded Filters**: Eliminated legacy exclusion filters in the web application, giving the admin total control over which extras are displayed to customers.
+- **Sidebar Integration**: Integrated the "Extras" management link into the primary administrative navigation.
+- **Verification**: Validated both applications with production builds and deployed to the main branch.
+
 ## 2026-05-13 - Footer UI Refinement & Brand Positioning
 **Agent: Antigravity**
 

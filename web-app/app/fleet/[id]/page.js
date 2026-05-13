@@ -277,7 +277,6 @@ function CarDetailContent() {
   );
 
   const templateImageUrl = template.default_thumbnail || template.image_url;
-  const availableCount = units.filter(u => u.availability_status === 'available').length;
 
   if (submitted) {
     return (

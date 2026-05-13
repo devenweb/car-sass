@@ -36,10 +36,10 @@ export function VehicleTemplateForm({
             <ArrowLeft size={20} className="text-slate-400" />
           </Link>
           <div>
-            <h1 className="text-2xl font-black text-admin-text uppercase tracking-tight leading-none">
+            <h1 className="text-2xl font-black text-admin-text uppercase leading-none">
               {isNew ? "Register New Model" : `Edit ${template.brand} ${template.model}`}
             </h1>
-            <p className="text-[10px] text-admin-muted font-bold tracking-tight uppercase mt-1">Vehicle Configuration Studio</p>
+            <p className="text-[10px] text-admin-muted font-bold uppercase mt-1">Vehicle Configuration Studio</p>
           </div>
         </div>
         <button 

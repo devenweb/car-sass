@@ -28,16 +28,16 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
             <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em]">{template.category}</span>
             {mounted && template.percentage_discount_rate > 0 && (
               <span className="px-3 py-1 bg-rose-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg animate-bounce">
-                -{template.percentage_discount_rate}% SALE
+                -{template.percentage_discount_rate}% DISCOUNT
               </span>
             )}
             {mounted && (template.available_count > 0 ? (
-               <span className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
+               <span className="px-3 py-1 bg-emerald-500/90 backdrop-blur-md text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm border border-white/20">
                  {template.available_count} Available
                </span>
              ) : (
-               <span className="px-3 py-1 bg-red-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
-                 Sold Out
+               <span className="px-3 py-1 bg-rose-500/90 backdrop-blur-md text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm border border-white/20">
+                 All Units Rented Out
                </span>
              ))}
           </div>
@@ -48,7 +48,7 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
         </div>
         
         <div className="p-7 flex flex-col flex-1">
-          <h3 className="text-[var(--bg-dark)] text-xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 tracking-tighter leading-tight">{template.brand} {template.model}</h3>
+          <h3 className="text-[var(--bg-dark)] text-xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 leading-tight">{template.brand} {template.model}</h3>
           <div className="flex items-center gap-2 mb-4">
              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
              <span className="text-[9px] font-black tracking-[0.2em] text-[var(--bg-dark)]/30">Verified Drive</span>
@@ -61,30 +61,28 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
             <Spec icon={Smartphone} label="Tech" value={mounted ? (template.has_apple_carplay ? 'CarPlay' : 'BT Audio') : '...'} />
           </div>
           
-           <div className="mt-auto flex items-center justify-between">
-             <div className="flex flex-col">
-               {template.marketing_strikethrough_price && (
-                 <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[10px] text-rose-500 font-bold line-through opacity-60">
-                      {formatPrice(template.marketing_strikethrough_price)}
-                    </span>
-                    <span className="text-[9px] font-black text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 uppercase tracking-tighter">Save {formatPrice(template.marketing_strikethrough_price - template.min_price)}</span>
-                 </div>
-               )}
-               <span className="text-[8px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em] mb-0.5 leading-none">Starting At</span>
-               <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
-                    {mounted ? formatPrice(template.min_price) : '...'}
-                  </span>
-                  <span className="text-[9px] font-bold text-[var(--bg-dark)]/30 uppercase tracking-widest">/D</span>
-               </div>
-             </div>
-             <div className="flex flex-col items-end gap-2">
-                <div className="w-12 h-12 rounded-full bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-md group-hover:scale-110 transition-transform">
-                  <ArrowRight className="w-6 h-6" />
+            <div className="mt-auto flex items-center justify-between pt-6 border-t border-black/5">
+              <div className="flex flex-col">
+                {template.marketing_strikethrough_price && (
+                  <div className="flex items-center gap-2 mb-1">
+                     <span className="text-[10px] text-rose-500 font-bold line-through opacity-50">
+                       {formatPrice(template.marketing_strikethrough_price)}
+                     </span>
+                     <span className="text-[9px] font-black text-rose-600 bg-rose-50/80 px-2 py-0.5 rounded-lg border border-rose-100 uppercase">Save {formatPrice(template.marketing_strikethrough_price - template.min_price)} /D</span>
+                  </div>
+                )}
+                <span className="text-[8px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.3em] mb-1 leading-none">Starting At</span>
+                <div className="flex items-baseline gap-1.5">
+                   <span className="text-3xl font-black text-[var(--bg-dark)] leading-none">
+                     {mounted ? formatPrice(template.min_price) : '...'}
+                   </span>
+                   <span className="text-[10px] font-bold text-[var(--bg-dark)]/20 uppercase tracking-widest">/D</span>
                 </div>
-             </div>
-           </div>
+              </div>
+              <div className="w-14 h-14 rounded-[1.25rem] bg-[var(--brand-yellow)] flex items-center justify-center text-[var(--bg-dark)] shadow-xl shadow-[var(--brand-yellow)]/20 group-hover:bg-[var(--bg-dark)] group-hover:text-white transition-all duration-500 group-hover:rotate-12">
+                <ArrowRight className="w-7 h-7" strokeWidth={2.5} />
+              </div>
+            </div>
         </div>
       </Link>
     );
@@ -102,15 +100,24 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
             alt={`${template.brand} ${template.model}`} 
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent opacity-100"></div>
-          <div className="absolute top-6 left-6 flex flex-col gap-1.5 z-20">
-            <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">{template.category}</span>
+          <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
+            <span className="badge-deal !bg-white/95 !text-[var(--bg-dark)] !shadow-lg !border-black/5 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">{template.category}</span>
+            {mounted && (template.available_count > 0 ? (
+               <span className="px-4 py-1.5 bg-emerald-500/90 backdrop-blur-md text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg border border-white/20">
+                 {template.available_count} Available
+               </span>
+             ) : (
+               <span className="px-4 py-1.5 bg-rose-500/90 backdrop-blur-md text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg border border-white/20">
+                 All Units Rented Out
+               </span>
+             ))}
           </div>
        </div>
 
        <div className="flex-grow p-10 flex flex-col border-t md:border-t-0 md:border-l border-black/5">
           <div className="flex justify-between items-start mb-6">
              <div>
-                <h3 className="text-[var(--bg-dark)] text-3xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1.5 tracking-tighter">{template.brand} {template.model}</h3>
+                <h3 className="text-[var(--bg-dark)] text-3xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1.5">{template.brand} {template.model}</h3>
                 <div className="flex items-center gap-3">
                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Immediate Confirmation • Premium Quality</span>
@@ -146,31 +153,34 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
                         <span className="text-sm font-bold text-rose-500 line-through opacity-60">
                           {formatPrice(template.marketing_strikethrough_price)}
                         </span>
-                        <span className="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 uppercase tracking-widest">You Save {formatPrice(template.marketing_strikethrough_price - template.min_price)}</span>
+                        <span className="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 uppercase tracking-widest">Save {formatPrice(template.marketing_strikethrough_price - template.min_price)} /D</span>
                       </div>
                     )}
                     {template.percentage_discount_rate > 0 && (
                       <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 uppercase tracking-widest shadow-sm">
-                        -{template.percentage_discount_rate}% Member Rate Applied
+                        -{template.percentage_discount_rate}% DISCOUNT APPLIED
                       </span>
                     )}
                  </div>
                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-black text-[var(--bg-dark)] tracking-tighter leading-none">
+                    <span className="text-5xl font-black text-[var(--bg-dark)] leading-none">
                       {mounted ? formatPrice(template.min_price) : '...'}
                     </span>
                     <span className="text-sm font-black text-[var(--bg-dark)]/30 uppercase tracking-[0.3em]">MUR / Day</span>
                  </div>
                </div>
-             <div className="flex items-center gap-6">
-                {mounted && template.available_count > 0 && (
-                  <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">{template.available_count} Cars Left</span>
-                )}
-                <div className="h-16 px-10 rounded-2xl bg-[var(--brand-yellow)] flex items-center justify-center gap-3 text-[var(--bg-dark)] font-black uppercase tracking-widest text-[11px] shadow-lg group-hover:scale-[1.02] transition-all">
-                  View Details
-                  <ArrowRight size={20} />
-                </div>
-             </div>
+              <div className="flex items-center gap-8">
+                 {mounted && template.available_count > 0 && (
+                   <div className="flex flex-col items-end">
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">{template.available_count} Units Left</span>
+                      <span className="text-[8px] font-bold text-emerald-600/40 uppercase tracking-widest animate-pulse">High Demand</span>
+                   </div>
+                 )}
+                 <div className="h-20 px-14 rounded-[2rem] bg-[var(--brand-yellow)] flex items-center justify-center gap-4 text-[var(--bg-dark)] font-black uppercase tracking-[0.3em] text-xs shadow-2xl shadow-[var(--brand-yellow)]/20 group-hover:bg-[var(--bg-dark)] group-hover:text-white transition-all duration-500">
+                   Experience Drive
+                   <ArrowRight size={24} strokeWidth={3} />
+                 </div>
+              </div>
           </div>
        </div>
     </Link>
@@ -192,7 +202,7 @@ function Spec({ icon: Icon, label, value, isLarge = false }) {
            isLarge ? "text-[8px]" : "text-[7px]"
          )}>{label}</span>
          <span className={cn(
-           "font-black text-[var(--bg-dark)] uppercase tracking-tight truncate",
+           "font-black text-[var(--bg-dark)] uppercase  truncate",
            isLarge ? "text-[11px]" : "text-[10px]"
          )}>
            {value}

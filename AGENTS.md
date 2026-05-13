@@ -1,6 +1,16 @@
 # Agents Log
 <!-- Last Sync: 2026-05-13 11:48 -->
 
+## 2026-05-13 - Admin Dashboard Cleanup & Fleet Migration
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Full-Page Fleet Management**: Replaced the modal-based vehicle editing with a high-density, full-page configuration studio.
+  - Created `/fleet/new` and `/fleet/[id]/edit` routes for a more professional administrative experience.
+  - Developed a shared `VehicleTemplateForm` component with a premium, organized layout for technical specs and marketing effects.
+- **Admin App Refactoring**: Completed the modularization of the Fleet module, removing legacy modal logic and standardizing on atomic components (`FleetHeader`, `FleetTable`, `FleetStats`).
+- **Verification**: Successfully validated the changes with a full production build (`npm run build`) and pushed all updates to the main branch.
+
 ## 2026-05-13 - Marketing Pricing Engine & Advanced Discounts
 **Agent: Antigravity**
 

@@ -15,8 +15,8 @@ export function FleetHeader({ searchQuery, setSearchQuery }: FleetHeaderProps) {
     <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-admin-border shadow-sm">
       <div className="flex items-center gap-6">
         <div>
-          <h1 className="text-lg font-black text-admin-text uppercase tracking-tight leading-none">Fleet Manager</h1>
-          <p className="text-[9px] text-admin-muted font-bold tracking-tight uppercase mt-1">Vehicle Control Center</p>
+          <h1 className="text-lg font-black text-admin-text uppercase leading-none">Fleet Manager</h1>
+          <p className="text-[9px] text-admin-muted font-bold uppercase mt-1">Vehicle Control Center</p>
         </div>
         <div className="relative w-64 h-8">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />

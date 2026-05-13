@@ -11,6 +11,7 @@ body {
   color: rgb(var(--foreground-rgb));
   background-color: rgb(var(--background-rgb));
   min-height: 100vh;
+  letter-spacing: 0.02em;
 }
 
 @layer components {

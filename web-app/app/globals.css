@@ -13,6 +13,7 @@
 @layer base {
   body {
     @apply bg-[var(--bg-primary)] text-[var(--bg-dark)] font-sans antialiased overflow-x-hidden;
+    letter-spacing: 0.02em;
   }
 }
 

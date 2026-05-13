@@ -7,8 +7,12 @@ import {
   ArrowLeft, 
   Image as ImageIcon, 
   Globe, 
-  Clock
+  Clock,
+  Upload,
+  FileText
 } from "lucide-react";
+import SmartUploader from "@/components/SmartUploader";
+import RichTextEditor from "@/components/RichTextEditor";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -162,12 +166,11 @@ export default function BlogEditor({ params }: { params: { id: string } }) {
             </div>
 
             <div className="space-y-1 pt-2">
-              <label className="text-[10px] font-black text-admin-muted uppercase tracking-widest ml-1">Article Content (Markdown/HTML Support)</label>
-              <textarea 
+              <label className="text-[10px] font-black text-admin-muted uppercase tracking-widest ml-1">Article Content</label>
+              <RichTextEditor 
                 value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
                 placeholder="Start writing your story here..."
-                className="w-full min-h-[400px] bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all font-mono"
               />
             </div>
           </div>
@@ -215,25 +218,21 @@ export default function BlogEditor({ params }: { params: { id: string } }) {
               <ImageIcon size={14} className="text-primary" />
               Visual Asset
             </h2>
-            <div className="space-y-3">
-              <div className="aspect-video bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-300 overflow-hidden relative">
-                {formData.thumbnail_url ? (
-                  <img src={formData.thumbnail_url} className="w-full h-full object-cover" />
-                ) : (
-                  <>
-                    <ImageIcon size={24} className="mb-2" />
-                    <span className="text-[8px] font-black uppercase">No Preview</span>
-                  </>
-                )}
-              </div>
+            <SmartUploader 
+              currentValue={formData.thumbnail_url}
+              onUploadComplete={(url) => setFormData(prev => ({ ...prev, thumbnail_url: url }))}
+              bucket="car-assets"
+              label="Cover Image"
+            />
+            <div className="space-y-1">
+              <label className="text-[8px] font-black text-admin-muted uppercase ml-1">Manual URL</label>
               <input 
                 type="text" 
                 value={formData.thumbnail_url}
                 onChange={(e) => setFormData(prev => ({ ...prev, thumbnail_url: e.target.value }))}
-                placeholder="Image URL..."
+                placeholder="Or paste an external URL..."
                 className="w-full bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-[10px] font-bold"
               />
-              <p className="text-[8px] text-slate-400 font-medium italic">Use high-resolution 16:9 images for best results.</p>
             </div>
           </div>
 

@@ -5,7 +5,7 @@ import {
   ArrowRight, Users, Settings2, Fuel, Star, 
   MapPin, CheckCircle2, ShieldCheck, Clock, 
   ChevronRight, Sparkles, MessageSquare, Phone, Car,
-  Shield, AlertTriangle, Music, Calendar, Plus, UserPlus
+  Shield, AlertTriangle, Music, Calendar, Plus, UserPlus, FileText
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -549,6 +549,20 @@ function CarDetailContent() {
                 </div>
               ))}
             </div>
+
+            {/* Marketing Description */}
+            {template.description && (
+              <div className="p-0 bg-transparent space-y-6">
+                <div className="flex items-center gap-4">
+                  <FileText className="text-[var(--brand-yellow)]" size={24} />
+                  <h3 className="text-2xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Experience the Drive</h3>
+                </div>
+                <div 
+                  className="prose prose-sm max-w-none text-[var(--bg-dark)]/70 font-medium leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: template.description }}
+                />
+              </div>
+            )}
 
             {/* Features List */}
             <div className="p-0 bg-transparent space-y-8">

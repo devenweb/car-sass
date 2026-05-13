@@ -2,9 +2,10 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import { Upload, Loader2, Zap, ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
+import { Upload, Loader2, Zap, ArrowLeft, Save, Plus, Trash2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface VehicleTemplateFormProps {
   template: any;
@@ -275,9 +276,16 @@ export function VehicleTemplateForm({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[9px] font-black uppercase text-slate-400 ml-2 tracking-widest">Marketing Description</label>
-              <textarea value={template.description || ""} onChange={e => setTemplate({...template, description: e.target.value})} className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] min-h-[120px] text-sm font-medium outline-none focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Describe the vehicle's unique selling points..." />
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 ml-2">
+                <FileText size={16} className="text-slate-400" />
+                <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Marketing Description</label>
+              </div>
+              <RichTextEditor 
+                value={template.description || ""} 
+                onChange={value => setTemplate({...template, description: value})} 
+                placeholder="Describe the vehicle's unique selling points..." 
+              />
             </div>
 
             <div className="space-y-4">

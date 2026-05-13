@@ -8,9 +8,11 @@ import {
   Image as ImageIcon, 
   Globe, 
   Clock,
-  Upload
+  Upload,
+  FileText
 } from "lucide-react";
 import SmartUploader from "@/components/SmartUploader";
+import RichTextEditor from "@/components/RichTextEditor";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -164,12 +166,11 @@ export default function BlogEditor({ params }: { params: { id: string } }) {
             </div>
 
             <div className="space-y-1 pt-2">
-              <label className="text-[10px] font-black text-admin-muted uppercase tracking-widest ml-1">Article Content (Markdown/HTML Support)</label>
-              <textarea 
+              <label className="text-[10px] font-black text-admin-muted uppercase tracking-widest ml-1">Article Content</label>
+              <RichTextEditor 
                 value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
                 placeholder="Start writing your story here..."
-                className="w-full min-h-[400px] bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm font-medium focus:ring-1 focus:ring-primary/20 transition-all font-mono"
               />
             </div>
           </div>

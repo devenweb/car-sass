@@ -192,9 +192,10 @@ function FleetContent() {
 
           <div className="flex flex-col lg:flex-row gap-12">
             {showFilters && (
-              <aside className="w-full lg:w-[320px] shrink-0 space-y-10">
-                <div className="bg-white rounded-[3rem] p-10 border border-black/5 space-y-12 shadow-sm sticky top-32 max-h-[85vh] overflow-y-auto no-scrollbar">
-                  <div className="flex justify-between items-center pb-2 border-b border-black/5">
+              <aside className="w-full lg:w-[280px] shrink-0">
+                <div className="bg-white rounded-[2rem] p-6 border border-black/5 space-y-6 shadow-sm sticky top-32 max-h-[85vh] overflow-y-auto no-scrollbar">
+                  <div className="flex justify-between items-center pb-3 border-b border-black/5">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]">Filters</span>
                     <button 
                       onClick={resetFilters}
                       className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-[var(--bg-dark)] transition-colors"
@@ -203,57 +204,54 @@ function FleetContent() {
                     </button>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Travel Dates</h3>
-                      <div className="space-y-3">
-                         <div className="space-y-2">
-                           <label className="text-[7px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-2">Pickup</label>
-                           <div className="flex gap-2">
-                             <input 
-                               type="date" 
-                               value={startDate}
-                               onChange={(e) => setStartDate(e.target.value)}
-                               className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-3 py-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-[var(--brand-yellow)]"
-                             />
-                             <input 
-                               type="time" 
-                               value={startTime}
-                               onChange={(e) => setStartTime(e.target.value)}
-                               className="w-20 bg-slate-50 border border-black/5 rounded-xl px-2 py-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-[var(--brand-yellow)]"
-                             />
-                           </div>
-                         </div>
-                         <div className="space-y-2">
-                           <label className="text-[7px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-2">Return</label>
-                           <div className="flex gap-2">
-                             <input 
-                               type="date" 
-                               value={endDate}
-                               onChange={(e) => setEndDate(e.target.value)}
-                               className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-3 py-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-[var(--brand-yellow)]"
-                             />
-                             <input 
-                               type="time" 
-                               value={endTime}
-                               onChange={(e) => setEndTime(e.target.value)}
-                               className="w-20 bg-slate-50 border border-black/5 rounded-xl px-2 py-3 text-[10px] font-bold outline-none focus:ring-1 focus:ring-[var(--brand-yellow)]"
-                             />
-                           </div>
-                         </div>
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Travel Dates (Pickup)</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="date" 
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-3 py-2 text-[10px] font-bold outline-none"
+                          />
+                          <input 
+                            type="time" 
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="w-20 bg-slate-50 border border-black/5 rounded-xl px-2 py-2 text-[10px] font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Return</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="date" 
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-3 py-2 text-[10px] font-bold outline-none"
+                          />
+                          <input 
+                            type="time" 
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
+                            className="w-20 bg-slate-50 border border-black/5 rounded-xl px-2 py-2 text-[10px] font-bold outline-none"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Sort By</h3>
-                    <div className="grid grid-cols-1 gap-1.5">
+                  <div className="space-y-3">
+                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Sort By</h3>
+                    <div className="grid grid-cols-2 gap-1.5">
                       {sortOptions.map(opt => (
                         <button 
                           key={opt}
                           onClick={() => setSortBy(opt)}
-                          className={`px-5 py-4 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all text-left ${
-                            sortBy === opt ? 'bg-[var(--bg-dark)] text-white shadow-md' : 'bg-slate-50 text-[var(--bg-dark)]/40 hover:bg-slate-100'
+                          className={`px-3 py-2.5 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all text-center ${
+                            sortBy === opt ? 'bg-[var(--bg-dark)] text-white' : 'bg-slate-50 text-[var(--bg-dark)]/40 hover:bg-slate-100'
                           }`}
                         >
                           {opt}
@@ -262,15 +260,15 @@ function FleetContent() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Body Type</h3>
+                  <div className="space-y-3">
+                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Body Type</h3>
                     <div className="flex flex-wrap gap-1.5">
                       {categories.map(cat => (
                         <button 
                           key={cat}
                           onClick={() => setActiveCategory(cat)}
-                          className={`px-4 py-3 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all ${
-                            activeCategory === cat ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md' : 'bg-slate-50 text-[var(--bg-dark)]/40 hover:bg-slate-100'
+                          className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all ${
+                            activeCategory === cat ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-sm' : 'bg-slate-50 text-[var(--bg-dark)]/40'
                           }`}
                         >
                           {cat}
@@ -279,15 +277,15 @@ function FleetContent() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Experiences</h3>
+                  <div className="space-y-3">
+                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Experience</h3>
                     <div className="flex flex-wrap gap-1.5">
                       {experienceOptions.map(opt => (
                         <button 
                           key={opt}
                           onClick={() => setActiveExperience(opt)}
-                          className={`px-4 py-3 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all ${
-                            activeExperience.toLowerCase() === opt.toLowerCase() ? 'bg-[var(--bg-dark)] text-white shadow-md' : 'bg-slate-50 text-[var(--bg-dark)]/40 hover:bg-slate-100'
+                          className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all ${
+                            activeExperience.toLowerCase() === opt.toLowerCase() ? 'bg-[var(--bg-dark)] text-white shadow-sm' : 'bg-slate-50 text-[var(--bg-dark)]/40'
                           }`}
                         >
                           {opt}
@@ -295,30 +293,26 @@ function FleetContent() {
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Price Range</h3>
-                      <span className="text-[10px] font-black text-primary px-3 py-1 bg-primary/5 rounded-full">
+                      <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Price</h3>
+                      <span className="text-[9px] font-black text-emerald-600">
                         {mounted ? `${formatPrice(priceRange[0])} - ${formatPrice(priceRange[1])}` : '...'}
                       </span>
                     </div>
                     
-                    <div className="relative pt-6 pb-2">
+                    <div className="relative pt-4 pb-0">
                       <div className="range-slider-container">
-                        <div className="range-slider-track"></div>
+                        <div className="range-slider-track !h-1"></div>
                         <div 
-                          className="range-slider-progress"
+                          className="range-slider-progress !h-1"
                           style={{
                             left: `${(priceRange[0] / 10000) * 100}%`,
                             right: `${100 - (priceRange[1] / 10000) * 100}%`
                           }}
                         ></div>
                         <input
-                          type="range"
-                          min="0"
-                          max="10000"
-                          step="500"
-                          value={priceRange[0]}
+                          type="range" min="0" max="10000" step="500" value={priceRange[0]}
                           onChange={(e) => {
                             const val = Math.min(Number(e.target.value), priceRange[1] - 500);
                             setPriceRange([val, priceRange[1]]);
@@ -326,11 +320,7 @@ function FleetContent() {
                           className="range-slider-input"
                         />
                         <input
-                          type="range"
-                          min="0"
-                          max="10000"
-                          step="500"
-                          value={priceRange[1]}
+                          type="range" min="0" max="10000" step="500" value={priceRange[1]}
                           onChange={(e) => {
                             const val = Math.max(Number(e.target.value), priceRange[0] + 500);
                             setPriceRange([priceRange[0], val]);
@@ -338,44 +328,41 @@ function FleetContent() {
                           className="range-slider-input"
                         />
                       </div>
-                      <div className="flex justify-between mt-4">
-                         <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Min</span>
-                         <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Max</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Trans</h3>
+                      <div className="flex flex-wrap gap-1">
+                        {transmissionOptions.map(opt => (
+                          <button 
+                            key={opt}
+                            onClick={() => setTransmission(opt)}
+                            className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all ${
+                              transmission === opt ? 'bg-[var(--bg-dark)] text-white' : 'bg-slate-50 text-[var(--bg-dark)]/40'
+                            }`}
+                          >
+                            {opt === 'Automatic' ? 'Auto' : 'Manual'}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Transmission</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {transmissionOptions.map(opt => (
-                        <button 
-                          key={opt}
-                          onClick={() => setTransmission(opt)}
-                          className={`px-4 py-3 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all ${
-                            transmission === opt ? 'bg-[var(--bg-dark)] text-white shadow-md' : 'bg-slate-50 text-[var(--bg-dark)]/40'
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]/30">Seats</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {seatOptions.map(opt => (
-                        <button 
-                          key={opt}
-                          onClick={() => setSeats(opt)}
-                          className={`px-4 py-3 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all ${
-                            seats === opt ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md' : 'bg-slate-50 text-[var(--bg-dark)]/40'
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
+                    <div className="space-y-2">
+                      <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Seats</h3>
+                      <div className="flex flex-wrap gap-1">
+                        {seatOptions.map(opt => (
+                          <button 
+                            key={opt}
+                            onClick={() => setSeats(opt)}
+                            className={`px-2.5 py-2 rounded-lg font-black text-[8px] transition-all ${
+                              seats === opt ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)]' : 'bg-slate-50 text-[var(--bg-dark)]/40'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

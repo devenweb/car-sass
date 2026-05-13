@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import { X, Fuel, Gauge, FileText, Image as ImageIcon, User, Calendar, Plus, Save } from "lucide-react";
 import SmartUploader from "./SmartUploader";
+import { cn } from "@/lib/utils";
 
 interface InspectionModalProps {
   rentalId: string;
@@ -12,6 +13,8 @@ interface InspectionModalProps {
 }
 
 export default function InspectionModal({ rentalId, onClose }: InspectionModalProps) {
+  const [inspections, setInspections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [newInspection, setNewInspection] = useState({
     type: 'delivery',
@@ -152,7 +155,7 @@ export default function InspectionModal({ rentalId, onClose }: InspectionModalPr
                      <div className="mt-3 flex flex-wrap gap-2">
                         {newInspection.photos.map((photo, i) => (
                           <div key={i} className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200">
-                             <img src={photo} className="w-full h-full object-cover" />
+                             <img src={photo} className="w-full h-full object-cover" alt={`Evidence ${i + 1}`} />
                              <button 
                                onClick={() => setNewInspection({...newInspection, photos: newInspection.photos.filter((_, idx) => idx !== i)})}
                                className="absolute top-0 right-0 bg-rose-500 text-white p-0.5 rounded-bl-lg"

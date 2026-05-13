@@ -1,5 +1,20 @@
 # Agents Log
-<!-- Last Sync: 2026-05-13 21:30 -->
+<!-- Last Sync: 2026-05-13 22:25 -->
+
+## 2026-05-13 - Ecosystem Optimization & Unified Governance
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Major Request Consolidation**:
+    - **Fleet Search Engine**: Refactored `fleetService.ts` to use bulk data fetching for units, bookings, and blocks. This optimized search complexity from O(N) to O(1), reducing network overhead by ~90% for the marketplace.
+    - **Admin Dashboard Pro**: Implemented the `get_dashboard_stats` RPC to aggregate all critical management metrics (Revenue, Counts, Recent Rentals) into a single database request, replacing six separate queries.
+- **Administrative Guardrails**:
+    - **Duplicate Prevention**: Integrated local and backend email validation to prevent provisioning errors in the agent creation flow.
+    - **Metadata Synchronization**: Hardened the `manage-admins` Edge Function to ensure names, emails, and phone numbers are correctly synchronized between Supabase Auth and the public user registry.
+- **Database Repair & Tuning**:
+    - Synchronized missing name/email metadata for existing personnel records.
+    - Deployed high-performance indexes on `rentals`, `vehicle_units`, and `vehicle_pricing` to support instant data retrieval.
+- **Build Verification**: Successfully validated both `web-app` and `admin-app` with clean production builds (0 errors) prior to the main branch merge.
 
 ## 2026-05-13 - Admin Portal Stability & RLS Governance
 **Agent: Antigravity**

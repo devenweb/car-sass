@@ -1,6 +1,15 @@
 # Agents Log
 <!-- Last Sync: 2026-05-13 11:48 -->
 
+## 2026-05-13 - UI Refinement & Pricing Synchronization
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Sidebar Layout Optimization**: Increased the fleet marketplace sidebar width to 320px, eliminating the horizontal scrollbar issue and providing a cleaner, more spacious layout for filters.
+- **Price Engine Synchronization**: Standardized the "Starting At" price calculation across the marketplace and detail pages. The detail page now correctly reflects unit-level and date-specific pricing overrides (resolving the discrepancy between marketplace cards and booking forms).
+- **Invoice Display Refinement**: Optimized the live invoice preview to use the dynamically calculated base rate, ensuring transparency from first glance to final confirmation.
+- **Verification**: Validated both UI and pricing logic with production builds and deployed to the main branch.
+
 ## 2026-05-13 - Comprehensive Vehicle Management & Gallery
 **Agent: Antigravity**
 

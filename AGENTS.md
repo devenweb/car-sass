@@ -1,5 +1,16 @@
 # Agents Log
-<!-- Last Sync: 2026-05-13 21:05 -->
+<!-- Last Sync: 2026-05-13 21:21 -->
+
+## 2026-05-13 - Staff Governance & Administrative Infrastructure
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Staff & Access Portal**: Formalized administrative governance by decoupling staff management into a dedicated, high-fidelity tab within the Settings module.
+- **Enhanced User Provisioning**: Refined the 'Provision New Account' interface with a premium, structured form, enabling the Super Admin to securely create team identities (Admin, Secretary, Consultant, Accountant).
+- **Security Logic Optimization**: Corrected JSX nesting errors in the Settings layout and isolated the Security tab to focus on account protection (Password management, 2FA readiness).
+- **Access Control Visualization**: Reinforced role-based access control through an updated personnel list featuring distinct status indicators and Super Admin protection badges.
+- **Repository Synchronization**: Validated and synchronized all governance refinements with the `freelance` branch.
+
 
 ## 2026-05-13 - System Maintenance & Portability Suite
 **Agent: Antigravity**

@@ -9,11 +9,14 @@ import {
   ArrowDownRight,
   Eye,
   Edit2,
-  Trash2
+  Trash2,
+  Sparkles,
+  BarChart3
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -26,9 +29,17 @@ export default function Dashboard() {
     maintenanceCount: 0
   });
 
+  const [addons, setAddons] = useState<any>({});
+
   useEffect(() => {
     fetchDashboardData();
+    fetchAddons();
   }, []);
+
+  async function fetchAddons() {
+    const { data } = await supabase.from("tenants").select("addons").single();
+    if (data?.addons) setAddons(data.addons);
+  }
 
   async function fetchDashboardData() {
     setLoading(true);
@@ -135,25 +146,44 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat: any) => (
-          <Link key={stat.label} href={stat.href} className="bg-white p-4 rounded-xl border border-admin-border shadow-sm hover:border-primary/50 transition-all group">
-            <div className="flex items-start justify-between">
-              <div className="p-1.5 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                <stat.icon size={20} />
-              </div>
-              <div className={`flex items-center gap-1 text-[10px] font-black ${
-                stat.trend === 'up' ? 'text-emerald-600' : 'text-rose-600'
-              }`}>
-                {stat.change}
-                {stat.trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-              </div>
+        {stats.map((stat: any) => {
+          const isRevenue = stat.label === "Revenue (MTD)";
+          const isLocked = isRevenue && addons.advanced_analytics !== true;
+          
+          return (
+            <div key={stat.label} className="relative group">
+              <Link 
+                href={isLocked ? "#" : stat.href} 
+                className={cn(
+                  "block bg-white p-4 rounded-xl border border-admin-border shadow-sm hover:border-primary/50 transition-all group",
+                  isLocked && "opacity-50 blur-[2px] pointer-events-none"
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="p-1.5 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                    <stat.icon size={20} />
+                  </div>
+                  <div className={`flex items-center gap-1 text-[10px] font-black ${
+                    stat.trend === 'up' ? 'text-emerald-600' : 'text-rose-600'
+                  }`}>
+                    {stat.change}
+                    {stat.trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <h3 className="text-admin-muted text-[10px] font-black uppercase tracking-widest">{stat.label}</h3>
+                  <p className="text-xl font-black text-admin-text mt-0.5">{stat.value}</p>
+                </div>
+              </Link>
+              {isLocked && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                  <Sparkles size={16} className="text-primary animate-pulse mb-1" />
+                  <span className="text-[8px] font-black text-primary uppercase tracking-widest">Unlock Analytics</span>
+                </div>
+              )}
             </div>
-            <div className="mt-3">
-              <h3 className="text-admin-muted text-[10px] font-black uppercase tracking-widest">{stat.label}</h3>
-              <p className="text-xl font-black text-admin-text mt-0.5">{stat.value}</p>
-            </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -207,7 +237,20 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-admin-border shadow-sm">
+        <div className="relative group overflow-hidden bg-white p-5 rounded-xl border border-admin-border shadow-sm">
+          {addons.advanced_analytics !== true && (
+            <div className="absolute inset-0 bg-white/60 backdrop-blur-[4px] z-10 flex flex-col items-center justify-center text-center p-6 transition-all group-hover:backdrop-blur-[2px]">
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-3">
+                <BarChart3 size={20} />
+              </div>
+              <h4 className="text-xs font-black text-admin-text uppercase mb-1">Fleet Performance Locked</h4>
+              <p className="text-[9px] text-admin-muted font-medium mb-4 max-w-[200px]">Activate the Fleet Analytics Pro addon to visualize your utilization and status trends.</p>
+              <Link href="/addons" className="btn-primary h-7 px-4 text-[8px] font-black uppercase tracking-widest flex items-center gap-2">
+                <Sparkles size={10} />
+                View Addons
+              </Link>
+            </div>
+          )}
           <Link href="/fleet" className="group flex items-center justify-between mb-4">
             <h3 className="text-sm font-black text-admin-text uppercase tracking-tight">Fleet Status</h3>
             <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Manage Fleet →</span>

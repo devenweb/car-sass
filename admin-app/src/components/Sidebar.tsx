@@ -14,7 +14,8 @@ import {
   LogOut,
   Sparkles,
   Gauge,
-  Package
+  Package,
+  BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -30,6 +31,8 @@ const menuItems = [
   { icon: Package, label: "Extras", href: "/extras" },
   { icon: Sparkles, label: "Addons", href: "/addons" },
   { icon: Gauge, label: "KM Monitoring", href: "/km-monitoring" },
+  { icon: BarChart3, label: "Analytics", href: "/analytics" },
+  { icon: Users, label: "Agents", href: "/agents" },
 ];
 
 export default function Sidebar() {
@@ -57,7 +60,10 @@ export default function Sidebar() {
     if (item.label === "Newsletter") return addons.marketing_suite;
     if (item.label === "Pricing") return addons.dynamic_pricing;
     if (item.label === "Inquiries") return addons.advanced_inquiries;
-    return true; // Dashboard, Fleet, Rentals, Customers, Extras, Addons are core
+    if (item.label === "Analytics") return addons.advanced_analytics;
+    if (item.label === "Agents") return addons.multi_agent;
+    if (item.label === "Extras") return addons.premium_extras;
+    return true; // Dashboard, Fleet, Rentals, Customers, Addons are core
   });
 
   return (

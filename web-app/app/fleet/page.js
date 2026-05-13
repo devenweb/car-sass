@@ -169,9 +169,9 @@ function FleetContent() {
     <div className="page-layout bg-[var(--bg-primary)] min-h-screen">
       <Navbar />
 
-      <section className="pt-24 pb-8">
+      <section className="pt-16 pb-8">
         <div className="content-container">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-6 shrink-0">
                <h1 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] tracking-tighter">
                   Our <span className="text-[var(--brand-yellow)]">Drive.</span>
@@ -185,20 +185,20 @@ function FleetContent() {
                 placeholder="Search by brand, model..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-black/5 h-16 pl-16 pr-6 rounded-[1.5rem] font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-yellow)] transition-all shadow-sm"
+                className="w-full bg-white border border-black/5 h-14 pl-14 pr-6 rounded-[1.25rem] font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-yellow)] transition-all shadow-sm"
               />
             </div>
 
-            <div className="flex items-center gap-2 bg-white border border-black/5 p-1.5 rounded-[1.5rem] shadow-sm">
+            <div className="flex items-center gap-2 bg-white border border-black/5 p-1 rounded-[1.25rem] shadow-sm">
               <button 
                 onClick={() => setViewMode('grid')}
-                className={`p-4 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md' : 'text-[var(--bg-dark)]/40 hover:bg-slate-50'}`}
+                className={`p-3 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md' : 'text-[var(--bg-dark)]/40 hover:bg-slate-50'}`}
               >
                 <LayoutGrid size={18} />
               </button>
               <button 
                 onClick={() => setViewMode('list')}
-                className={`p-4 rounded-xl transition-all ${viewMode === 'list' ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md' : 'text-[var(--bg-dark)]/40 hover:bg-slate-50'}`}
+                className={`p-3 rounded-xl transition-all ${viewMode === 'list' ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md' : 'text-[var(--bg-dark)]/40 hover:bg-slate-50'}`}
               >
                 <List size={18} />
               </button>
@@ -206,7 +206,7 @@ function FleetContent() {
 
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-3 px-8 py-5 rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] transition-all shadow-sm ${
+              className={`flex items-center gap-3 px-6 py-4 rounded-[1.25rem] font-black uppercase tracking-widest text-[10px] transition-all shadow-sm ${
                 showFilters ? 'bg-[var(--bg-dark)] text-white' : 'bg-white text-[var(--bg-dark)] border border-black/5'
               }`}
             >
@@ -215,11 +215,11 @@ function FleetContent() {
             </button>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-12">
+          <div className="flex flex-col lg:flex-row gap-8">
             {showFilters && (
               <aside className="w-full lg:w-[320px] shrink-0">
-                <div className="bg-white rounded-[2.5rem] p-8 border border-black/5 space-y-10 shadow-sm sticky top-32 max-h-[85vh] overflow-y-auto no-scrollbar">
-                  <div className="flex justify-between items-center pb-4 border-b border-black/5">
+                <div className="bg-white rounded-[2.5rem] p-8 border border-black/5 space-y-6 shadow-sm sticky top-24 max-h-[85vh] overflow-y-auto no-scrollbar">
+                  <div className="flex justify-between items-center pb-2 border-b border-black/5">
                     <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]">Filters</span>
                     <button 
                       onClick={resetFilters}
@@ -230,7 +230,7 @@ function FleetContent() {
                   </div>
 
                   {/* Sort By - Now First and Simplified */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Sort By</h3>
                     <div className="flex flex-wrap gap-2">
                       {sortOptions.map(opt => (
@@ -248,8 +248,8 @@ function FleetContent() {
                   </div>
 
                   {/* Travel Dates */}
-                  <div className="space-y-4">
-                    <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="space-y-3">
                       <div className="space-y-2">
                         <label className="text-[9px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Pickup Date & Time</label>
                         <div className="flex gap-2">
@@ -288,7 +288,7 @@ function FleetContent() {
                   </div>
 
                   {/* Body Type */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Body Type</h3>
                     <div className="flex flex-wrap gap-2">
                       {categories.map(cat => (
@@ -306,7 +306,7 @@ function FleetContent() {
                   </div>
 
                   {/* Experience */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Experience</h3>
                     <div className="flex flex-wrap gap-2">
                       {experienceOptions.map(opt => (
@@ -324,7 +324,7 @@ function FleetContent() {
                   </div>
 
                   {/* Price */}
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Price Range</h3>
                       <span className="text-[11px] font-black text-emerald-600">

@@ -16,7 +16,8 @@ import {
   Smartphone,
   Save,
   Gauge,
-  Car
+  Car,
+  Package
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +78,38 @@ const ADDONS: Addon[] = [
     description: "Dedicated sub-accounts for drivers and staff with custom access level controls.",
     icon: Users2,
     price: "Rs 900 / mo"
+  },
+  {
+    id: "whatsapp",
+    key: "whatsapp_notifications",
+    name: "WhatsApp Connect",
+    description: "Automated booking summaries and inquiry alerts sent directly to your phone.",
+    icon: Smartphone,
+    price: "Rs 500 / mo"
+  },
+  {
+    id: "extra-emails",
+    key: "extra_emails",
+    name: "Extra Email Alerts",
+    description: "Distribute booking and inquiry notifications to multiple team members.",
+    icon: Mail,
+    price: "Rs 300 / mo"
+  },
+  {
+    id: "analytics",
+    key: "advanced_analytics",
+    name: "Fleet Analytics Pro",
+    description: "Deep dive into your revenue, peak rental periods, and vehicle performance stats.",
+    icon: BarChart3,
+    price: "Rs 1,500 / mo"
+  },
+  {
+    id: "premium-extras",
+    key: "premium_extras",
+    name: "Premium Extras Manager",
+    description: "Manage and upsell additional services like Child Seats, GPS, and Airport Meet & Greet.",
+    icon: Package,
+    price: "Rs 400 / mo"
   }
 ];
 

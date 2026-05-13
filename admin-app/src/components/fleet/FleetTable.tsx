@@ -91,7 +91,14 @@ export function FleetTable({
                     </td>
                     <td className="px-6 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1.5">
-                        <Link href={`https://royalcarmauritius.vercel.app/fleet/${template.id}`} target="_blank" className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="View on Public Site"><Eye size={14}/></Link>
+                        <Link 
+                          href={`https://royalcarmauritius.vercel.app/fleet/${template.slug || template.id}`} 
+                          target="_blank" 
+                          className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" 
+                          title="View on Public Site"
+                        >
+                          <Eye size={14}/>
+                        </Link>
                         <Link href={`/fleet/${template.id}/edit`} className="p-1.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg border border-slate-100 transition-all" title="Edit Template"><Edit2 size={14}/></Link>
                         <button onClick={(e) => { e.stopPropagation(); onDeleteTemplate(template.id); }} className="p-1.5 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg border border-slate-100 transition-all" title="Delete Template"><Trash2 size={14}/></button>
                       </div>

@@ -156,15 +156,23 @@ function CarDetailContent() {
 
   async function fetchCarData() {
     try {
-      const { data, error } = await supabase
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      
+      let query = supabase
         .from("vehicle_templates")
         .select(`
           *,
           vehicle_pricing (*),
           vehicle_units (*)
-        `)
-        .or(`id.eq.${id},slug.eq.${id}`)
-        .single();
+        `);
+
+      if (isUUID) {
+        query = query.or(`id.eq.${id},slug.eq.${id}`);
+      } else {
+        query = query.eq('slug', id);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) throw error;
       setTemplate(data);
@@ -706,14 +714,15 @@ function CarDetailContent() {
                   </div>
                 </div>
 
-                {/* Resources (Extras) */}
-                <div className="space-y-6 pt-2">
-                   <div className="flex items-center gap-3 ml-4">
-                     <Plus size={14} className="text-[var(--brand-yellow)]" />
-                     <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
-                   </div>
-                   <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
-                </div>
+                   {addons.premium_extras === true && (
+                     <div className="space-y-6 pt-2">
+                        <div className="flex items-center gap-3 ml-4">
+                          <Plus size={14} className="text-[var(--brand-yellow)]" />
+                          <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
+                        </div>
+                        <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
+                     </div>
+                   )}
 
                 {/* Formal Invoice Table */}
                 {addons.dynamic_pricing !== false && invoice.days > 0 && (

@@ -48,21 +48,21 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
           </div>
         </div>
         
-        <div className="p-7 flex flex-col flex-1">
-          <h3 className="text-[var(--bg-dark)] text-xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 leading-tight">{template.brand} {template.model}</h3>
+        <div className="p-5 flex flex-col flex-1">
+          <h3 className="text-[var(--bg-dark)] text-lg font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 leading-tight">{template.brand} {template.model}</h3>
           <div className="flex items-center gap-2 mb-4">
              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
              <span className="text-[9px] font-black tracking-[0.2em] text-[var(--bg-dark)]/30">Verified Drive</span>
           </div>
           
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-4 border-y border-black/5 mb-5">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-3 border-y border-black/5 mb-4">
             <Spec icon={Users} label="Seats" value={mounted ? `${template.seats}` : '...'} />
             <Spec icon={Briefcase} label="Luggage" value={mounted ? `${template.luggage_large || 2} Large` : '...'} />
             <Spec icon={Fuel} label="Fuel" value={mounted ? (template.fuel_type || 'Gasoline') : '...'} />
             <Spec icon={Smartphone} label="Tech" value={mounted ? (template.has_apple_carplay ? 'CarPlay' : 'BT Audio') : '...'} />
           </div>
           
-            <div className="mt-auto flex items-center justify-between pt-6 border-t border-black/5">
+            <div className="mt-auto flex items-center justify-between pt-4 border-t border-black/5">
               <div className="flex flex-col">
                 {showDynamicPricing && template.marketing_strikethrough_price && (
                   <div className="flex items-center gap-2 mb-1">
@@ -115,8 +115,8 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
           </div>
        </div>
 
-       <div className="flex-grow p-10 flex flex-col border-t md:border-t-0 md:border-l border-black/5">
-          <div className="flex justify-between items-start mb-6">
+       <div className="flex-grow p-7 flex flex-col border-t md:border-t-0 md:border-l border-black/5">
+          <div className="flex justify-between items-start mb-4">
              <div>
                 <h3 className="text-[var(--bg-dark)] text-3xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1.5">{template.brand} {template.model}</h3>
                 <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
              </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-y border-black/5 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-6 border-y border-black/5 mb-6">
             <Spec icon={Users} label="Seats" value={mounted ? template.seats : '...'} isLarge />
             <Spec icon={Briefcase} label="Luggage" value={mounted ? `${template.luggage_large || 2} Large` : '...'} isLarge />
             <Spec icon={Fuel} label="Fuel" value={mounted ? (template.fuel_type || 'Gasoline') : '...'} isLarge />
@@ -145,7 +145,7 @@ export default function VehicleCard({ template, viewMode = 'grid', formatPrice, 
              ))}
           </div>
 
-           <div className="mt-auto flex items-center justify-between pt-6 border-t border-black/5">
+           <div className="mt-auto flex items-center justify-between pt-4 border-t border-black/5">
               <div className="flex flex-col">
                  <div className="flex items-center gap-2 mb-1">
                     <span className="text-[11px] text-[var(--bg-dark)]/30 font-black uppercase tracking-[0.2em]">Starting At</span>

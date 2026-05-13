@@ -1,5 +1,20 @@
 # Agents Log
-<!-- Last Sync: 2026-05-13 11:48 -->
+<!-- Last Sync: 2026-05-13 20:03 -->
+
+## 2026-05-13 - High-Density UI Refinement & Marketplace Addon Transformation
+**Agent: Antigravity**
+
+### Accomplishments:
+- **UI Layout Tightening**: Systematically optimized the fleet marketplace ('Our Drive') for higher information density. Reduced vertical padding, margins, and component heights by ~15-20% to achieve a "compact, professional" feel as requested.
+- **Addon Modularization (Premium Extras)**: Successfully converted the Booking Extras feature into a gated marketplace addon.
+  - Implemented strict opt-in logic in `web-app/app/fleet/[id]/page.js`.
+  - Integrated "Premium Extras Manager" into the admin marketplace portal.
+- **Routing & Navigation Stabilization**:
+  - Resolved a critical Postgres cast error in the web app's detail page, enabling robust support for both UUID and slug-based routing.
+  - Corrected the "View on Public Site" redirection in the admin Fleet Manager to point to the correct production domain with slug prioritization.
+- **Build Validation**: Verified both `web-app` and `admin-app` with successful production builds (`npm run build`) resulting in 0 errors.
+- **Git Synchronization**: Pushed all layout refinements, routing fixes, and modularization updates to the main repository.
+- **Verification**: All systems validated as operational, compact, and modular.
 
 ## 2026-05-13 - Project Handover & Operational Certification
 **Agent: Antigravity**

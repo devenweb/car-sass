@@ -1,7 +1,7 @@
 "use client";
 
-import { Save, User, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package, Key, Smartphone, Mail, Server, Globe, MapPin, Phone } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Save, User, Users, Bell, Shield, Database, History, Download, Upload, RefreshCcw, AlertTriangle, FileJson, CheckCircle2, Trash2, Package, Key, Smartphone, Mail, Server, Globe, MapPin, Phone, UserPlus, Lock, ShieldCheck, Crown } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,10 @@ export default function SettingsPage() {
   const [notificationSettings, setNotificationSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [adminsLoading, setAdminsLoading] = useState(false);
+  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", password: "", role: "admin" });
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const tabs = [
     { id: "general", label: "General", icon: User },
@@ -24,7 +28,70 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchTenant();
+    fetchAdmins();
+    fetchCurrentUser();
   }, []);
+
+  async function fetchCurrentUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase.from("users").select("*").eq("id", user.id).single();
+      setCurrentUser(data);
+    }
+  }
+
+  async function fetchAdmins() {
+    setAdminsLoading(true);
+    const { data } = await supabase.from("users").select("*").order("created_at", { ascending: false });
+    if (data) setAdmins(data);
+    setAdminsLoading(false);
+  }
+
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdmin.email || !newAdmin.password || !newAdmin.name) return;
+    
+    setAdminsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-admins', {
+        body: { 
+          action: 'create_admin',
+          email: newAdmin.email,
+          password: newAdmin.password,
+          name: newAdmin.name,
+          role: newAdmin.role
+        }
+      });
+
+      if (error) throw error;
+      alert("Admin account created successfully!");
+      setNewAdmin({ name: "", email: "", password: "", role: "admin" });
+      fetchAdmins();
+    } catch (error: any) {
+      alert("Error creating admin: " + error.message);
+    } finally {
+      setAdminsLoading(false);
+    }
+  };
+
+  const handleDeleteAdmin = async (id: string, role: string) => {
+    if (role === 'super_admin') {
+      alert("Super Admin cannot be deleted.");
+      return;
+    }
+    if (!confirm("Are you sure you want to remove this admin? Access will be revoked immediately.")) return;
+    
+    setAdminsLoading(true);
+    try {
+      const { error } = await supabase.from("users").delete().eq("id", id);
+      if (error) throw error;
+      fetchAdmins();
+    } catch (error: any) {
+      alert("Error deleting admin: " + error.message);
+    } finally {
+      setAdminsLoading(false);
+    }
+  };
 
   async function fetchTenant() {
     setLoading(true);
@@ -359,19 +426,129 @@ export default function SettingsPage() {
                 )}
 
                 {activeTab === "security" && (
-                  <div className="max-w-xl space-y-8">
+                  <div className="space-y-8">
                     <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex items-start gap-4">
-                      <Shield className="text-amber-500 shrink-0" size={24} />
+                      <ShieldCheck className="text-amber-500 shrink-0" size={24} />
                       <div>
-                        <p className="text-sm font-black text-amber-900 uppercase">Access Management</p>
-                        <p className="text-xs text-amber-700 mt-2 leading-relaxed">
-                          Admin authentication is currently managed via Supabase Auth. To change your password or manage team members, please use the Supabase Dashboard or the primary auth interface.
+                        <p className="text-sm font-black text-amber-900 uppercase">Ecosystem Governance</p>
+                        <p className="text-xs text-amber-700 mt-2 leading-relaxed font-medium">
+                          You are currently managing administrative access for the entire ecosystem. New accounts created here will have full dashboard access. 
+                          <span className="block mt-1 font-bold">Important: Super Admin accounts are protected from deletion.</span>
                         </p>
                       </div>
                     </div>
-                    
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Authorized Sessions</h4>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Admin List */}
+                      <div className="space-y-4">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                          <Users size={14} /> Active Personnel
+                        </h4>
+                        <div className="space-y-2">
+                          {adminsLoading && admins.length === 0 ? (
+                            <div className="h-20 bg-slate-50 rounded-xl animate-pulse" />
+                          ) : admins.map((admin) => (
+                            <div key={admin.id} className={cn(
+                              "p-4 rounded-xl border flex items-center justify-between transition-all",
+                              admin.role === 'super_admin' ? "bg-amber-50/50 border-amber-100 shadow-sm" : "bg-white border-slate-100"
+                            )}>
+                              <div className="flex items-center gap-3">
+                                <div className={cn(
+                                  "w-10 h-10 rounded-full flex items-center justify-center border-2 border-white shadow-sm",
+                                  admin.role === 'super_admin' ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400"
+                                )}>
+                                  {admin.role === 'super_admin' ? <Crown size={18} /> : <User size={18} />}
+                                </div>
+                                <div>
+                                  <p className="text-xs font-black text-slate-900 leading-none flex items-center gap-1.5">
+                                    {admin.role === 'super_admin' ? 'Ecosystem Owner' : 'Staff Admin'}
+                                    {admin.role === 'super_admin' && <Shield size={10} className="text-amber-500" />}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tight">Access Level: {admin.role}</p>
+                                </div>
+                              </div>
+                              {admin.role !== 'super_admin' && currentUser?.role === 'super_admin' && (
+                                <button 
+                                  onClick={() => handleDeleteAdmin(admin.id, admin.role)}
+                                  className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Add Admin Form */}
+                      {currentUser?.role === 'super_admin' && (
+                        <div className="space-y-4 bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+                          <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                            <UserPlus size={14} /> Provision New Account
+                          </h4>
+                          <form onSubmit={handleCreateAdmin} className="space-y-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black text-slate-400 uppercase ml-1">Full Name</label>
+                              <input 
+                                type="text" 
+                                value={newAdmin.name}
+                                onChange={(e) => setNewAdmin({...newAdmin, name: e.target.value})}
+                                required
+                                className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none" 
+                                placeholder="Ex: John Doe"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black text-slate-400 uppercase ml-1">Email Address</label>
+                              <input 
+                                type="email" 
+                                value={newAdmin.email}
+                                onChange={(e) => setNewAdmin({...newAdmin, email: e.target.value})}
+                                required
+                                className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none" 
+                                placeholder="john@example.com"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black text-slate-400 uppercase ml-1">Initial Password</label>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                                <input 
+                                  type="password" 
+                                  value={newAdmin.password}
+                                  onChange={(e) => setNewAdmin({...newAdmin, password: e.target.value})}
+                                  required
+                                  minLength={6}
+                                  className="w-full p-2.5 pl-10 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none" 
+                                  placeholder="Min 6 characters"
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black text-slate-400 uppercase ml-1">Assigned Role</label>
+                              <select 
+                                value={newAdmin.role}
+                                onChange={(e) => setNewAdmin({...newAdmin, role: e.target.value})}
+                                className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none"
+                              >
+                                <option value="admin">Administrator</option>
+                                <option value="staff">Operations Staff</option>
+                              </select>
+                            </div>
+                            <button 
+                              type="submit" 
+                              disabled={adminsLoading}
+                              className="w-full h-10 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-slate-200 disabled:opacity-50"
+                            >
+                              {adminsLoading ? "Provisioning..." : "Create Account"}
+                            </button>
+                          </form>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-slate-50">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Security Protocols</h4>
                       <div className="bg-white border border-slate-100 rounded-2xl divide-y">
                         <div className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">

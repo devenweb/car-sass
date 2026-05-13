@@ -69,7 +69,7 @@ export default function SmartUploader({
       <div 
         onClick={() => !uploading && fileInputRef.current?.click()}
         className={cn(
-          "relative aspect-video rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2",
+          "relative aspect-video rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-3 group",
           currentValue ? "border-primary/20 bg-primary/5" : "border-slate-200 bg-slate-50 hover:border-primary/50 hover:bg-slate-100",
           uploading && "opacity-50 cursor-not-allowed"
         )}
@@ -80,16 +80,29 @@ export default function SmartUploader({
             <span className="text-[10px] font-black uppercase text-primary animate-pulse">Uploading to Cloud...</span>
           </div>
         ) : currentValue ? (
-          <img src={currentValue} className="w-full h-full object-cover" alt="Preview" />
+          <>
+            <img src={currentValue} className="w-full h-full object-cover" alt="Preview" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-white text-[10px] font-black uppercase tracking-widest bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30">
+                Change Image
+              </span>
+            </div>
+          </>
         ) : (
           <>
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
-              <Upload size={18} />
+            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 group-hover:scale-110 group-hover:text-primary transition-all">
+              <Upload size={20} />
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-black text-admin-text uppercase tracking-tight">Drop Image or Click</p>
-              <p className="text-[8px] text-slate-400 font-bold uppercase mt-1">PNG, JPG, WEBP (Max 5MB)</p>
+              <p className="text-[11px] font-black text-admin-text uppercase tracking-tight">Drop Image or Click to Browse</p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">PNG, JPG, WEBP (Max 5MB)</p>
             </div>
+            <button 
+              type="button"
+              className="mt-2 bg-white px-4 py-1.5 rounded-full border border-slate-200 text-[9px] font-black uppercase tracking-widest text-admin-text hover:bg-slate-50 shadow-sm active:scale-95 transition-all"
+            >
+              Select File
+            </button>
           </>
         )}
         <input 

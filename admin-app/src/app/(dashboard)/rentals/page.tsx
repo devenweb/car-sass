@@ -35,7 +35,6 @@ const statusColors: Record<string, string> = {
 export default function RentalsPage() {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedRentalId, setSelectedRentalId] = useState<string | null>(null);
   const [editingRental, setEditingRental] = useState<any>(null);
   const [saving, setSaving] = useState(false);
@@ -105,28 +104,14 @@ export default function RentalsPage() {
     }
   };
 
-  const filteredRentals = rentals.filter(rental => {
-    const customerName = rental.customers?.name?.toLowerCase() || "";
-    const vehicleBrand = rental.vehicle_units?.vehicle_templates?.brand?.toLowerCase() || "";
-    const vehicleModel = rental.vehicle_units?.vehicle_templates?.model?.toLowerCase() || "";
-    const searchTermLower = searchTerm.toLowerCase();
-    
-    return customerName.includes(searchTermLower) || 
-           vehicleBrand.includes(searchTermLower) || 
-           vehicleModel.includes(searchTermLower);
-  });
-
   return (
     <div className="space-y-4">
-      <RentalsHeader 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-      />
+      <RentalsHeader />
 
       <RentalsStats rentals={rentals} />
 
       <RentalsTable 
-        rentals={filteredRentals}
+        rentals={rentals}
         loading={loading}
         statusColors={statusColors}
         onViewInspection={setSelectedRentalId}

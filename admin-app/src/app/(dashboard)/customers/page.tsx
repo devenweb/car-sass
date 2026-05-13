@@ -22,7 +22,6 @@ interface Customer {
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [saving, setSaving] = useState(false);
@@ -80,23 +79,14 @@ export default function CustomersPage() {
     } else fetchCustomers();
   }
 
-  const filteredCustomers = customers.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.license_number && c.license_number.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
   return (
     <div className="space-y-4">
-      <CustomersHeader 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-      />
+      <CustomersHeader />
 
       <CustomersStats customers={customers} />
 
       <CustomersTable 
-        customers={filteredCustomers}
+        customers={customers}
         loading={loading}
         onView={setSelectedCustomer}
         onEdit={setEditingCustomer}

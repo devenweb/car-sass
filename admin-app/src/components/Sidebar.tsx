@@ -39,14 +39,22 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [addons, setAddons] = useState<Record<string, boolean>>({});
+  const [role, setRole] = useState<string>("");
 
   useEffect(() => {
-    fetchAddons();
+    fetchUserData();
   }, []);
 
-  const fetchAddons = async () => {
-    const { data } = await supabase.from("tenants").select("addons").single();
-    if (data?.addons) setAddons(data.addons);
+  const fetchUserData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      // Fetch role
+      const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
+      if (profile) setRole(profile.role);
+    }
+
+    const { data: tenant } = await supabase.from("tenants").select("addons").single();
+    if (tenant?.addons) setAddons(tenant.addons);
   };
 
   const handleLogout = async () => {
@@ -54,14 +62,16 @@ export default function Sidebar() {
     router.push("/login");
   };
 
-  // Filter menu items based on addons
+  // Filter menu items based on addons and roles
   const visibleMenuItems = menuItems.filter(item => {
+    const isAdmin = ['super_admin', 'admin'].includes(role);
+
     if (item.label === "KM Monitoring") return addons.km_monitoring;
     if (item.label === "Newsletter") return addons.marketing_suite;
     if (item.label === "Pricing") return addons.dynamic_pricing;
     if (item.label === "Inquiries") return addons.advanced_inquiries;
     if (item.label === "Analytics") return addons.advanced_analytics;
-    if (item.label === "Agents") return addons.multi_agent;
+    if (item.label === "Agents") return addons.multi_agent && isAdmin;
     if (item.label === "Extras") return addons.premium_extras;
     return true; // Dashboard, Fleet, Rentals, Customers, Addons are core
   });

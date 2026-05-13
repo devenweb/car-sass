@@ -14,7 +14,9 @@ import {
   Trash2,
   CheckCircle2,
   XCircle,
-  X
+  X,
+  Lock,
+  Crown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -35,10 +37,24 @@ export default function AgentsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
+    fetchCurrentUser();
     fetchAgents();
   }, []);
+
+  async function fetchCurrentUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      setCurrentUser(data);
+    }
+  }
 
   async function fetchAgents() {
     setLoading(true);
@@ -56,13 +72,15 @@ export default function AgentsPage() {
     setSaving(true);
     
     const formData = new FormData(e.target as HTMLFormElement);
-    const agentData = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      role: formData.get("role"),
-      status: formData.get("status"),
-    };
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    const role = formData.get("role") as string;
+    const status = formData.get("status") as string;
+    const password = formData.get("password") as string;
+    const createAccount = formData.get("createAccount") === "on";
+
+    const agentData = { name, email, phone, role, status };
 
     let error;
     if (editingAgent) {
@@ -72,14 +90,32 @@ export default function AgentsPage() {
         .eq("id", editingAgent.id);
       error = err;
     } else {
-      const { error: err } = await supabase
-        .from("agents")
-        .insert([agentData]);
-      error = err;
+      // If creating a new agent and "Create Dashboard Account" is checked
+      if (createAccount && password) {
+        const { data, error: fnError } = await supabase.functions.invoke('manage-admins', {
+          body: { 
+            action: 'create_admin',
+            email,
+            password,
+            name,
+            role: role === 'admin' ? 'admin' : 'consultant', // Map UI roles to DB roles
+            phone
+          }
+        });
+        
+        if (fnError) {
+          error = fnError;
+        }
+      } else {
+        const { error: err } = await supabase
+          .from("agents")
+          .insert([agentData]);
+        error = err;
+      }
     }
 
     if (error) {
-      alert("Error saving agent: " + error.message);
+      alert("Error: " + (error.message || "Failed to process request"));
     } else {
       setShowModal(false);
       setEditingAgent(null);
@@ -88,9 +124,14 @@ export default function AgentsPage() {
     setSaving(false);
   }
 
-  async function deleteAgent(id: string) {
+  async function deleteAgent(agent: Agent) {
+    if (agent.role === 'super_admin') {
+      alert("CRITICAL: Super Admin accounts cannot be deleted for security integrity.");
+      return;
+    }
+
     if (!confirm("Remove this agent from the system?")) return;
-    const { error } = await supabase.from("agents").delete().eq("id", id);
+    const { error } = await supabase.from("agents").delete().eq("id", agent.id);
     if (error) alert("Error deleting agent");
     else fetchAgents();
   }
@@ -138,22 +179,32 @@ export default function AgentsPage() {
           [1, 2, 3].map(i => <div key={i} className="h-32 bg-white rounded-xl border border-admin-border animate-pulse" />)
         ) : filteredAgents.length > 0 ? (
           filteredAgents.map(agent => (
-            <div key={agent.id} className="bg-white p-5 rounded-xl border border-admin-border shadow-sm hover:border-primary/50 transition-all group relative overflow-hidden">
+            <div key={agent.id} className={cn(
+              "bg-white p-5 rounded-xl border transition-all group relative overflow-hidden",
+              agent.role === 'super_admin' ? "border-amber-200 bg-amber-50/30" : "border-admin-border hover:border-primary/50 shadow-sm"
+            )}>
               <div className="flex items-start justify-between relative z-10">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border-2 border-white shadow-sm overflow-hidden">
-                    <Users size={24} />
+                  <div className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center border-2 border-white shadow-sm overflow-hidden",
+                    agent.role === 'super_admin' ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400"
+                  )}>
+                    {agent.role === 'super_admin' ? <Crown size={24} /> : <Users size={24} />}
                   </div>
                   <div>
-                    <h3 className="font-black text-admin-text text-sm leading-tight">{agent.name}</h3>
+                    <h3 className="font-black text-admin-text text-sm leading-tight flex items-center gap-2">
+                      {agent.name}
+                      {agent.role === 'super_admin' && <Shield size={12} className="text-amber-500" />}
+                    </h3>
                     <div className="flex items-center gap-2 mt-1">
                       <span className={cn(
                         "text-[8px] font-black uppercase px-2 py-0.5 rounded-full border",
+                        agent.role === 'super_admin' ? 'bg-amber-500 text-white border-amber-600' :
                         agent.role === 'admin' ? 'bg-rose-50 text-rose-600 border-rose-100' :
                         agent.role === 'staff' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                         'bg-slate-50 text-slate-600 border-slate-100'
                       )}>
-                        {agent.role}
+                        {agent.role.replace('_', ' ')}
                       </span>
                       <span className={cn(
                         "text-[8px] font-black uppercase px-2 py-0.5 rounded-full border",
@@ -166,7 +217,9 @@ export default function AgentsPage() {
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => { setEditingAgent(agent); setShowModal(true); }} className="p-1.5 text-slate-400 hover:text-primary transition-colors"><Edit2 size={14} /></button>
-                  <button onClick={() => deleteAgent(agent.id)} className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={14} /></button>
+                  {agent.role !== 'super_admin' && (
+                    <button onClick={() => deleteAgent(agent)} className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={14} /></button>
+                  )}
                 </div>
               </div>
 
@@ -233,11 +286,30 @@ export default function AgentsPage() {
                     <option value="inactive">Suspended</option>
                   </select>
                 </div>
+
+                {!editingAgent && (
+                  <div className="col-span-2 pt-2 pb-2">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" name="createAccount" className="w-4 h-4 rounded border-slate-200 text-primary focus:ring-primary/20 transition-all" />
+                      <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight group-hover:text-primary transition-colors">Create Dashboard Login Account</span>
+                    </label>
+                  </div>
+                )}
+
+                {!editingAgent && (
+                  <div className="col-span-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Initial Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                      <input name="password" type="password" placeholder="Min 6 characters" className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none" />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 h-10 text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 transition-all">Cancel</button>
                 <button type="submit" disabled={saving} className="flex-1 h-10 text-[10px] font-black uppercase tracking-widest text-white bg-primary rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50">
-                  {saving ? "Saving..." : "Save Agent"}
+                  {saving ? "Processing..." : editingAgent ? "Update Agent" : "Save Agent"}
                 </button>
               </div>
             </form>

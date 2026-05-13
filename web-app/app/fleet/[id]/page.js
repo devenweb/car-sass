@@ -693,6 +693,12 @@ function CarDetailContent() {
                             <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)] text-right">{formatPrice(invoice.extrasTotal)}</td>
                           </tr>
                         )}
+                        {template.marketing_strikethrough_price && (
+                          <tr className="bg-rose-50/30">
+                            <td className="px-8 py-2.5 text-[10px] font-black text-rose-600 uppercase tracking-widest">Instant Marketing Saving</td>
+                            <td className="px-8 py-2.5 text-[11px] font-black text-rose-600 text-right">-{formatPrice((template.marketing_strikethrough_price - template.min_price) * invoice.days)}</td>
+                          </tr>
+                        )}
                         <tr>
                           <td className="px-8 py-2.5 text-[11px] font-bold text-[var(--bg-dark)]/30 italic">Total excluding tax</td>
                           <td className="px-8 py-2.5 text-[11px] font-black text-[var(--bg-dark)]/40 text-right">{formatPrice(invoice.subtotal)}</td>

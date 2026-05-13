@@ -1,6 +1,17 @@
 # Agents Log
 <!-- Last Sync: 2026-05-13 11:48 -->
 
+## 2026-05-13 - Marketing Pricing Engine & Advanced Discounts
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Pricing Infrastructure**: Created database migrations for marketing strikethrough prices, independent fixed (Rs) and percentage (%) discounts, and long-term rental rules.
+- **Admin Dashboard**: Integrated high-fidelity "Marketing & Pricing Effects" controls into the Fleet Manager, allowing per-model configuration of all discount parameters.
+- **Marketplace UI**: Implemented premium strikethrough pricing display on the Homepage and Fleet Marketplace (Grid/List views) with dynamic "Member Rate" and "Discount" badges.
+- **Dynamic Booking Engine**: Refactored the booking detail page to automatically calculate and apply duration-based discounts (e.g., > 5 days) with live invoice feedback for the user.
+- **Branding Alignment**: Continued the "Drive" branding migration with updated labels and badges across all newly modified pricing components.
+- **Verification**: Validated state with production-ready code structure and pushed all changes to the main branch for Vercel deployment.
+
 ## 2026-05-13 - Branding Realignment & UI Refinement
 **Agent: Antigravity**
 

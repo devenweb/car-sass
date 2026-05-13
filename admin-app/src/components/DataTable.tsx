@@ -159,7 +159,7 @@ export function DataTable<T extends { id: string | number }>({
                   >
                     {columns.map((col, colIdx) => (
                       <td key={colIdx} className={cn("px-6 py-3.5", col.className)}>
-                        {col.cell ? col.cell(item) : (col.accessorKey ? (col.accessorKey.toString().split('.').reduce((obj, key) => obj?.[key], item) as React.ReactNode) : null)}
+                        {col.cell ? col.cell(item) : (col.accessorKey ? (col.accessorKey.toString().split('.').reduce((obj: any, key) => obj?.[key], item) as unknown as React.ReactNode) : null)}
                       </td>
                     ))}
                   </tr>

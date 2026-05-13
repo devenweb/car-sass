@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [admins, setAdmins] = useState<any[]>([]);
   const [adminsLoading, setAdminsLoading] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", password: "", role: "admin" });
+  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", password: "", role: "admin", phone: "" });
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   const tabs = [
@@ -59,19 +59,29 @@ export default function SettingsPage() {
     
     setAdminsLoading(true);
     try {
+      // Local duplicate check to reduce requests
+      if (admins.some(a => a.email?.toLowerCase() === newAdmin.email.toLowerCase())) {
+        alert(`An account with the email ${newAdmin.email} already exists in the system.`);
+        setAdminsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('manage-admins', {
         body: { 
           action: 'create_admin',
           email: newAdmin.email,
           password: newAdmin.password,
           name: newAdmin.name,
-          role: newAdmin.role
+          role: newAdmin.role,
+          phone: newAdmin.phone
         }
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
       alert("Admin account created successfully!");
-      setNewAdmin({ name: "", email: "", password: "", role: "admin" });
+      setNewAdmin({ name: "", email: "", password: "", role: "admin", phone: "" });
       fetchAdmins();
     } catch (error: any) {
       alert("Error creating admin: " + error.message);
@@ -661,6 +671,20 @@ export default function SettingsPage() {
                                   required
                                   className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
                                   placeholder="staff@royalrentals.com"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-[9px] font-black text-slate-400 uppercase ml-1 tracking-widest">Phone Number (Optional)</label>
+                              <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                                <input 
+                                  type="tel" 
+                                  value={newAdmin.phone}
+                                  onChange={(e) => setNewAdmin({...newAdmin, phone: e.target.value})}
+                                  className="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
+                                  placeholder="+230 5XXX XXXX"
                                 />
                               </div>
                             </div>

@@ -46,80 +46,65 @@ export default function Dashboard() {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-    const [
-      { count: carCount },
-      { count: rentalCount },
-      { count: customerCount },
-      { data: recentRentals },
-      { data: allCars },
-      { data: revenueData }
-    ] = await Promise.all([
-      supabase.from("vehicle_units").select("*", { count: "exact" }).limit(1),
-      supabase.from("rentals").select("*", { count: "exact" }).limit(1),
-      supabase.from("customers").select("*", { count: "exact" }).limit(1),
-      supabase.from("rentals").select(`
-        id,
-        total_amount,
-        total_price,
-        status,
-        created_at,
-        vehicle_templates (brand, model),
-        customers (name)
-      `).order("created_at", { ascending: false }).limit(5),
-      supabase.from("vehicle_units").select("availability_status"),
-      supabase.from("rentals").select("total_amount, total_price").gte("created_at", firstDayOfMonth)
-    ]);
+    try {
+      const { data: statsData, error } = await supabase.rpc('get_dashboard_stats', { 
+        first_day_of_month: firstDayOfMonth 
+      });
 
-    const mtdRevenue = revenueData?.reduce((acc, curr) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
+      if (error) throw error;
 
-    const availableCount = allCars?.filter(c => c.availability_status === 'available').length || 0;
-    const inUseCount = allCars?.filter(c => c.availability_status === 'rented' || c.availability_status === 'booked').length || 0;
-    const maintenanceCount = allCars?.filter(c => c.availability_status === 'maintenance').length || 0;
+      const stats = [
+        { 
+          label: "Total Cars", 
+          value: statsData.carCount.toString(), 
+          icon: Car, 
+          change: "+0", 
+          trend: "up",
+          href: "/fleet"
+        },
+        { 
+          label: "Active Rentals", 
+          value: statsData.rentalCount.toString(), 
+          icon: CalendarCheck, 
+          change: "+0", 
+          trend: "up",
+          href: "/rentals"
+        },
+        { 
+          label: "Total Customers", 
+          value: statsData.customerCount.toString(), 
+          icon: Users, 
+          change: "+0", 
+          trend: "up",
+          href: "/customers"
+        },
+        { 
+          label: "Revenue (MTD)", 
+          value: `Rs ${statsData.mtdRevenue.toLocaleString()}`, 
+          icon: TrendingUp, 
+          change: "+0%", 
+          trend: "up",
+          href: "/rentals"
+        },
+      ];
 
-    const stats = [
-      { 
-        label: "Total Cars", 
-        value: carCount?.toString() || "0", 
-        icon: Car, 
-        change: "+0", 
-        trend: "up",
-        href: "/fleet"
-      },
-      { 
-        label: "Active Rentals", 
-        value: rentalCount?.toString() || "0", 
-        icon: CalendarCheck, 
-        change: "+0", 
-        trend: "up",
-        href: "/rentals"
-      },
-      { 
-        label: "Total Customers", 
-        value: customerCount?.toString() || "0", 
-        icon: Users, 
-        change: "+0", 
-        trend: "up",
-        href: "/customers"
-      },
-      { 
-        label: "Revenue (MTD)", 
-        value: `Rs ${mtdRevenue.toLocaleString()}`, 
-        icon: TrendingUp, 
-        change: "+0%", 
-        trend: "up",
-        href: "/rentals"
-      },
-    ];
-
-    setData({
-      stats,
-      recentRentals: recentRentals || [],
-      totalCars: carCount || 0,
-      availableCount,
-      inUseCount,
-      maintenanceCount
-    });
-    setLoading(false);
+      setData({
+        stats,
+        recentRentals: statsData.recentRentals.map((r: any) => ({
+          ...r,
+          vehicle_templates: { brand: r.brand, model: r.model },
+          customers: { name: r.customer_name }
+        })),
+        totalCars: statsData.carCount,
+        availableCount: statsData.availableCount,
+        inUseCount: statsData.inUseCount,
+        maintenanceCount: statsData.maintenanceCount
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function deleteRental(id: string) {

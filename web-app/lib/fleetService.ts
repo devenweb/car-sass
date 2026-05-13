@@ -21,18 +21,18 @@ export async function getAvailableUnits(templateId: string, startDate: string, e
     .from("vehicle_units")
     .select("*")
     .eq("vehicle_template_id", templateId)
-    .eq("status", "available"); // Or 'active' depending on your schema
+    .or("availability_status.eq.available,status.eq.available");
 
   if (unitsError) throw unitsError;
   if (!units || units.length === 0) return [];
 
-  // 2. Get overlapping bookings for these units
+  // 2. Get overlapping bookings for these units (using correct columns)
   const { data: bookings, error: bookingsError } = await supabase
     .from("rentals")
     .select("vehicle_unit_id")
     .in("vehicle_unit_id", units.map(u => u.id))
     .not("status", "eq", "cancelled")
-    .or(`and(start_date.lt.${endDate},end_date.gt.${startDate})`);
+    .or(`and(pickup_datetime.lt.${endDate},return_datetime.gt.${startDate})`);
 
   if (bookingsError) throw bookingsError;
 
@@ -53,14 +53,15 @@ export async function getAvailableUnits(templateId: string, startDate: string, e
 }
 
 /**
- * Aggregated Fleet Search
+ * Aggregated Fleet Search (Optimized)
  * 
- * Returns templates with availability counts and lowest pricing.
+ * Returns templates with availability counts and lowest pricing using bulk fetching.
+ * Reduces requests from O(N) to O(1) where N is the number of templates.
  */
 export async function searchFleet(params: any = {}) {
   const { startDate, endDate, category } = params;
 
-  // 1. Fetch templates
+  // 1. Fetch templates with basic unit info
   let query = supabase.from("vehicle_templates").select(`
     *,
     units:vehicle_units(
@@ -80,22 +81,45 @@ export async function searchFleet(params: any = {}) {
     return templates.map(t => ({
       ...t,
       available_count: t.units.length,
-      lowest_price: t.units.length > 0 ? 1500 : 0
+      lowest_price: 1500 // Base price fallback
     }));
   }
 
-  // 3. If dates provided, calculate real availability
-  const results = await Promise.all(templates.map(async (t) => {
-    const availableUnits = await getAvailableUnits(t.id, startDate, endDate);
+  // 3. BULK FETCHING for Availability Calculation
+  const allUnitIds = templates.flatMap(t => t.units.map(u => u.id));
+  if (allUnitIds.length === 0) {
+    return templates.map(t => ({ ...t, available_count: 0, is_available: false, lowest_price: 0 }));
+  }
+
+  // Parallel bulk fetches - Correcting column names to pickup_datetime/return_datetime
+  const [bookingsRes, blocksRes] = await Promise.all([
+    supabase.from("rentals")
+      .select("vehicle_unit_id")
+      .in("vehicle_unit_id", allUnitIds)
+      .not("status", "eq", "cancelled")
+      .or(`and(pickup_datetime.lt.${endDate},return_datetime.gt.${startDate})`),
+    supabase.from("vehicle_availability_blocks")
+      .select("vehicle_unit_id")
+      .in("vehicle_unit_id", allUnitIds)
+      .or(`and(start_datetime.lt.${endDate},end_datetime.gt.${startDate})`)
+  ]);
+
+  const bookedUnitIds = new Set(bookingsRes.data?.map(b => b.vehicle_unit_id) || []);
+  const blockedUnitIds = new Set(blocksRes.data?.map(b => b.vehicle_unit_id) || []);
+
+  // 4. Map results back to templates
+  return templates.map(t => {
+    const availableUnits = t.units.filter(u => 
+      (u.availability_status === 'available' || (u as any).status === 'available') && 
+      !bookedUnitIds.has(u.id) && 
+      !blockedUnitIds.has(u.id)
+    );
+
     return {
       ...t,
       available_count: availableUnits.length,
-      lowest_price: availableUnits.length > 0 
-        ? 1500
-        : (t.units.length > 0 ? 1500 : 0), // Fallback
-      is_available: availableUnits.length > 0
+      is_available: availableUnits.length > 0,
+      lowest_price: 1500 // In a real app, you'd calculate this from vehicle_pricing
     };
-  }));
-
-  return results;
+  });
 }

@@ -47,7 +47,7 @@ function FleetContent() {
   const categories = ['All', 'Economy', 'Sedan', 'SUV', 'MPV', 'Luxury', 'Hatchback'];
   const transmissionOptions = ['All', 'Auto', 'Manual'];
   const experienceOptions = ['All', 'Family', 'Honeymoon', 'Sporty', 'Luxury', 'Economy'];
-  const sortOptions = ['Price: Low to High', 'Price: High to Low', 'Newest First'];
+  const sortOptions = ['Price: Low - High', 'Price: High - Low', 'Newest First', 'Name: A - Z'];
   const seatOptions = ['All', '4', '5', '7'];
   const priceRanges = [
     { label: 'All Prices', min: 0, max: 100000 },
@@ -148,9 +148,10 @@ function FleetContent() {
       return matchesSearch && matchesCategory && matchesTransmission && matchesSeats && matchesPrice && matchesExperience;
     })
     .sort((a, b) => {
-      if (sortBy === 'Price: Low to High') return a.min_price - b.min_price;
-      if (sortBy === 'Price: High to Low') return b.min_price - a.min_price;
+      if (sortBy === 'Price: Low - High') return a.min_price - b.min_price;
+      if (sortBy === 'Price: High - Low') return b.min_price - a.min_price;
       if (sortBy === 'Newest First') return new Date(b.created_at) - new Date(a.created_at);
+      if (sortBy === 'Name: A - Z') return `${a.brand} ${a.model}`.localeCompare(`${b.brand} ${b.model}`);
       return 0;
     });
     
@@ -207,65 +208,27 @@ function FleetContent() {
           <div className="flex flex-col lg:flex-row gap-12">
             {showFilters && (
               <aside className="w-full lg:w-[280px] shrink-0">
-                <div className="bg-white rounded-[2rem] p-6 border border-black/5 space-y-6 shadow-sm sticky top-32 max-h-[85vh] overflow-y-auto no-scrollbar">
-                  <div className="flex justify-between items-center pb-3 border-b border-black/5">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]">Filters</span>
+                <div className="bg-white rounded-[2.5rem] p-8 border border-black/5 space-y-10 shadow-sm sticky top-32 max-h-[85vh] overflow-y-auto no-scrollbar">
+                  <div className="flex justify-between items-center pb-4 border-b border-black/5">
+                    <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[var(--bg-dark)]">Filters</span>
                     <button 
                       onClick={resetFilters}
-                      className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-[var(--bg-dark)] transition-colors"
+                      className="text-[11px] font-black uppercase tracking-widest text-primary hover:text-[var(--bg-dark)] transition-colors"
                     >
-                      Reset All
+                      Reset
                     </button>
                   </div>
 
+                  {/* Sort By - Now First and Simplified */}
                   <div className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="space-y-1.5">
-                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Travel Dates (Pickup)</label>
-                        <div className="flex gap-2">
-                          <input 
-                            type="date" 
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-3 py-2 text-[10px] font-bold outline-none"
-                          />
-                          <input 
-                            type="time" 
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            className="w-20 bg-slate-50 border border-black/5 rounded-xl px-2 py-2 text-[10px] font-bold outline-none"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[7px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Return</label>
-                        <div className="flex gap-2">
-                          <input 
-                            type="date" 
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-3 py-2 text-[10px] font-bold outline-none"
-                          />
-                          <input 
-                            type="time" 
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                            className="w-20 bg-slate-50 border border-black/5 rounded-xl px-2 py-2 text-[10px] font-bold outline-none"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Sort By</h3>
-                    <div className="grid grid-cols-2 gap-1.5">
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Sort By</h3>
+                    <div className="flex flex-wrap gap-2">
                       {sortOptions.map(opt => (
                         <button 
                           key={opt}
                           onClick={() => setSortBy(opt)}
-                          className={`px-3 py-2.5 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all text-center ${
-                            sortBy === opt ? 'bg-[var(--bg-dark)] text-white' : 'bg-slate-50 text-[var(--bg-dark)]/40 hover:bg-slate-100'
+                          className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[9px] transition-all border ${
+                            sortBy === opt ? 'bg-[var(--bg-dark)] text-white border-[var(--bg-dark)]' : 'bg-white text-[var(--bg-dark)]/40 border-black/5 hover:border-black/20'
                           }`}
                         >
                           {opt}
@@ -274,15 +237,56 @@ function FleetContent() {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Body Type</h3>
-                    <div className="flex flex-wrap gap-1.5">
+                  {/* Travel Dates */}
+                  <div className="space-y-4">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Pickup Date & Time</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="date" 
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-4 py-3 text-[12px] font-bold outline-none focus:ring-2 focus:ring-[var(--brand-yellow)]/20"
+                          />
+                          <input 
+                            type="time" 
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="w-24 bg-slate-50 border border-black/5 rounded-xl px-2 py-3 text-[12px] font-bold outline-none focus:ring-2 focus:ring-[var(--brand-yellow)]/20"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-[var(--bg-dark)]/40 ml-1">Return</label>
+                        <div className="flex gap-2">
+                          <input 
+                            type="date" 
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="flex-grow bg-slate-50 border border-black/5 rounded-xl px-4 py-3 text-[12px] font-bold outline-none focus:ring-2 focus:ring-[var(--brand-yellow)]/20"
+                          />
+                          <input 
+                            type="time" 
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
+                            className="w-24 bg-slate-50 border border-black/5 rounded-xl px-2 py-3 text-[12px] font-bold outline-none focus:ring-2 focus:ring-[var(--brand-yellow)]/20"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Body Type */}
+                  <div className="space-y-4">
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Body Type</h3>
+                    <div className="flex flex-wrap gap-2">
                       {categories.map(cat => (
                         <button 
                           key={cat}
                           onClick={() => setActiveCategory(cat)}
-                          className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all ${
-                            activeCategory === cat ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-sm' : 'bg-slate-50 text-[var(--bg-dark)]/40'
+                          className={`px-4 py-2.5 rounded-xl font-black uppercase tracking-tighter text-[10px] transition-all border ${
+                            activeCategory === cat ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)] shadow-md shadow-[var(--brand-yellow)]/20' : 'bg-slate-50 border-transparent text-[var(--bg-dark)]/40 hover:bg-slate-100'
                           }`}
                         >
                           {cat}
@@ -291,15 +295,16 @@ function FleetContent() {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Experience</h3>
-                    <div className="flex flex-wrap gap-1.5">
+                  {/* Experience */}
+                  <div className="space-y-4">
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Experience</h3>
+                    <div className="flex flex-wrap gap-2">
                       {experienceOptions.map(opt => (
                         <button 
                           key={opt}
                           onClick={() => setActiveExperience(opt)}
-                          className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all ${
-                            activeExperience.toLowerCase() === opt.toLowerCase() ? 'bg-[var(--bg-dark)] text-white shadow-sm' : 'bg-slate-50 text-[var(--bg-dark)]/40'
+                          className={`px-4 py-2.5 rounded-xl font-black uppercase tracking-tighter text-[10px] transition-all border ${
+                            activeExperience.toLowerCase() === opt.toLowerCase() ? 'bg-[var(--bg-dark)] border-[var(--bg-dark)] text-white shadow-lg shadow-black/10' : 'bg-slate-50 border-transparent text-[var(--bg-dark)]/40 hover:bg-slate-100'
                           }`}
                         >
                           {opt}
@@ -307,19 +312,21 @@ function FleetContent() {
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-4">
+
+                  {/* Price */}
+                  <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Price</h3>
-                      <span className="text-[9px] font-black text-emerald-600">
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Price Range</h3>
+                      <span className="text-[11px] font-black text-emerald-600">
                         {mounted ? `${formatPrice(priceRange[0])} - ${formatPrice(priceRange[1])}` : '...'}
                       </span>
                     </div>
                     
-                    <div className="relative pt-4 pb-0">
+                    <div className="relative px-2">
                       <div className="range-slider-container">
-                        <div className="range-slider-track !h-1"></div>
+                        <div className="range-slider-track !h-1.5"></div>
                         <div 
-                          className="range-slider-progress !h-1"
+                          className="range-slider-progress !h-1.5"
                           style={{
                             left: `${(priceRange[0] / 10000) * 100}%`,
                             right: `${100 - (priceRange[1] / 10000) * 100}%`
@@ -345,32 +352,33 @@ function FleetContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Trans</h3>
-                      <div className="flex flex-wrap gap-1">
+                  {/* Trans & Seats */}
+                  <div className="grid grid-cols-2 gap-6 pt-4 border-t border-black/5">
+                    <div className="space-y-3">
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Transmission</h3>
+                      <div className="flex flex-col gap-2">
                         {transmissionOptions.map(opt => (
                           <button 
                             key={opt}
                             onClick={() => setTransmission(opt)}
-                            className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[8px] transition-all ${
-                              transmission === opt ? 'bg-[var(--bg-dark)] text-white' : 'bg-slate-50 text-[var(--bg-dark)]/40'
+                            className={`px-3 py-2 rounded-lg font-black uppercase tracking-tighter text-[10px] transition-all border ${
+                              transmission === opt ? 'bg-[var(--bg-dark)] border-[var(--bg-dark)] text-white' : 'bg-slate-50 border-transparent text-[var(--bg-dark)]/40'
                             }`}
                           >
-                            {opt === 'Automatic' ? 'Auto' : 'Manual'}
+                            {opt}
                           </button>
                         ))}
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Seats</h3>
-                      <div className="flex flex-wrap gap-1">
+                    <div className="space-y-3">
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Seats</h3>
+                      <div className="flex flex-wrap gap-1.5">
                         {seatOptions.map(opt => (
                           <button 
                             key={opt}
                             onClick={() => setSeats(opt)}
-                            className={`px-2.5 py-2 rounded-lg font-black text-[8px] transition-all ${
-                              seats === opt ? 'bg-[var(--brand-yellow)] text-[var(--bg-dark)]' : 'bg-slate-50 text-[var(--bg-dark)]/40'
+                            className={`w-10 h-10 rounded-xl font-black text-[11px] transition-all border ${
+                              seats === opt ? 'bg-[var(--brand-yellow)] border-[var(--brand-yellow)] text-[var(--bg-dark)]' : 'bg-slate-50 border-transparent text-[var(--bg-dark)]/40'
                             }`}
                           >
                             {opt}

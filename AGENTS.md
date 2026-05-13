@@ -1,6 +1,19 @@
 # Agents Log
 <!-- Last Sync: 2026-05-13 11:48 -->
 
+## 2026-05-13 - Typography Optimization & UI Premiumization
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Global Character Spacing**: Increased letter-spacing by 20% (`0.02em`) across the entire codebase (both web-app and admin-app) to improve readability and aesthetic premiumization.
+- **Typography Cleanup**: Systematically removed character-crowding classes (`tracking-tight`, `tracking-tighter`) to allow the new spacing standard to take full effect.
+- **Vehicle Card Refinement**:
+  - Rebranded "SALE" badges to "DISCOUNT" for a more professional tone.
+  - Updated availability status: "Sold Out" → **"ALL UNITS RENTED OUT"** with glassmorphic styling.
+  - Enhanced pricing transparency: Added **"/D"** (Per Day) indicators to all savings and discount displays.
+  - Premiumized card interactions: Added high-density shadows, backdrop blurs, and refined CTA animations ("Experience Drive").
+- **Stability**: Successfully validated both applications with production builds and deployed all UI refinements to the main branch.
+
 ## 2026-05-13 - Admin Dashboard Cleanup & Fleet Migration
 **Agent: Antigravity**
 

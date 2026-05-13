@@ -85,10 +85,10 @@ export default function HomePage() {
     <div className="page-layout bg-[var(--bg-primary)]">
       <Navbar />
       
-      <section className="hero-standard min-h-[75vh] flex items-center">
+      <section className="hero-standard min-h-[85vh] flex items-center">
         <img 
           src="/assets/vibrant_hero_bg.png" 
-          className="hero-bg-image scale-110" 
+          className="hero-bg-image" 
           alt="Hero Background" 
         />
         <div className="hero-overlay"></div>

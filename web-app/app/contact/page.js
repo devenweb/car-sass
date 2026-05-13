@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Mail, Phone, MapPin, ShieldCheck, Clock, CheckCircle2, Search, Calendar, Car as CarIcon, ArrowRight } from 'lucide-react';
+import { Mail, Phone, MapPin, ShieldCheck, Clock, CheckCircle2, Search, Calendar, Car as CarIcon, ArrowRight, Users, Settings2 } from 'lucide-react';
 import BookingExtras from '@/components/BookingExtras';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import Link from 'next/link';
 
 function ContactContent() {
   const searchParams = useSearchParams();

@@ -53,30 +53,6 @@ const ADDONS: Addon[] = [
     price: "Rs 1,500 / mo"
   },
   {
-    id: "analytics",
-    key: "advanced_analytics",
-    name: "Advanced Fleet Analytics",
-    description: "Detailed occupancy heatmaps, revenue forecasting, and vehicle performance reports.",
-    icon: BarChart3,
-    price: "Rs 750 / mo"
-  },
-  {
-    id: "inspection",
-    key: "digital_inspection",
-    name: "Digital Inspection Suite",
-    description: "High-res damage mapping, unlimited photo storage, and digital handover e-signatures.",
-    icon: ShieldCheck,
-    price: "Rs 600 / mo"
-  },
-  {
-    id: "reviews",
-    key: "review_manager",
-    name: "Automated Review Manager",
-    description: "Automated post-rental requests to boost your agency reputation and trust score.",
-    icon: Star,
-    price: "Rs 400 / mo"
-  },
-  {
     id: "multi-agent",
     key: "multi_agent",
     name: "Multi-Agent System",

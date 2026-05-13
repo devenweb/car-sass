@@ -137,7 +137,7 @@ function ContactContent() {
                Thank you for choosing Royal Road Car Rental. Our concierge team will review your requirements and contact you within 30 minutes to finalize your reservation.
              </p>
              <Link href="/fleet" className="inline-flex items-center gap-4 bg-[var(--bg-dark)] text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[var(--brand-yellow)] hover:text-[var(--bg-dark)] transition-all">
-               Return to Fleet <ArrowRight size={16} />
+               Return to Drive <ArrowRight size={16} />
              </Link>
           </div>
         </div>

@@ -112,7 +112,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-5 pt-4">
               <Link href="/fleet" className="bg-[var(--brand-yellow)] text-[var(--bg-dark)] px-12 py-6 rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-4 hover:scale-105 transition-all shadow-2xl shadow-[var(--brand-yellow)]/20">
-                Explore The Fleet
+                Explore Our DRIVE
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -121,6 +121,7 @@ export default function HomePage() {
       </section>
 
       {/* 1. Experiences Section */}
+      {/* 1. Experiences Section - Hidden as per user request
       <section className="py-12 -mt-16 relative z-20">
         <div className="content-container">
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -156,6 +157,7 @@ export default function HomePage() {
            </div>
         </div>
       </section>
+      */}
 
       {/* 2. Categories Section */}
       <section className="py-24 relative overflow-hidden bg-white">

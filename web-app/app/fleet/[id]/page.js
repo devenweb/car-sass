@@ -243,7 +243,7 @@ function CarDetailContent() {
   if (!template) return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-6">
       <h2 className="text-3xl font-black uppercase tracking-tighter text-[var(--bg-dark)]">Model Not Found</h2>
-      <Link href="/fleet" className="text-[var(--bg-dark)] font-black uppercase tracking-widest text-xs underline">Back to Fleet</Link>
+      <Link href="/fleet" className="text-[var(--bg-dark)] font-black tracking-widest text-xs underline">Back to Drive</Link>
     </div>
   );
 
@@ -372,7 +372,7 @@ function CarDetailContent() {
 
                   <div className="mt-12 space-y-4">
                     <Link href="/fleet" className="flex items-center justify-center gap-3 w-full bg-white text-[var(--bg-dark)] py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[var(--brand-yellow)] transition-all">
-                      Return to Fleet
+                      Return to Drive
                       <ArrowRight size={14} />
                     </Link>
                   </div>

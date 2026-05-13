@@ -24,7 +24,7 @@ export default function Navbar() {
   useEffect(() => setIsOpen(false), [pathname]);
 
   const navLinks = [
-    { href: '/fleet', label: 'Our Fleet' },
+    { href: '/fleet', label: 'Our Drive' },
     { href: '/services', label: 'How It Works' },
     { href: '/blog', label: 'Blog' },
     { href: '/about', label: 'About Us' },
@@ -69,7 +69,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Nav */}
-          <div className={`hidden lg:flex items-center gap-8 xl:gap-10 text-[13px] font-black uppercase tracking-widest transition-colors duration-500 ${linkColor}`}>
+          <div className={`hidden lg:flex items-center gap-8 xl:gap-10 text-[13px] font-black tracking-widest transition-colors duration-500 ${linkColor}`}>
             {navLinks.map((link) => (
               <Link 
                 key={link.href} 
@@ -187,7 +187,7 @@ export default function Navbar() {
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className={`text-4xl font-black uppercase tracking-tighter hover:text-brand-yellow transition-colors ${
+                className={`text-4xl font-black tracking-tighter hover:text-brand-yellow transition-colors ${
                   pathname === link.href ? 'text-brand-yellow' : 'text-[#1A1A1A]'
                 }`}
               >

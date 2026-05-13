@@ -73,7 +73,6 @@ export default function FleetPage() {
       transmission: editingTemplate.transmission,
       seats: editingTemplate.seats,
       description: editingTemplate.description,
-      image_url: editingTemplate.image_url,
       default_thumbnail: editingTemplate.default_thumbnail,
       published_status: editingTemplate.published_status,
       rating: editingTemplate.rating,
@@ -83,6 +82,11 @@ export default function FleetPage() {
       has_apple_carplay: editingTemplate.has_apple_carplay,
       has_android_auto: editingTemplate.has_android_auto,
       airbag_count: editingTemplate.airbag_count,
+      fuel_type: editingTemplate.fuel_type,
+      luggage_large: editingTemplate.luggage_large,
+      luggage_small: editingTemplate.luggage_small,
+      doors: editingTemplate.doors,
+      engine_size: editingTemplate.engine_size,
       tags: editingTemplate.tags
     };
     
@@ -147,6 +151,7 @@ export default function FleetPage() {
       color: editingUnit.color,
       mileage: editingUnit.mileage,
       availability_status: editingUnit.availability_status,
+      daily_price: editingUnit.daily_price,
       internal_reference: editingUnit.internal_reference
     };
     
@@ -209,14 +214,35 @@ export default function FleetPage() {
     const file = e.target.files?.[0];
     if (!file || !editingTemplate) return;
     setUploading(true);
-    const fileName = `${Math.random()}.${file.name.split('.').pop()}`;
-    const { error: uploadError } = await supabase.storage.from('fleet').upload(`templates/${fileName}`, file);
-    if (uploadError) alert("Upload failed");
-    else {
-      const { data: { publicUrl } } = supabase.storage.from('fleet').getPublicUrl(`templates/${fileName}`);
-      setEditingTemplate({ ...editingTemplate, image_url: publicUrl, default_thumbnail: publicUrl });
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `templates/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('car-assets')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error("Upload error details:", uploadError);
+        alert(`Upload failed: ${uploadError.message}`);
+      } else {
+        const { data: { publicUrl } } = supabase.storage
+          .from('car-assets')
+          .getPublicUrl(filePath);
+          
+        setEditingTemplate({ 
+          ...editingTemplate, 
+          default_thumbnail: publicUrl 
+        });
+      }
+    } catch (error: any) {
+      console.error("Unexpected upload error:", error);
+      alert(`Unexpected error: ${error.message}`);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const filteredTemplates = templates.filter(t => 
@@ -290,7 +316,7 @@ export default function FleetPage() {
                         <div className="flex items-center gap-3">
                           {expandedRows.has(template.id) ? <ChevronDown size={14} className="text-primary" /> : <ChevronRight size={14} className="text-slate-300" />}
                           <div className="w-14 h-9 relative rounded-lg overflow-hidden border bg-slate-100 shrink-0">
-                            <Image src={template.image_url || template.default_thumbnail || "/placeholder-car.png"} alt={template.brand} fill className="object-cover" />
+                            <Image src={template.default_thumbnail || "/placeholder-car.png"} alt={template.brand} fill className="object-cover" />
                           </div>
                           <div><p className="text-sm font-bold tracking-tight">{template.brand} {template.model}</p></div>
                         </div>
@@ -388,9 +414,9 @@ export default function FleetPage() {
             <div className="w-full md:w-[40%] bg-slate-50 p-10 border-r">
               <h3 className="text-xl font-black uppercase mb-6">Vehicle Image</h3>
               <div className="aspect-[4/3] relative rounded-3xl overflow-hidden border-2 border-dashed bg-white flex items-center justify-center group shadow-inner">
-                {(editingTemplate.image_url || editingTemplate.default_thumbnail) ? (
+                {editingTemplate.default_thumbnail ? (
                   <>
-                    <Image src={editingTemplate.image_url || editingTemplate.default_thumbnail} alt="Preview" fill className="object-cover" />
+                    <Image src={editingTemplate.default_thumbnail} alt="Preview" fill className="object-cover" />
                     <div className="absolute top-4 right-4 flex items-center justify-center">
                       <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white transition-all text-primary border border-primary/10">
                         <Upload size={20}/>
@@ -410,12 +436,32 @@ export default function FleetPage() {
                 <input type="text" value={editingTemplate.brand || ''} onChange={e => setEditingTemplate({...editingTemplate, brand: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Brand" />
                 <input type="text" value={editingTemplate.model || ''} onChange={e => setEditingTemplate({...editingTemplate, model: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Model" />
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <select value={editingTemplate.category || ''} onChange={e => setEditingTemplate({...editingTemplate, category: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Economy</option><option>Sedan</option><option>SUV</option><option>MPV</option><option>Luxury</option><option>Hatchback</option></select>
                 <select value={editingTemplate.transmission || ''} onChange={e => setEditingTemplate({...editingTemplate, transmission: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Automatic</option><option>Manual</option></select>
+                <select value={editingTemplate.fuel_type || 'Petrol'} onChange={e => setEditingTemplate({...editingTemplate, fuel_type: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select>
                 <div className="grid grid-cols-2 gap-2">
-                  <input type="number" value={editingTemplate.seats ?? 5} onChange={e => setEditingTemplate({...editingTemplate, seats: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Seats" />
-                  <input type="number" step="0.1" min="0" max="5" value={editingTemplate.rating ?? 5.0} onChange={e => setEditingTemplate({...editingTemplate, rating: parseFloat(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold text-amber-500" placeholder="Rating" />
+                  <input type="number" value={editingTemplate.seats ?? 5} onChange={e => setEditingTemplate({...editingTemplate, seats: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" title="Seats" />
+                  <input type="number" step="0.1" min="0" max="5" value={editingTemplate.rating ?? 5.0} onChange={e => setEditingTemplate({...editingTemplate, rating: parseFloat(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold text-amber-500" title="Rating" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Lrg Luggage</label>
+                  <input type="number" value={editingTemplate.luggage_large ?? 2} onChange={e => setEditingTemplate({...editingTemplate, luggage_large: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Sml Luggage</label>
+                  <input type="number" value={editingTemplate.luggage_small ?? 1} onChange={e => setEditingTemplate({...editingTemplate, luggage_small: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Doors</label>
+                  <input type="number" value={editingTemplate.doors ?? 5} onChange={e => setEditingTemplate({...editingTemplate, doors: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[8px] font-black uppercase text-slate-400 ml-1">Engine</label>
+                  <input type="text" value={editingTemplate.engine_size || ''} onChange={e => setEditingTemplate({...editingTemplate, engine_size: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="e.g. 1.5L" />
                 </div>
               </div>
               <textarea value={editingTemplate.description || ""} onChange={e => setEditingTemplate({...editingTemplate, description: e.target.value})} className="w-full p-4 bg-slate-50 border rounded-xl min-h-[100px]" placeholder="Description" />
@@ -504,7 +550,10 @@ export default function FleetPage() {
               <input type="text" value={editingUnit.plate_number || ''} onChange={e => setEditingUnit({...editingUnit, plate_number: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold uppercase" placeholder="Plate Number" />
               <input type="text" value={editingUnit.vin || ""} onChange={e => setEditingUnit({...editingUnit, vin: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="VIN" />
               <input type="text" value={editingUnit.color || ''} onChange={e => setEditingUnit({...editingUnit, color: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Color" />
-              <input type="number" value={editingUnit.mileage ?? 0} onChange={e => setEditingUnit({...editingUnit, mileage: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Mileage" />
+              <div className="grid grid-cols-2 gap-2">
+                <input type="number" value={editingUnit.mileage ?? 0} onChange={e => setEditingUnit({...editingUnit, mileage: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold" placeholder="Mileage" />
+                <input type="number" value={editingUnit.daily_price ?? 0} onChange={e => setEditingUnit({...editingUnit, daily_price: parseInt(e.target.value)})} className="p-4 bg-slate-50 border rounded-xl font-bold text-emerald-600" placeholder="Price/Day" />
+              </div>
               <select value={editingUnit.availability_status || 'available'} onChange={e => setEditingUnit({...editingUnit, availability_status: e.target.value})} className="p-4 bg-slate-50 border rounded-xl font-bold col-span-2"><option value="available">Available</option><option value="maintenance">Maintenance</option><option value="rented">Rented</option></select>
             </div>
             <button onClick={handleSaveUnit} className="w-full py-4 bg-admin-text text-white rounded-xl font-black uppercase text-sm">Save Unit</button>

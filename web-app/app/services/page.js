@@ -54,7 +54,7 @@ export default function ServicesPage() {
                 <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
               </a>
               <Link href="/fleet" className="text-[#1A1A1A]/40 hover:text-brand-yellow font-bold text-lg flex items-center gap-2 transition-colors">
-                Browse our fleet
+                Browse our Drive
                 <MoveRight className="w-5 h-5" />
               </Link>
             </div>
@@ -247,7 +247,7 @@ export default function ServicesPage() {
             </h2>
             <div className="flex justify-center gap-6">
               <Link href="/fleet" className="bg-[#1A1A1A] text-white px-12 py-6 rounded-full font-black text-xl hover:scale-105 transition-transform active:scale-95 shadow-2xl shadow-black/20">
-                Browse the fleet
+                Browse the Drive
               </Link>
             </div>
          </div>

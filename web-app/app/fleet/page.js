@@ -148,8 +148,8 @@ function FleetContent() {
         <div className="content-container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
             <div className="flex items-center gap-6 shrink-0">
-               <h1 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] uppercase tracking-tighter">
-                  Our <span className="text-[var(--brand-yellow)]">Fleet.</span>
+               <h1 className="text-5xl md:text-7xl font-black text-[var(--bg-dark)] tracking-tighter">
+                  Our <span className="text-[var(--brand-yellow)]">Drive.</span>
                </h1>
             </div>
 
@@ -432,7 +432,7 @@ function FleetContent() {
                             <h3 className="text-[var(--bg-dark)] text-xl font-black uppercase group-hover:text-[var(--brand-yellow)] transition-colors mb-1 tracking-tighter leading-tight">{template.brand} {template.model}</h3>
                             <div className="flex items-center gap-2 mb-4">
                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--bg-dark)]/30">Verified Fleet</span>
+                               <span className="text-[9px] font-black tracking-[0.2em] text-[var(--bg-dark)]/30">Verified Drive</span>
                             </div>
                             
                             <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-4 border-y border-black/5 mb-5">

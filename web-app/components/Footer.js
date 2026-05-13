@@ -47,7 +47,7 @@ export default function Footer() {
           {/* Navigation Links */}
           <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12">
             <div className="space-y-8">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-[var(--brand-yellow)]">Fleet</h4>
+              <h4 className="text-[11px] font-black tracking-[0.3em] text-[var(--brand-yellow)]">Drive</h4>
               <ul className="space-y-5">
                 {['SUV Selections', 'Luxury Executive', 'Economy Daily', 'Family MPVs'].map((item) => (
                   <li key={item}>

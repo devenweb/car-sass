@@ -1,5 +1,15 @@
 # Agents Log
-<!-- Last Sync: 2026-05-12 19:14 -->
+<!-- Last Sync: 2026-05-13 11:48 -->
+
+## 2026-05-13 - Branding Realignment & UI Refinement
+**Agent: Antigravity**
+
+### Accomplishments:
+- **Branding Migration**: Rebranded "Our Fleet" to **"Our Drive"** across the entire web application (Fleet page, Navbar, Homepage, Search, Detail pages, and Footer).
+- **Typography & Case Styling**: Standardized branding to sentence case ("Drive" instead of "DRIVE") and removed `uppercase` CSS constraints in navigation and headings to support a more modern, readable aesthetic.
+- **Homepage Optimization**: Commented out the "Experiences" section (vertical category cards) to streamline the landing page flow as requested.
+- **Global Text Updates**: Systematically updated all secondary references (e.g., "Back to Fleet" → "Back to Drive", "Verified Fleet" → "Verified Drive") for full brand consistency.
+- **Verification**: Successfully validated the changes with a full production build (`npm run build`) of the `web-app`.
 
 ## 2026-05-12 - Competitor Alignment & UX Overhaul
 **Agent: Antigravity**

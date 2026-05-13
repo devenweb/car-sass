@@ -78,7 +78,7 @@ export default function AboutPage() {
 
             <div className="flex flex-wrap items-center gap-6 pt-4">
               <Link href="/fleet" className="bg-[var(--bg-dark)] text-white px-10 py-5 rounded-full font-bold text-lg flex items-center gap-3 hover:scale-105 transition-transform active:scale-95 shadow-xl shadow-black/10 group">
-                Explore the fleet
+                Explore the Drive
                 <MoveRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>

@@ -288,7 +288,7 @@ function SearchResultsContent() {
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                       <Link href="/" className="btn-primary !px-12">New Search</Link>
-                      <Link href="/fleet" className="text-secondary font-black uppercase tracking-widest text-[11px] hover:text-primary transition-colors">View Entire Fleet</Link>
+                      <Link href="/fleet" className="text-secondary font-black tracking-widest text-[11px] hover:text-primary transition-colors">View Entire Drive</Link>
                     </div>
                   </div>
                 )}

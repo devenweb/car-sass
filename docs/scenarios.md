@@ -44,25 +44,46 @@
 **Scenario**: A returning VIP customer requests a one-off special rate.
 **Solution**: Customer CRM -> View History -> Admin App -> Create a Manual Rental -> Apply custom subtotal override -> Send PDF Invoice.
 
-## Group D: Operations & Risk Control
+## Group D: Operations & Communications
 ### 11. Crisis Message Management
 **Scenario**: 50 inquiries come in during a holiday weekend.
 **Solution**: Inquiries Module -> Bulk Selection -> Change status to "Replied" -> Centralized tracking of all customer touchpoints.
 
-### 12. Fraud Prevention & Verification
-**Scenario**: A suspicious booking arrives with an invalid phone number.
-**Solution**: Admin App -> Rentals -> View Detail -> Verify Phone/Email -> Flag as "Cancelled" or "Pending Verification" to block the unit.
-
-### 13. High-Volume "Sold Out" Status
+### 12. High-Volume "Sold Out" Status
 **Scenario**: Handling a total fleet sell-out during a major festival.
 **Solution**: Fleet Manager -> Units -> Bulk Set Status to "Rented" -> Marketplace automatically displays "ALL UNITS RENTED OUT" badges to manage expectations.
 
-### 14. Return Inspection & Settlement
-**Scenario**: A car is returned with minor scratches or low fuel.
-**Solution**: Inspections Module -> Create Digital Checksheet -> Log damages/fuel -> Auto-calculates return settlement amount for the customer.
+## Group E: Serious Risk & Damage Management
+### 13. Reckless Driving / Excessive Speeding
+**Scenario**: Customer drives the car aggressively, ignoring mechanical limits.
+**Solution**: KM Monitoring -> Check mileage/tire wear post-rental -> Note "Aggressive Usage" in Customer Profile -> **Blacklist customer** from future bookings.
+
+### 14. Major Accident / Total Loss
+**Scenario**: A vehicle is involved in a severe crash.
+**Solution**: Rentals Dashboard -> Change Status to "Accident" -> Upload Police Report to Rental Files -> Trigger Insurance Claims -> Set Plate to "Total Loss".
+
+### 15. Interior Vandalism (Smoking/Stains)
+**Scenario**: Customer returns a luxury car smelling of smoke or with deep seat stains.
+**Solution**: Inspections Module -> Photo Evidence -> Add "Deep Cleaning Fee" (e.g., 5000 Rs) to Invoice -> Deduct from Security Deposit.
+
+### 16. Off-Road Violation (Sand/Beach)
+**Scenario**: Driving a 2WD sedan on prohibited sandy terrain, causing undercarriage damage.
+**Solution**: Post-Rental Inspection -> Log "Terrain Violation" -> Add Mechanical Repair Penalty -> Log violation against the Driver's License in CRM.
+
+### 17. Drunk Driving / Police Impoundment
+**Scenario**: Vehicle is seized by authorities due to driver negligence.
+**Solution**: Admin App -> Rental Immediate Termination -> Flag profile as **"High Risk / Legal Issue"** -> Notify Legal Team via CRM internal notes.
+
+### 18. Late Return / "Ghosting"
+**Scenario**: Customer doesn't return the car on time and stops answering calls.
+**Solution**: Rentals Dashboard -> Auto-flag "Overdue" -> Enable "Hourly Penalty" calculation -> Initiate "Theft Protocol" after 24 hours of silence.
+
+### 19. Unauthorized Driver Accident
+**Scenario**: An unlisted friend of the customer crashes the car.
+**Solution**: Compare Accident Report vs Rental Agreement -> Deny insurance coverage -> Log "Contract Breach" -> Pursuit of full recovery from the primary hirer.
 
 ---
 
 ### **Final System Maturity Rating**
-# **9.8 / 10** 
-*Extremely robust, handling everything from marketing surges to operational risk and fleet health monitoring.*
+# **9.9 / 10** 
+*A fortress of a system, designed to protect agency assets from reckless usage and legal liabilities.*

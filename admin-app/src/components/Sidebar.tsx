@@ -29,6 +29,7 @@ const menuItems = [
   { icon: Mail, label: "Newsletter", href: "/newsletter" },
   { icon: CalendarRange, label: "Pricing", href: "/pricing" },
   { icon: Package, label: "Extras", href: "/extras" },
+  { icon: Sparkles, label: "Addons", href: "/addons" },
   { icon: Gauge, label: "KM Monitoring", href: "/km-monitoring" },
   { icon: BarChart3, label: "Analytics", href: "/analytics" },
   { icon: Users, label: "Agents", href: "/agents" },
@@ -38,6 +39,7 @@ const menuItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [addons, setAddons] = useState<Record<string, boolean>>({});
   const [role, setRole] = useState<string>("");
 
   useEffect(() => {
@@ -50,6 +52,9 @@ export default function Sidebar() {
       const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
       if (profile) setRole(profile.role);
     }
+
+    const { data: tenant } = await supabase.from("tenants").select("addons").single();
+    if (tenant?.addons) setAddons(tenant.addons);
   };
 
   const handleLogout = async () => {
@@ -57,11 +62,22 @@ export default function Sidebar() {
     router.push("/login");
   };
 
-  // Filter menu items based on roles
+  // Filter menu items based on addons and roles
   const visibleMenuItems = menuItems.filter(item => {
     const isAdmin = ['super_admin', 'admin'].includes(role);
-    if (item.label === "Agents") return isAdmin;
-    return true;
+
+    if (item.label === "KM Monitoring") return !!addons.km_monitoring;
+    if (item.label === "Newsletter") return !!addons.marketing_suite;
+    if (item.label === "Pricing") return !!addons.dynamic_pricing;
+    if (item.label === "Inquiries") return !!addons.advanced_inquiries;
+    if (item.label === "Analytics") return !!addons.advanced_analytics;
+    if (item.label === "Agents") return !!addons.multi_agent && isAdmin;
+    if (item.label === "Extras") return !!addons.premium_extras;
+    if (item.label === "Blog") return !!addons.blog_system;
+    if (item.label === "Customers") return addons.customer_registry !== false; 
+    if (item.label === "Rentals") return addons.rental_operations !== false;
+    if (item.label === "Addons") return isAdmin; // Only admins can manage addons
+    return true; 
   });
 
   return (

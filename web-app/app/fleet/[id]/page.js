@@ -62,6 +62,8 @@ function CarDetailContent() {
     longTermDiscountApplied: 0
   });
 
+  const [addons, setAddons] = useState({});
+
   // Get today's date for validation
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -138,15 +140,14 @@ function CarDetailContent() {
 
   const availableCount = units.filter(u => u.availability_status === 'available').length;
 
-  // Remove addon fetching since all features are now core
-  // useEffect(() => {
-  //   fetchAddons();
-  // }, []);
+  useEffect(() => {
+    fetchAddons();
+  }, []);
 
-  // async function fetchAddons() {
-  //   const { data } = await supabase.from("tenants").select("addons").single();
-  //   if (data?.addons) setAddons(data.addons);
-  // }
+  async function fetchAddons() {
+    const { data } = await supabase.from("tenants").select("addons").single();
+    if (data?.addons) setAddons(data.addons);
+  }
 
   useEffect(() => {
     if (id) fetchCarData();
@@ -722,13 +723,15 @@ function CarDetailContent() {
                   </div>
                 </div>
 
-                   <div className="space-y-6 pt-2">
-                      <div className="flex items-center gap-3 ml-4">
-                        <Plus size={14} className="text-[var(--brand-yellow)]" />
-                        <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
-                      </div>
-                      <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
-                   </div>
+                   {addons?.booking_extras && (
+                     <div className="space-y-6 pt-2">
+                        <div className="flex items-center gap-3 ml-4">
+                          <Plus size={14} className="text-[var(--brand-yellow)]" />
+                          <h4 className="text-[10px] font-black text-[var(--bg-dark)] uppercase tracking-[0.2em]">Resources / Extras</h4>
+                        </div>
+                        <BookingExtras onSelectionChange={setSelectedExtras} isDark={false} />
+                     </div>
+                   )}
 
                 {/* Formal Invoice Table */}
                 {invoice.days > 0 && (

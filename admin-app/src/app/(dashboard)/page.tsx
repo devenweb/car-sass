@@ -39,61 +39,79 @@ export default function Dashboard() {
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
     try {
-      const { data: statsData, error } = await supabase.rpc('get_dashboard_stats', { 
+      // Attempt RPC first for performance
+      const { data: statsData, error: rpcError } = await supabase.rpc('get_dashboard_stats', { 
         first_day_of_month: firstDayOfMonth 
       });
 
-      if (error) throw error;
+      if (!rpcError && statsData) {
+        const stats = [
+          { label: "Total Cars", value: (statsData.carCount || 0).toString(), icon: Car, change: "+0", trend: "up", href: "/fleet" },
+          { label: "Active Rentals", value: (statsData.rentalCount || 0).toString(), icon: CalendarCheck, change: "+0", trend: "up", href: "/rentals" },
+          { label: "Total Customers", value: (statsData.customerCount || 0).toString(), icon: Users, change: "+0", trend: "up", href: "/customers" },
+          { label: "Revenue (MTD)", value: `Rs ${(statsData.mtdRevenue || 0).toLocaleString()}`, icon: TrendingUp, change: "+0%", trend: "up", href: "/rentals" },
+        ];
 
-      const stats = [
-        { 
-          label: "Total Cars", 
-          value: statsData.carCount.toString(), 
-          icon: Car, 
-          change: "+0", 
-          trend: "up",
-          href: "/fleet"
-        },
-        { 
-          label: "Active Rentals", 
-          value: statsData.rentalCount.toString(), 
-          icon: CalendarCheck, 
-          change: "+0", 
-          trend: "up",
-          href: "/rentals"
-        },
-        { 
-          label: "Total Customers", 
-          value: statsData.customerCount.toString(), 
-          icon: Users, 
-          change: "+0", 
-          trend: "up",
-          href: "/customers"
-        },
-        { 
-          label: "Revenue (MTD)", 
-          value: `Rs ${statsData.mtdRevenue.toLocaleString()}`, 
-          icon: TrendingUp, 
-          change: "+0%", 
-          trend: "up",
-          href: "/rentals"
-        },
-      ];
+        setData({
+          stats,
+          recentRentals: (statsData.recentRentals || []).map((r: any) => ({
+            ...r,
+            vehicle_templates: { brand: r.brand, model: r.model },
+            customers: { name: r.customer_name }
+          })),
+          totalCars: statsData.carCount || 0,
+          availableCount: statsData.availableCount || 0,
+          inUseCount: statsData.inUseCount || 0,
+          maintenanceCount: statsData.maintenanceCount || 0
+        });
+      } else {
+        // Fallback to manual fetching if RPC fails
+        console.warn("RPC failed, falling back to manual fetch:", rpcError);
+        const [
+          { count: carCount },
+          { count: rentalCount },
+          { count: customerCount },
+          { data: recentRentals },
+          { data: allCars },
+          { data: revenueData }
+        ] = await Promise.all([
+          supabase.from("vehicle_units").select("*", { count: "exact" }).limit(1),
+          supabase.from("rentals").select("*", { count: "exact" }).limit(1),
+          supabase.from("customers").select("*", { count: "exact" }).limit(1),
+          supabase.from("rentals").select(`
+            id, total_amount, total_price, status, created_at,
+            vehicle_units (vehicle_templates (brand, model)),
+            customers (name)
+          `).order("created_at", { ascending: false }).limit(5),
+          supabase.from("vehicle_units").select("availability_status"),
+          supabase.from("rentals").select("total_amount, total_price").gte("created_at", firstDayOfMonth)
+        ]);
 
-      setData({
-        stats,
-        recentRentals: statsData.recentRentals.map((r: any) => ({
-          ...r,
-          vehicle_templates: { brand: r.brand, model: r.model },
-          customers: { name: r.customer_name }
-        })),
-        totalCars: statsData.carCount,
-        availableCount: statsData.availableCount,
-        inUseCount: statsData.inUseCount,
-        maintenanceCount: statsData.maintenanceCount
-      });
+        const mtdRevenue = revenueData?.reduce((acc: number, curr: any) => acc + (curr.total_amount || curr.total_price || 0), 0) || 0;
+        const availableCount = allCars?.filter((c: any) => c.availability_status === 'available').length || 0;
+        const inUseCount = allCars?.filter((c: any) => c.availability_status === 'rented' || c.availability_status === 'booked').length || 0;
+        const maintenanceCount = allCars?.filter((c: any) => c.availability_status === 'maintenance').length || 0;
+
+        setData({
+          stats: [
+            { label: "Total Cars", value: (carCount || 0).toString(), icon: Car, change: "+0", trend: "up", href: "/fleet" },
+            { label: "Active Rentals", value: (rentalCount || 0).toString(), icon: CalendarCheck, change: "+0", trend: "up", href: "/rentals" },
+            { label: "Total Customers", value: (customerCount || 0).toString(), icon: Users, change: "+0", trend: "up", href: "/customers" },
+            { label: "Revenue (MTD)", value: `Rs ${mtdRevenue.toLocaleString()}`, icon: TrendingUp, change: "+0%", trend: "up", href: "/rentals" },
+          ],
+          recentRentals: recentRentals?.map((r: any) => ({
+            ...r,
+            vehicle_templates: (r.vehicle_units as any)?.vehicle_templates,
+            customers: r.customers
+          })) || [],
+          totalCars: carCount || 0,
+          availableCount,
+          inUseCount,
+          maintenanceCount
+        });
+      }
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error("Critical error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
